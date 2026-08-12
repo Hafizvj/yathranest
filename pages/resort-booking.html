@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Discover resorts and stays with YathraNest. Check availability and request a quote — no online rates." />
+  <title>Resort Stay Booking | YathraNest</title>
+  <link rel="icon" href="../assets/logo/logo.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+  <link rel="stylesheet" href="../css/responsive.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <a class="logo" href="../index.html" aria-label="YathraNest home"><span class="logo__mark" aria-hidden="true">YN</span><span class="logo__text">Yathra<span>Nest</span></span></a>
+      <nav class="nav-desktop" aria-label="Primary">
+        <a href="kerala-packages.html" data-nav="packages">Packages</a>
+        <a href="taxi-booking.html" data-nav>Taxi</a>
+        <a href="resort-booking.html" data-nav>Resorts</a>
+        <a href="weekend-getaways.html" data-nav>Getaways</a>
+        <a href="gift-cards.html" data-nav>Gift Cards</a>
+        <a href="investment-plans.html" data-nav>Investment Plans</a>
+        <a href="about.html" data-nav>About</a>
+        <a href="contact.html" data-nav>Contact</a>
+      </nav>
+      <div class="header-actions">
+        <a class="btn btn--primary btn--header-cta" href="#enquiry" data-open-modal="enquiry-modal">Check Availability</a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-drawer" aria-label="Open menu"><span class="nav-toggle__bars" aria-hidden="true"><span></span><span></span><span></span></span></button>
+      </div>
+    </div>
+  </header>
+  <div class="nav-drawer" id="nav-drawer">
+    <div class="nav-drawer__backdrop"></div>
+    <div class="nav-drawer__panel" role="dialog" aria-label="Mobile navigation">
+      <div class="nav-drawer__head">
+        <a class="logo" href="../index.html"><span class="logo__mark" aria-hidden="true">YN</span><span class="logo__text">Yathra<span>Nest</span></span></a>
+        <button class="nav-drawer__close" type="button" aria-label="Close menu">&times;</button>
+      </div>
+      <nav class="nav-drawer__links" aria-label="Mobile">
+        <a href="kerala-packages.html">Packages</a><a href="taxi-booking.html">Taxi</a><a href="resort-booking.html">Resorts</a>
+        <a href="weekend-getaways.html">Getaways</a><a href="gift-cards.html">Gift Cards</a><a href="investment-plans.html">Investment Plans</a>
+        <a href="about.html">About</a><a href="contact.html">Contact</a>
+      </nav>
+      <div class="nav-drawer__cta"><a class="btn btn--primary btn--block" href="#enquiry" data-open-modal="enquiry-modal">Check Availability</a></div>
+    </div>
+  </div>
+
+  <main id="main">
+    <section class="page-hero page-hero--media" style="background-image:url('../assets/images/resort.jpg')">
+      <div class="container page-hero__inner">
+        <h1>Resort Stay Booking</h1>
+        <p>Browse stays and check availability. Pricing is shared personally after your enquiry.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container" data-filter-root>
+        <form data-filter-form>
+          <div class="search-strip" style="margin-top:-3.5rem;margin-bottom:1.25rem">
+            <div class="search-strip__grid">
+              <div class="form-group">
+                <label for="s-dest">Destination</label>
+                <input class="form-control" id="s-dest" type="search" placeholder="Munnar, Goa, Wayanad..." data-search />
+              </div>
+              <div class="form-group">
+                <label for="s-in">Check-in</label>
+                <input class="form-control" id="s-in" type="date" />
+              </div>
+              <div class="form-group">
+                <label for="s-out">Check-out</label>
+                <input class="form-control" id="s-out" type="date" />
+              </div>
+              <div class="form-group">
+                <label for="s-guests">Guests</label>
+                <select class="form-control" id="s-guests"><option>2</option><option>3</option><option>4</option><option>5+</option></select>
+              </div>
+              <div class="filter-actions"><button class="btn btn--primary" type="submit">Search</button></div>
+            </div>
+          </div>
+
+          <div class="filter-bar">
+            <div class="filter-bar__row">
+              <div class="form-group">
+                <label for="f-loc">Location</label>
+                <select class="form-control" id="f-loc" data-filter="location">
+                  <option value="all">All locations</option>
+                  <option value="munnar">Munnar</option>
+                  <option value="alleppey">Alleppey</option>
+                  <option value="wayanad">Wayanad</option>
+                  <option value="goa">Goa</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="f-type">Resort type</label>
+                <select class="form-control" id="f-type" data-filter="type">
+                  <option value="all">All types</option>
+                  <option value="hill">Hill resort</option>
+                  <option value="backwater">Backwater</option>
+                  <option value="beach">Beach</option>
+                  <option value="wildlife">Wildlife</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="f-amen">Amenities</label>
+                <select class="form-control" id="f-amen" data-filter="amenities">
+                  <option value="all">Any</option>
+                  <option value="pool">Pool</option>
+                  <option value="spa">Spa</option>
+                  <option value="wifi">Wi‑Fi</option>
+                </select>
+              </div>
+              <div class="filter-actions">
+                <button class="btn btn--primary" type="submit">Apply</button>
+                <button class="btn btn--secondary" type="button" data-filter-reset>Reset</button>
+              </div>
+            </div>
+          </div>
+        </form>
+
+        <div class="results-meta"><span data-filter-count></span></div>
+        <div class="resort-grid" data-filter-list data-per-page="6">
+          <article class="card" data-filter-item data-name="Misty Valley Resort" data-location="munnar" data-type="hill" data-amenities="pool spa wifi">
+            <div class="card__media"><img src="../assets/images/resort.jpg" alt="Misty Valley Resort" loading="lazy" /></div>
+            <div class="card__body">
+              <p class="card__meta">Munnar, Kerala</p>
+              <h3 class="card__title"><a href="resort-details.html?resort=misty-valley">Misty Valley Resort</a></h3>
+              <p class="card__text">Hillside rooms with plantation views and quiet evenings.</p>
+              <ul class="highlight-list"><li>Pool</li><li>Spa</li><li>Wi‑Fi</li></ul>
+              <div class="card__actions">
+                <a class="btn btn--secondary btn--sm" href="resort-details.html?resort=misty-valley">View Resort</a>
+                <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">Check Availability</a>
+              </div>
+            </div>
+          </article>
+          <article class="card" data-filter-item data-name="Lagoon Houseboats Stay" data-location="alleppey" data-type="backwater" data-amenities="wifi">
+            <div class="card__media"><img src="../assets/images/kerala-backwaters.jpg" alt="Lagoon stay" loading="lazy" /></div>
+            <div class="card__body">
+              <p class="card__meta">Alleppey, Kerala</p>
+              <h3 class="card__title"><a href="resort-details.html?resort=lagoon-house">Lagoon Edge Resort</a></h3>
+              <p class="card__text">Waterfront cottages with easy access to canal cruises.</p>
+              <ul class="highlight-list"><li>Backwater</li><li>Restaurant</li><li>Wi‑Fi</li></ul>
+              <div class="card__actions">
+                <a class="btn btn--secondary btn--sm" href="resort-details.html?resort=lagoon-house">View Resort</a>
+                <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">Check Availability</a>
+              </div>
+            </div>
+          </article>
+          <article class="card" data-filter-item data-name="Wayanad Canopy Lodge" data-location="wayanad" data-type="wildlife" data-amenities="spa wifi">
+            <div class="card__media"><img src="../assets/images/forest.jpg" alt="Wayanad lodge" loading="lazy" /></div>
+            <div class="card__body">
+              <p class="card__meta">Wayanad, Kerala</p>
+              <h3 class="card__title"><a href="resort-details.html?resort=canopy-lodge">Wayanad Canopy Lodge</a></h3>
+              <p class="card__text">Forest-edge lodge ideal for nature lovers and families.</p>
+              <ul class="highlight-list"><li>Nature</li><li>Spa</li><li>Wi‑Fi</li></ul>
+              <div class="card__actions">
+                <a class="btn btn--secondary btn--sm" href="resort-details.html?resort=canopy-lodge">View Resort</a>
+                <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">Check Availability</a>
+              </div>
+            </div>
+          </article>
+          <article class="card" data-filter-item data-name="Palm Coast Resort" data-location="goa" data-type="beach" data-amenities="pool wifi">
+            <div class="card__media"><img src="../assets/images/goa-beach.jpg" alt="Palm Coast Resort" loading="lazy" /></div>
+            <div class="card__body">
+              <p class="card__meta">Goa</p>
+              <h3 class="card__title"><a href="resort-details.html?resort=palm-coast">Palm Coast Resort</a></h3>
+              <p class="card__text">Beach-proximate stay with pool lounges and easy cafe access.</p>
+              <ul class="highlight-list"><li>Pool</li><li>Beach</li><li>Wi‑Fi</li></ul>
+              <div class="card__actions">
+                <a class="btn btn--secondary btn--sm" href="resort-details.html?resort=palm-coast">View Resort</a>
+                <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">Check Availability</a>
+              </div>
+            </div>
+          </article>
+          <article class="card" data-filter-item data-name="Tea Garden Retreat" data-location="munnar" data-type="hill" data-amenities="spa wifi">
+            <div class="card__media"><img src="../assets/images/tea-plantation.jpg" alt="Tea Garden Retreat" loading="lazy" /></div>
+            <div class="card__body">
+              <p class="card__meta">Munnar, Kerala</p>
+              <h3 class="card__title"><a href="resort-details.html?resort=tea-garden">Tea Garden Retreat</a></h3>
+              <p class="card__text">Boutique rooms overlooking rolling tea estates.</p>
+              <ul class="highlight-list"><li>Views</li><li>Spa</li><li>Wi‑Fi</li></ul>
+              <div class="card__actions">
+                <a class="btn btn--secondary btn--sm" href="resort-details.html?resort=tea-garden">View Resort</a>
+                <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">Check Availability</a>
+              </div>
+            </div>
+          </article>
+          <article class="card" data-filter-item data-name="Sunset Bay Villas" data-location="goa" data-type="beach" data-amenities="pool spa wifi">
+            <div class="card__media"><img src="../assets/images/resort-pool.jpg" alt="Sunset Bay Villas" loading="lazy" /></div>
+            <div class="card__body">
+              <p class="card__meta">Goa</p>
+              <h3 class="card__title"><a href="resort-details.html?resort=sunset-bay">Sunset Bay Villas</a></h3>
+              <p class="card__text">Villa-style spaces for families and longer leisure stays.</p>
+              <ul class="highlight-list"><li>Pool</li><li>Spa</li><li>Wi‑Fi</li></ul>
+              <div class="card__actions">
+                <a class="btn btn--secondary btn--sm" href="resort-details.html?resort=sunset-bay">View Resort</a>
+                <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">Check Availability</a>
+              </div>
+            </div>
+          </article>
+        </div>
+        <div class="empty-state" data-filter-empty hidden>No resorts match your filters. Try resetting or enquire for recommendations.</div>
+        <div class="pagination" data-pagination></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a class="logo" href="../index.html"><span class="logo__mark" aria-hidden="true">YN</span><span class="logo__text">Yathra<span>Nest</span></span></a>
+          <p>Curated travel packages, stays, taxi services and unique experiences across India and beyond.</p>
+          <div class="footer-contact">
+            <a href="tel:+919876543210">+91 98765 43210</a>
+            <a href="mailto:hello@yathranest.com">hello@yathranest.com</a>
+            <a href="https://wa.me/919876543210" rel="noopener noreferrer" target="_blank">WhatsApp</a>
+          </div>
+          <div class="social-links"><a href="#" aria-label="Instagram">IG</a><a href="#" aria-label="Facebook">FB</a><a href="#" aria-label="YouTube">YT</a></div>
+        </div>
+        <div class="footer-col"><h4>Explore</h4><ul>
+          <li><a href="kerala-packages.html">Kerala Packages</a></li>
+          <li><a href="south-indian-packages.html">South Indian Packages</a></li>
+          <li><a href="domestic-packages.html">Domestic Packages</a></li>
+          <li><a href="international-packages.html">International Packages</a></li>
+          <li><a href="weekend-getaways.html">Weekend Getaways</a></li>
+        </ul></div>
+        <div class="footer-col"><h4>Services</h4><ul>
+          <li><a href="taxi-booking.html">Taxi Booking</a></li>
+          <li><a href="resort-booking.html">Resort Stays</a></li>
+          <li><a href="gift-cards.html">Gift Cards</a></li>
+          <li><a href="investment-plans.html">Investment Plans</a></li>
+        </ul></div>
+        <div class="footer-col"><h4>Company</h4><ul>
+          <li><a href="about.html">About Us</a></li>
+          <li><a href="contact.html">Contact</a></li>
+          <li><a href="faq.html">FAQ</a></li>
+        </ul></div>
+        <div class="footer-col"><h4>Legal</h4><ul>
+          <li><a href="terms.html">Terms &amp; Conditions</a></li>
+          <li><a href="privacy.html">Privacy Policy</a></li>
+        </ul></div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; <span data-year>2026</span> YathraNest. All rights reserved.</p>
+        <p>Browse · Explore · Enquire — pricing shared personally.</p>
+      </div>
+    </div>
+  </footer>
+
+  <div class="modal" id="enquiry-modal" role="dialog" aria-modal="true" aria-labelledby="enquiry-title">
+    <div class="modal__backdrop"></div>
+    <div class="modal__dialog modal__dialog--lg">
+      <button class="modal__close" type="button" data-close-modal aria-label="Close">&times;</button>
+      <h2 id="enquiry-title">Check Availability</h2>
+      <p>Tell us your dates and guests. We’ll confirm options and share pricing.</p>
+      <form data-enquiry-form data-success-modal="success-modal" novalidate>
+        <div class="form-grid form-grid--2">
+          <div class="form-group"><label for="enq-name">Full name</label><input class="form-control" id="enq-name" name="name" type="text" required /><span class="field-error"></span></div>
+          <div class="form-group"><label for="enq-phone">Phone</label><input class="form-control" id="enq-phone" name="phone" type="tel" required data-validate="phone" /><span class="field-error"></span></div>
+          <div class="form-group"><label for="enq-email">Email</label><input class="form-control" id="enq-email" name="email" type="email" required /><span class="field-error"></span></div>
+          <div class="form-group"><label for="enq-interest">Resort / destination</label><input class="form-control" id="enq-interest" name="interest" type="text" value="Resort stay" data-prefill="resort" /></div>
+          <div class="form-group" style="grid-column:1/-1"><label for="enq-message">Check-in, check-out &amp; guests</label><textarea class="form-control" id="enq-message" name="message" rows="4"></textarea></div>
+        </div>
+        <div class="btn-group">
+          <button class="btn btn--primary" type="submit">Submit Enquiry</button>
+          <button class="btn btn--secondary" type="button" data-close-modal>Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="modal" id="success-modal" role="dialog" aria-modal="true" aria-labelledby="success-title">
+    <div class="modal__backdrop"></div>
+    <div class="modal__dialog">
+      <button class="modal__close" type="button" data-close-modal aria-label="Close">&times;</button>
+      <div class="modal__icon" aria-hidden="true">✓</div>
+      <h2 id="success-title">Thank you!</h2>
+      <p>Your resort enquiry has been submitted. Our team will contact you with availability and pricing.</p>
+      <button class="btn btn--primary" type="button" data-close-modal>Close</button>
+    </div>
+  </div>
+
+  <script src="../js/navigation.js" defer></script>
+  <script src="../js/filters.js" defer></script>
+  <script src="../js/forms.js" defer></script>
+  <script src="../js/gallery.js" defer></script>
+  <script src="../js/main.js" defer></script>
+</body>
+</html>

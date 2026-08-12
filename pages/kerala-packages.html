@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Explore curated Kerala travel packages with YathraNest. Request personalised pricing." />
+  <title>Kerala Packages | YathraNest</title>
+  <link rel="icon" href="../assets/logo/logo.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+  <link rel="stylesheet" href="../css/responsive.css" />
+  
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <a class="logo" href="../index.html" aria-label="YathraNest home">
+        <span class="logo__mark" aria-hidden="true">YN</span>
+        <span class="logo__text">Yathra<span>Nest</span></span>
+      </a>
+      <nav class="nav-desktop" aria-label="Primary">
+        <a href="../pages/kerala-packages.html" data-nav="packages">Packages</a>
+        <a href="../pages/taxi-booking.html" data-nav>Taxi</a>
+        <a href="../pages/resort-booking.html" data-nav>Resorts</a>
+        <a href="../pages/weekend-getaways.html" data-nav>Getaways</a>
+        <a href="../pages/gift-cards.html" data-nav>Gift Cards</a>
+        <a href="../pages/investment-plans.html" data-nav>Investment Plans</a>
+        <a href="../pages/about.html" data-nav>About</a>
+        <a href="../pages/contact.html" data-nav>Contact</a>
+      </nav>
+      <div class="header-actions">
+        <a class="btn btn--primary btn--header-cta" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-drawer" aria-label="Open menu">
+          <span class="nav-toggle__bars" aria-hidden="true"><span></span><span></span><span></span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+  <div class="nav-drawer" id="nav-drawer">
+    <div class="nav-drawer__backdrop"></div>
+    <div class="nav-drawer__panel" role="dialog" aria-label="Mobile navigation">
+      <div class="nav-drawer__head">
+        <a class="logo" href="../index.html">
+          <span class="logo__mark" aria-hidden="true">YN</span>
+          <span class="logo__text">Yathra<span>Nest</span></span>
+        </a>
+        <button class="nav-drawer__close" type="button" aria-label="Close menu">&times;</button>
+      </div>
+      <nav class="nav-drawer__links" aria-label="Mobile">
+        <a href="../pages/kerala-packages.html">Packages</a>
+        <a href="../pages/taxi-booking.html">Taxi</a>
+        <a href="../pages/resort-booking.html">Resorts</a>
+        <a href="../pages/weekend-getaways.html">Getaways</a>
+        <a href="../pages/gift-cards.html">Gift Cards</a>
+        <a href="../pages/investment-plans.html">Investment Plans</a>
+        <a href="../pages/about.html">About</a>
+        <a href="../pages/contact.html">Contact</a>
+      </nav>
+      <div class="nav-drawer__cta">
+        <a class="btn btn--primary btn--block" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
+      </div>
+    </div>
+  </div>
+  <main id="main">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <div class="container">
+        <ol>
+          <li><a href="../index.html">Home</a></li>
+          <li><span aria-current="page">Kerala Packages</span></li>
+        </ol>
+      </div>
+    </nav>
+    <section class="page-hero page-hero--media" style="background-image:url('../assets/images/kerala-backwaters.jpg')">
+      <div class="container page-hero__inner">
+        <h1>Kerala Packages</h1>
+        <p>Curated journeys through backwaters, tea hills, wildlife sanctuaries and coastal towns — request pricing for your dates.</p>
+      </div>
+    </section>
+    <section class="section">
+      <div class="container" data-filter-root>
+        <div class="section-header">
+          <h2>Explore Kerala</h2>
+          <p class="section-lead">Filter by destination, duration and travel style. Pricing is shared after you enquire.</p>
+        </div>
+        <form class="filter-bar" data-filter-form>
+          <div class="filter-bar__row">
+            <div class="form-group">
+              <label for="f-dest">Destination</label>
+              <select class="form-control" id="f-dest" data-filter="destination">
+                <option value="all">All destinations</option>
+                <option value="munnar">Munnar</option>
+                <option value="alleppey">Alleppey</option>
+                <option value="wayanad">Wayanad</option>
+                <option value="cochin">Cochin</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="f-duration">Duration</label>
+              <select class="form-control" id="f-duration" data-filter="duration">
+                <option value="all">Any duration</option>
+                <option value="2-4">2–4 days</option>
+                <option value="5-7">5–7 days</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="f-type">Travel type</label>
+              <select class="form-control" id="f-type" data-filter="type">
+                <option value="all">All types</option>
+                <option value="family">Family</option>
+                <option value="couple">Couple</option>
+                <option value="adventure">Adventure</option>
+                <option value="leisure">Leisure</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="f-search">Search</label>
+              <input class="form-control" id="f-search" type="search" placeholder="Search packages" data-search />
+            </div>
+            <div class="filter-actions">
+              <button class="btn btn--primary" type="submit">Apply</button>
+              <button class="btn btn--secondary" type="button" data-filter-reset>Reset</button>
+            </div>
+          </div>
+        </form>
+        <div class="results-meta"><span data-filter-count></span></div>
+        <div class="package-grid" data-filter-list data-per-page="6">
+          <article class="card" data-filter-item data-name="Magical Kerala" data-destination="munnar" data-state="kerala" data-duration="5-7" data-type="family">
+            <div class="card__media">
+              <img src="../assets/images/kerala-backwaters.jpg" alt="Magical Kerala" width="800" height="500" loading="lazy" />
+            </div>
+            <div class="card__body">
+              <p class="card__meta">Munnar · Thekkady · Alleppey</p>
+              <h3 class="card__title"><a href="package-details.html?package=magical-kerala">Magical Kerala</a></h3>
+              <p class="meta-row"><span><strong>5 Days / 4 Nights</strong></span></p>
+              <p class="card__text">Mountains, wildlife and serene backwaters in one classic Kerala circuit.</p>
+              <ul class="highlight-list"><li>Tea gardens</li><li>Houseboat</li><li>Wildlife</li></ul>
+              <div class="card__actions">
+                <a class="btn btn--secondary btn--sm" href="package-details.html?package=magical-kerala">View Details</a>
+                <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
+              </div>
+            </div>
+          </article>
+          <article class="card" data-filter-item data-name="Backwater Bliss" data-destination="alleppey" data-state="kerala" data-duration="2-4" data-type="couple">
+            <div class="card__media">
+              <img src="../assets/images/tea-plantation.jpg" alt="Backwater Bliss" width="800" height="500" loading="lazy" />
+            </div>
+            <div class="card__body">
+              <p class="card__meta">Alleppey · Kumarakom</p>
+              <h3 class="card__title"><a href="package-details.html?package=backwater-bliss">Backwater Bliss</a></h3>
+              <p class="meta-row"><span><strong>3 Days / 2 Nights</strong></span></p>
+              <p class="card__text">Slow travel on the canals with village life and sunset houseboat moments.</p>
+              <ul class="highlight-list"><li>Houseboat</li><li>Village walk</li><li>Cuisine</li></ul>
+              <div class="card__actions">
+                <a class="btn btn--secondary btn--sm" href="package-details.html?package=backwater-bliss">View Details</a>
+                <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
+              </div>
+            </div>
+          </article>
+          <article class="card" data-filter-item data-name="Wayanad Wilderness" data-destination="wayanad" data-state="kerala" data-duration="2-4" data-type="adventure">
+            <div class="card__media">
+              <img src="../assets/images/forest.jpg" alt="Wayanad Wilderness" width="800" height="500" loading="lazy" />
+            </div>
+            <div class="card__body">
+              <p class="card__meta">Wayanad · Edakkal</p>
+              <h3 class="card__title"><a href="package-details.html?package=wayanad-wilderness">Wayanad Wilderness</a></h3>
+              <p class="meta-row"><span><strong>4 Days / 3 Nights</strong></span></p>
+              <p class="card__text">Forest trails, viewpoints and plantation stays in the Western Ghats.</p>
+              <ul class="highlight-list"><li>Trekking</li><li>Caves</li><li>Nature</li></ul>
+              <div class="card__actions">
+                <a class="btn btn--secondary btn--sm" href="package-details.html?package=wayanad-wilderness">View Details</a>
+                <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
+              </div>
+            </div>
+          </article>
+          <article class="card" data-filter-item data-name="Kerala Honeymoon" data-destination="munnar" data-state="kerala" data-duration="5-7" data-type="couple">
+            <div class="card__media">
+              <img src="../assets/images/waterfall.jpg" alt="Kerala Honeymoon" width="800" height="500" loading="lazy" />
+            </div>
+            <div class="card__body">
+              <p class="card__meta">Munnar · Alleppey · Kovalam</p>
+              <h3 class="card__title"><a href="package-details.html?package=kerala-honeymoon">Kerala Honeymoon</a></h3>
+              <p class="meta-row"><span><strong>6 Days / 5 Nights</strong></span></p>
+              <p class="card__text">Romantic pacing with private experiences, beaches and hill-station calm.</p>
+              <ul class="highlight-list"><li>Private boat</li><li>Beach</li><li>Spa</li></ul>
+              <div class="card__actions">
+                <a class="btn btn--secondary btn--sm" href="package-details.html?package=kerala-honeymoon">View Details</a>
+                <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
+              </div>
+            </div>
+          </article>
+          <article class="card" data-filter-item data-name="Gods Own Country Classic" data-destination="cochin" data-state="kerala" data-duration="5-7" data-type="family">
+            <div class="card__media">
+              <img src="../assets/images/temple.jpg" alt="Gods Own Country Classic" width="800" height="500" loading="lazy" />
+            </div>
+            <div class="card__body">
+              <p class="card__meta">Cochin · Munnar · Thekkady · Alleppey</p>
+              <h3 class="card__title"><a href="package-details.html?package=gods-own-country">Gods Own Country Classic</a></h3>
+              <p class="meta-row"><span><strong>7 Days / 6 Nights</strong></span></p>
+              <p class="card__text">A complete introduction to Kerala for first-time visitors.</p>
+              <ul class="highlight-list"><li>City walk</li><li>Hills</li><li>Backwaters</li></ul>
+              <div class="card__actions">
+                <a class="btn btn--secondary btn--sm" href="package-details.html?package=gods-own-country">View Details</a>
+                <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
+              </div>
+            </div>
+          </article>
+          <article class="card" data-filter-item data-name="North Kerala Discovery" data-destination="wayanad" data-state="kerala" data-duration="5-7" data-type="leisure">
+            <div class="card__media">
+              <img src="../assets/images/hills-mist.jpg" alt="North Kerala Discovery" width="800" height="500" loading="lazy" />
+            </div>
+            <div class="card__body">
+              <p class="card__meta">Kannur · Bekal · Wayanad</p>
+              <h3 class="card__title"><a href="package-details.html?package=north-kerala">North Kerala Discovery</a></h3>
+              <p class="meta-row"><span><strong>5 Days / 4 Nights</strong></span></p>
+              <p class="card__text">Quieter coasts, forts and green hinterlands beyond the usual trail.</p>
+              <ul class="highlight-list"><li>Forts</li><li>Beaches</li><li>Hills</li></ul>
+              <div class="card__actions">
+                <a class="btn btn--secondary btn--sm" href="package-details.html?package=north-kerala">View Details</a>
+                <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
+              </div>
+            </div>
+          </article>
+        </div>
+        <div class="empty-state" data-filter-empty hidden>No packages match your filters. Try resetting or enquire for a custom plan.</div>
+        <div class="pagination" data-pagination></div>
+        <div class="cta-band mt-3" style="margin-top:3rem">
+          <h2>Looking for a custom Kerala itinerary?</h2>
+          <p>Share your dates and preferences — we'll craft a plan and send pricing.</p>
+          <div class="btn-group"><a class="btn btn--light" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a></div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a class="logo" href="../index.html">
+            <span class="logo__mark" aria-hidden="true">YN</span>
+            <span class="logo__text">Yathra<span>Nest</span></span>
+          </a>
+          <p>Curated travel packages, stays, taxi services and unique experiences across India and beyond.</p>
+          <div class="footer-contact">
+            <a href="tel:+919876543210">+91 98765 43210</a>
+            <a href="mailto:hello@yathranest.com">hello@yathranest.com</a>
+            <a href="https://wa.me/919876543210" rel="noopener noreferrer" target="_blank">WhatsApp</a>
+          </div>
+          <div class="social-links" aria-label="Social media">
+            <a href="#" aria-label="Instagram">IG</a>
+            <a href="#" aria-label="Facebook">FB</a>
+            <a href="#" aria-label="YouTube">YT</a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Explore</h4>
+          <ul>
+            <li><a href="../pages/kerala-packages.html">Kerala Packages</a></li>
+            <li><a href="../pages/south-indian-packages.html">South Indian Packages</a></li>
+            <li><a href="../pages/domestic-packages.html">Domestic Packages</a></li>
+            <li><a href="../pages/international-packages.html">International Packages</a></li>
+            <li><a href="../pages/weekend-getaways.html">Weekend Getaways</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Services</h4>
+          <ul>
+            <li><a href="../pages/taxi-booking.html">Taxi Booking</a></li>
+            <li><a href="../pages/resort-booking.html">Resort Stays</a></li>
+            <li><a href="../pages/gift-cards.html">Gift Cards</a></li>
+            <li><a href="../pages/investment-plans.html">Investment Plans</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="../pages/about.html">About Us</a></li>
+            <li><a href="../pages/contact.html">Contact</a></li>
+            <li><a href="../pages/faq.html">FAQ</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="../pages/terms.html">Terms &amp; Conditions</a></li>
+            <li><a href="../pages/privacy.html">Privacy Policy</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; <span data-year>2026</span> YathraNest. All rights reserved.</p>
+        <p>Browse · Explore · Enquire — pricing shared personally.</p>
+      </div>
+    </div>
+  </footer>
+  <div class="modal" id="enquiry-modal" role="dialog" aria-modal="true" aria-labelledby="enquiry-title">
+    <div class="modal__backdrop"></div>
+    <div class="modal__dialog modal__dialog--lg">
+      <button class="modal__close" type="button" data-close-modal aria-label="Close">&times;</button>
+      <h2 id="enquiry-title">Request Pricing</h2>
+      <p>Tell us what you're planning. We'll get back with a personalised quote — no online payment required.</p>
+      <form data-enquiry-form data-success-modal="success-modal" novalidate>
+        <div class="form-grid form-grid--2">
+          <div class="form-group">
+            <label for="enq-name">Full name</label>
+            <input class="form-control" id="enq-name" name="name" type="text" required autocomplete="name" />
+            <span class="field-error"></span>
+          </div>
+          <div class="form-group">
+            <label for="enq-phone">Phone</label>
+            <input class="form-control" id="enq-phone" name="phone" type="tel" required data-validate="phone" autocomplete="tel" />
+            <span class="field-error"></span>
+          </div>
+          <div class="form-group">
+            <label for="enq-email">Email</label>
+            <input class="form-control" id="enq-email" name="email" type="email" required autocomplete="email" />
+            <span class="field-error"></span>
+          </div>
+          <div class="form-group">
+            <label for="enq-interest">Interest</label>
+            <input class="form-control" id="enq-interest" name="interest" type="text" value="Kerala Packages" data-prefill="interest" />
+          </div>
+          <div class="form-group" style="grid-column:1/-1">
+            <label for="enq-message">Tell us more</label>
+            <textarea class="form-control" id="enq-message" name="message" rows="4" placeholder="Destination, dates, travellers, preferences..."></textarea>
+          </div>
+        </div>
+        <div class="btn-group">
+          <button class="btn btn--primary" type="submit">Submit Enquiry</button>
+          <button class="btn btn--secondary" type="button" data-close-modal>Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="modal" id="success-modal" role="dialog" aria-modal="true" aria-labelledby="success-title">
+    <div class="modal__backdrop"></div>
+    <div class="modal__dialog">
+      <button class="modal__close" type="button" data-close-modal aria-label="Close">&times;</button>
+      <div class="modal__icon" aria-hidden="true">✓</div>
+      <h2 id="success-title">Thank you!</h2>
+      <p>Your enquiry has been submitted. Our team will contact you shortly with availability and pricing.</p>
+      <button class="btn btn--primary" type="button" data-close-modal>Close</button>
+    </div>
+  </div>
+  <script src="../js/navigation.js" defer></script>
+  <script src="../js/filters.js" defer></script>
+  <script src="../js/forms.js" defer></script>
+  <script src="../js/gallery.js" defer></script>
+  <script src="../js/main.js" defer></script>
+</body>
+</html>

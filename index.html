@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="YathraNest — curated travel packages, taxi services, resort stays, weekend getaways, gift cards and investment plans. Browse, explore and enquire for personalised pricing." />
+  <title>YathraNest — Your Journey Starts Here</title>
+  <link rel="icon" href="assets/logo/logo.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="css/style.css?v=6" />
+  <link rel="stylesheet" href="css/components.css?v=6" />
+  <link rel="stylesheet" href="css/responsive.css?v=6" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <a class="logo" href="index.html" aria-label="YathraNest home">
+        <span class="logo__mark" aria-hidden="true">YN</span>
+        <span class="logo__text">Yathra<span>Nest</span></span>
+      </a>
+      <nav class="nav-desktop" aria-label="Primary">
+        <a href="pages/kerala-packages.html" data-nav="packages">Packages</a>
+        <a href="pages/taxi-booking.html" data-nav>Taxi</a>
+        <a href="pages/resort-booking.html" data-nav>Resorts</a>
+        <a href="pages/weekend-getaways.html" data-nav>Getaways</a>
+        <a href="pages/gift-cards.html" data-nav>Gift Cards</a>
+        <a href="pages/investment-plans.html" data-nav>Investment Plans</a>
+        <a href="pages/about.html" data-nav>About</a>
+        <a href="pages/contact.html" data-nav>Contact</a>
+      </nav>
+      <div class="header-actions">
+        <a class="btn btn--primary btn--header-cta" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-drawer" aria-label="Open menu">
+          <span class="nav-toggle__bars" aria-hidden="true"><span></span><span></span><span></span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="nav-drawer" id="nav-drawer">
+    <div class="nav-drawer__backdrop"></div>
+    <div class="nav-drawer__panel" role="dialog" aria-label="Mobile navigation">
+      <div class="nav-drawer__head">
+        <a class="logo" href="index.html">
+          <span class="logo__mark" aria-hidden="true">YN</span>
+          <span class="logo__text">Yathra<span>Nest</span></span>
+        </a>
+        <button class="nav-drawer__close" type="button" aria-label="Close menu">&times;</button>
+      </div>
+      <nav class="nav-drawer__links" aria-label="Mobile">
+        <a href="pages/kerala-packages.html">Packages</a>
+        <a href="pages/taxi-booking.html">Taxi</a>
+        <a href="pages/resort-booking.html">Resorts</a>
+        <a href="pages/weekend-getaways.html">Getaways</a>
+        <a href="pages/gift-cards.html">Gift Cards</a>
+        <a href="pages/investment-plans.html">Investment Plans</a>
+        <a href="pages/about.html">About</a>
+        <a href="pages/contact.html">Contact</a>
+      </nav>
+      <div class="nav-drawer__cta">
+        <a class="btn btn--primary btn--block" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
+      </div>
+    </div>
+  </div>
+
+  <main id="main">
+    <!-- Image-tile hero: 9 service categories -->
+    <section class="hero-tiles" aria-labelledby="hero-heading">
+      <h1 id="hero-heading" class="sr-only">Your Journey Starts Here — Explore YathraNest</h1>
+      <div class="container container--wide">
+        <div class="hero-tiles__grid" role="list">
+          <a class="hero-tile" href="pages/kerala-packages.html" role="listitem">
+            <img src="./assets/images/kerala-backwaters.jpg" alt="" width="800" height="600" />
+            <span class="hero-tile__shade" aria-hidden="true"></span>
+            <span class="hero-tile__body">
+              <span class="hero-tile__title">Kerala Packages</span>
+              <span class="hero-tile__desc">Hills, wildlife &amp; backwaters</span>
+              <span class="hero-tile__cta">Explore →</span>
+            </span>
+          </a>
+
+          <a class="hero-tile" href="pages/south-indian-packages.html" role="listitem">
+            <img src="./assets/images/temple.jpg" alt="" width="800" height="600" />
+            <span class="hero-tile__shade" aria-hidden="true"></span>
+            <span class="hero-tile__body">
+              <span class="hero-tile__title">South Indian Packages</span>
+              <span class="hero-tile__desc">Temples, hills &amp; coasts</span>
+              <span class="hero-tile__cta">Explore →</span>
+            </span>
+          </a>
+
+          <a class="hero-tile" href="pages/domestic-packages.html" role="listitem">
+            <img src="./assets/images/rajasthan.jpg" alt="" width="800" height="600" />
+            <span class="hero-tile__shade" aria-hidden="true"></span>
+            <span class="hero-tile__body">
+              <span class="hero-tile__title">Domestic Packages</span>
+              <span class="hero-tile__desc">Discover India</span>
+              <span class="hero-tile__cta">Explore →</span>
+            </span>
+          </a>
+
+          <a class="hero-tile" href="pages/international-packages.html" role="listitem">
+            <img src="./assets/images/dubai.jpg" alt="" width="800" height="600" />
+            <span class="hero-tile__shade" aria-hidden="true"></span>
+            <span class="hero-tile__body">
+              <span class="hero-tile__title">International Packages</span>
+              <span class="hero-tile__desc">Handpicked overseas trips</span>
+              <span class="hero-tile__cta">Explore →</span>
+            </span>
+          </a>
+
+          <a class="hero-tile" href="pages/taxi-booking.html" role="listitem">
+            <img src="./assets/images/car-taxi.jpg" alt="" width="800" height="600" />
+            <span class="hero-tile__shade" aria-hidden="true"></span>
+            <span class="hero-tile__body">
+              <span class="hero-tile__title">Taxi Cab Booking</span>
+              <span class="hero-tile__desc">Airport &amp; outstation</span>
+              <span class="hero-tile__cta">Get a Quote →</span>
+            </span>
+          </a>
+
+          <a class="hero-tile" href="pages/resort-booking.html" role="listitem">
+            <img src="./assets/images/resort.jpg" alt="" width="800" height="600" />
+            <span class="hero-tile__shade" aria-hidden="true"></span>
+            <span class="hero-tile__body">
+              <span class="hero-tile__title">Resort Stay Booking</span>
+              <span class="hero-tile__desc">Scenic stays &amp; escapes</span>
+              <span class="hero-tile__cta">Browse →</span>
+            </span>
+          </a>
+
+          <a class="hero-tile" href="pages/weekend-getaways.html" role="listitem">
+            <img src="./assets/images/friends-travel.jpg" alt="" width="800" height="600" />
+            <span class="hero-tile__shade" aria-hidden="true"></span>
+            <span class="hero-tile__body">
+              <span class="hero-tile__title">Weekend Getaways</span>
+              <span class="hero-tile__desc">Short escapes &amp; stranger trips</span>
+              <span class="hero-tile__cta">Explore →</span>
+            </span>
+          </a>
+
+          <a class="hero-tile" href="pages/gift-cards.html" role="listitem">
+            <img src="./assets/images/gift.jpg" alt="" width="800" height="600" />
+            <span class="hero-tile__shade" aria-hidden="true"></span>
+            <span class="hero-tile__body">
+              <span class="hero-tile__title">Gift Cards</span>
+              <span class="hero-tile__desc">Give the gift of travel</span>
+              <span class="hero-tile__cta">Explore →</span>
+            </span>
+          </a>
+
+          <a class="hero-tile" href="pages/investment-plans.html" role="listitem">
+            <img src="./assets/images/city.jpg" alt="" width="800" height="600" />
+            <span class="hero-tile__shade" aria-hidden="true"></span>
+            <span class="hero-tile__body">
+              <span class="hero-tile__title">Investment Plans</span>
+              <span class="hero-tile__desc">Request information</span>
+              <span class="hero-tile__cta">Learn More →</span>
+            </span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured Packages -->
+    <section class="section section--alt" aria-labelledby="featured-heading">
+      <div class="container">
+        <div class="section-header section-header__row">
+          <div>
+            <p class="section-eyebrow">Featured</p>
+            <h2 id="featured-heading">Featured Packages</h2>
+            <p class="section-lead">Handpicked itineraries designed for comfort, discovery and memorable moments.</p>
+          </div>
+          <a class="btn btn--secondary" href="pages/kerala-packages.html">View All Packages</a>
+        </div>
+
+        <div class="package-grid">
+          <article class="card">
+            <div class="card__media">
+              <img src="./assets/images/kerala-backwaters.jpg" alt="Kerala backwaters with houseboat" width="800" height="500" loading="lazy" />
+            </div>
+            <div class="card__body">
+              <p class="card__meta">Munnar · Thekkady · Alleppey</p>
+              <h3 class="card__title"><a href="pages/package-details.html?package=magical-kerala">Magical Kerala</a></h3>
+              <p class="meta-row"><span><strong>5 Days</strong> / 4 Nights</span></p>
+              <p class="card__text">Explore the best of Kerala through mountains, wildlife and backwaters.</p>
+              <ul class="highlight-list">
+                <li>Tea gardens</li>
+                <li>Houseboat</li>
+                <li>Wildlife</li>
+              </ul>
+              <div class="card__actions">
+                <a class="btn btn--secondary btn--sm" href="pages/package-details.html?package=magical-kerala">View Package</a>
+                <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card__media">
+              <img src="./assets/images/temple.jpg" alt="South Indian temple architecture" width="800" height="500" loading="lazy" />
+            </div>
+            <div class="card__body">
+              <p class="card__meta">Madurai · Rameswaram · Kanyakumari</p>
+              <h3 class="card__title"><a href="pages/package-details.html?package=tamil-trail">Tamil Heritage Trail</a></h3>
+              <p class="meta-row"><span><strong>6 Days</strong> / 5 Nights</span></p>
+              <p class="card__text">A cultural journey through sacred temples, coastal towns and heritage streets.</p>
+              <ul class="highlight-list">
+                <li>Temple visits</li>
+                <li>Coastal drive</li>
+                <li>Local cuisine</li>
+              </ul>
+              <div class="card__actions">
+                <a class="btn btn--secondary btn--sm" href="pages/package-details.html?package=tamil-trail">View Package</a>
+                <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card__media">
+              <img src="./assets/images/hills-mist.jpg" alt="Himalayan mountain landscape" width="800" height="500" loading="lazy" />
+            </div>
+            <div class="card__body">
+              <p class="card__meta">Manali · Solang · Kasol</p>
+              <h3 class="card__title"><a href="pages/package-details.html?package=himachal-escape">Himachal Escape</a></h3>
+              <p class="meta-row"><span><strong>7 Days</strong> / 6 Nights</span></p>
+              <p class="card__text">Snow peaks, pine forests and valley views for a refreshing mountain holiday.</p>
+              <ul class="highlight-list">
+                <li>Mountain views</li>
+                <li>Adventure</li>
+                <li>Cafe trail</li>
+              </ul>
+              <div class="card__actions">
+                <a class="btn btn--secondary btn--sm" href="pages/package-details.html?package=himachal-escape">View Package</a>
+                <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Popular Destinations -->
+    <section class="section" aria-labelledby="destinations-heading">
+      <div class="container">
+        <div class="section-header section-header--center">
+          <p class="section-eyebrow">Destinations</p>
+          <h2 id="destinations-heading">Popular Destinations</h2>
+          <p class="section-lead">Places travellers ask us about most — explore and enquire for a tailored plan.</p>
+        </div>
+        <div class="destinations-grid">
+          <a class="destination-card" href="pages/kerala-packages.html">
+            <img src="./assets/images/tea-plantation.jpg" alt="Tea plantations in Munnar" width="600" height="800" loading="lazy" />
+            <div class="destination-card__overlay"><h3>Munnar</h3><span>Kerala</span></div>
+          </a>
+          <a class="destination-card" href="pages/kerala-packages.html">
+            <img src="./assets/images/kerala-backwaters.jpg" alt="Houseboat on Alleppey backwaters" width="600" height="800" loading="lazy" />
+            <div class="destination-card__overlay"><h3>Alleppey</h3><span>Kerala</span></div>
+          </a>
+          <a class="destination-card" href="pages/south-indian-packages.html">
+            <img src="./assets/images/waterfall.jpg" alt="Lush hills of Coorg" width="600" height="800" loading="lazy" />
+            <div class="destination-card__overlay"><h3>Coorg</h3><span>Karnataka</span></div>
+          </a>
+          <a class="destination-card" href="pages/south-indian-packages.html">
+            <img src="./assets/images/temple.jpg" alt="Scenic view of Ooty" width="600" height="800" loading="lazy" />
+            <div class="destination-card__overlay"><h3>Ooty</h3><span>Tamil Nadu</span></div>
+          </a>
+          <a class="destination-card" href="pages/domestic-packages.html">
+            <img src="./assets/images/goa-beach.jpg" alt="Beach in Goa" width="600" height="800" loading="lazy" />
+            <div class="destination-card__overlay"><h3>Goa</h3><span>West India</span></div>
+          </a>
+          <a class="destination-card" href="pages/kerala-packages.html">
+            <img src="./assets/images/forest.jpg" alt="Misty forests of Wayanad" width="600" height="800" loading="lazy" />
+            <div class="destination-card__overlay"><h3>Wayanad</h3><span>Kerala</span></div>
+          </a>
+          <a class="destination-card" href="pages/domestic-packages.html">
+            <img src="./assets/images/hills-mist.jpg" alt="Mountains near Manali" width="600" height="800" loading="lazy" />
+            <div class="destination-card__overlay"><h3>Manali</h3><span>Himachal</span></div>
+          </a>
+          <a class="destination-card" href="pages/domestic-packages.html">
+            <img src="./assets/images/lake.jpg" alt="Dal Lake Kashmir" width="600" height="800" loading="lazy" />
+            <div class="destination-card__overlay"><h3>Kashmir</h3><span>North India</span></div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Weekend Getaways -->
+    <section class="section section--soft" aria-labelledby="getaways-heading">
+      <div class="container">
+        <div class="promo-split">
+          <div class="promo-split__media">
+            <img src="./assets/images/friends-travel.jpg" alt="Friends on a weekend trip" width="900" height="620" loading="lazy" />
+          </div>
+          <div>
+            <p class="section-eyebrow">Short escapes</p>
+            <h2 id="getaways-heading">Weekend Getaways &amp; Stranger Trips</h2>
+            <p class="section-lead" style="margin-bottom:1rem">Break the routine with short getaways, group escapes and curated stranger trips — planned for comfort and connection.</p>
+            <ul class="check-list" style="margin-bottom:1.25rem">
+              <li>2–4 day weekend itineraries</li>
+              <li>Group and stranger trip options</li>
+              <li>Transport and stay coordination</li>
+            </ul>
+            <a class="btn btn--primary" href="pages/weekend-getaways.html">Explore Getaways</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Why YathraNest -->
+    <section class="section" aria-labelledby="why-heading">
+      <div class="container">
+        <div class="section-header section-header--center">
+          <p class="section-eyebrow">Why us</p>
+          <h2 id="why-heading">Why YathraNest</h2>
+          <p class="section-lead">Thoughtful planning, trusted partners and personal support at every step.</p>
+        </div>
+        <div class="benefit-grid">
+          <div class="benefit-item">
+            <p class="benefit-item__num">01</p>
+            <h3>Curated Travel Experiences</h3>
+            <p>Itineraries shaped around destinations, pacing and what matters to you.</p>
+          </div>
+          <div class="benefit-item">
+            <p class="benefit-item__num">02</p>
+            <h3>Trusted Travel Partners</h3>
+            <p>Stays, transport and experiences coordinated with reliable local partners.</p>
+          </div>
+          <div class="benefit-item">
+            <p class="benefit-item__num">03</p>
+            <h3>Personalized Planning</h3>
+            <p>Share your dates and preferences — we tailor the plan and pricing for you.</p>
+          </div>
+          <div class="benefit-item">
+            <p class="benefit-item__num">04</p>
+            <h3>Flexible Travel Options</h3>
+            <p>Packages, taxis, resorts, getaways and gifts — one place to explore it all.</p>
+          </div>
+          <div class="benefit-item">
+            <p class="benefit-item__num">05</p>
+            <h3>Dedicated Support</h3>
+            <p>From enquiry to return, our team stays reachable when you need us.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Gift Cards -->
+    <section class="section section--alt" aria-labelledby="gifts-heading">
+      <div class="container">
+        <div class="promo-split promo-split--reverse">
+          <div class="promo-split__media">
+            <img src="./assets/images/gift.jpg" alt="Gift wrapped for a special occasion" width="900" height="620" loading="lazy" />
+          </div>
+          <div>
+            <p class="section-eyebrow">Gifting</p>
+            <h2 id="gifts-heading">Give the Gift of Travel</h2>
+            <p class="section-lead" style="margin-bottom:1.25rem">YathraNest gift cards let loved ones choose the journey that fits them — packages, stays or getaways.</p>
+            <a class="btn btn--primary" href="pages/gift-cards.html">Explore Gift Cards</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Investment Plans -->
+    <section class="section" aria-labelledby="invest-heading">
+      <div class="container">
+        <div class="investment-banner">
+          <p class="section-eyebrow" style="color:var(--accent)">Investment</p>
+          <h2 id="invest-heading">Investment Plans</h2>
+          <p>Interested in learning about YathraNest investment options? Request information and our team will share the right details for you.</p>
+          <a class="btn btn--accent" href="pages/investment-plans.html">Learn More</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="section section--tight" id="enquiry" aria-labelledby="final-cta-heading">
+      <div class="container">
+        <div class="cta-band">
+          <h2 id="final-cta-heading">Planning your next journey?</h2>
+          <p>Tell us where you want to go and we’ll help you plan it. Pricing is shared personally after your enquiry.</p>
+          <div class="btn-group">
+            <a class="btn btn--light" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
+            <a class="btn btn--secondary" href="pages/contact.html" style="border-color:rgba(255,255,255,.35);color:#fff;background:transparent">Contact Us</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a class="logo" href="index.html">
+            <span class="logo__mark" aria-hidden="true">YN</span>
+            <span class="logo__text">Yathra<span>Nest</span></span>
+          </a>
+          <p>Curated travel packages, stays, taxi services and unique experiences across India and beyond.</p>
+          <div class="footer-contact">
+            <a href="tel:+919876543210">+91 98765 43210</a>
+            <a href="mailto:hello@yathranest.com">hello@yathranest.com</a>
+            <a href="https://wa.me/919876543210" rel="noopener noreferrer" target="_blank">WhatsApp</a>
+          </div>
+          <div class="social-links" aria-label="Social media">
+            <a href="#" aria-label="Instagram">IG</a>
+            <a href="#" aria-label="Facebook">FB</a>
+            <a href="#" aria-label="YouTube">YT</a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Explore</h4>
+          <ul>
+            <li><a href="pages/kerala-packages.html">Kerala Packages</a></li>
+            <li><a href="pages/south-indian-packages.html">South Indian Packages</a></li>
+            <li><a href="pages/domestic-packages.html">Domestic Packages</a></li>
+            <li><a href="pages/international-packages.html">International Packages</a></li>
+            <li><a href="pages/weekend-getaways.html">Weekend Getaways</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Services</h4>
+          <ul>
+            <li><a href="pages/taxi-booking.html">Taxi Booking</a></li>
+            <li><a href="pages/resort-booking.html">Resort Stays</a></li>
+            <li><a href="pages/gift-cards.html">Gift Cards</a></li>
+            <li><a href="pages/investment-plans.html">Investment Plans</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="pages/about.html">About Us</a></li>
+            <li><a href="pages/contact.html">Contact</a></li>
+            <li><a href="pages/faq.html">FAQ</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="pages/terms.html">Terms &amp; Conditions</a></li>
+            <li><a href="pages/privacy.html">Privacy Policy</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; <span data-year>2026</span> YathraNest. All rights reserved.</p>
+        <p>Browse · Explore · Enquire — pricing shared personally.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Enquiry Modal -->
+  <div class="modal" id="enquiry-modal" role="dialog" aria-modal="true" aria-labelledby="enquiry-title">
+    <div class="modal__backdrop"></div>
+    <div class="modal__dialog modal__dialog--lg">
+      <button class="modal__close" type="button" data-close-modal aria-label="Close">&times;</button>
+      <h2 id="enquiry-title">Request Pricing</h2>
+      <p>Tell us what you’re planning. We’ll get back with a personalised quote — no online payment required.</p>
+      <form data-enquiry-form data-success-modal="success-modal" novalidate>
+        <div class="form-grid form-grid--2">
+          <div class="form-group">
+            <label for="enq-name">Full name</label>
+            <input class="form-control" id="enq-name" name="name" type="text" required autocomplete="name" />
+            <span class="field-error"></span>
+          </div>
+          <div class="form-group">
+            <label for="enq-phone">Phone</label>
+            <input class="form-control" id="enq-phone" name="phone" type="tel" required data-validate="phone" autocomplete="tel" />
+            <span class="field-error"></span>
+          </div>
+          <div class="form-group">
+            <label for="enq-email">Email</label>
+            <input class="form-control" id="enq-email" name="email" type="email" required autocomplete="email" />
+            <span class="field-error"></span>
+          </div>
+          <div class="form-group">
+            <label for="enq-interest">Interest</label>
+            <input class="form-control" id="enq-interest" name="interest" type="text" value="General travel enquiry" data-prefill="interest" />
+          </div>
+          <div class="form-group" style="grid-column:1/-1">
+            <label for="enq-message">Tell us more</label>
+            <textarea class="form-control" id="enq-message" name="message" rows="4" placeholder="Destination, dates, travellers, preferences..."></textarea>
+          </div>
+        </div>
+        <div class="btn-group">
+          <button class="btn btn--primary" type="submit">Submit Enquiry</button>
+          <button class="btn btn--secondary" type="button" data-close-modal>Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="success-modal" role="dialog" aria-modal="true" aria-labelledby="success-title">
+    <div class="modal__backdrop"></div>
+    <div class="modal__dialog">
+      <button class="modal__close" type="button" data-close-modal aria-label="Close">&times;</button>
+      <div class="modal__icon" aria-hidden="true">✓</div>
+      <h2 id="success-title">Thank you!</h2>
+      <p>Your enquiry has been submitted. Our team will contact you shortly with availability and pricing.</p>
+      <button class="btn btn--primary" type="button" data-close-modal>Close</button>
+    </div>
+  </div>
+
+  <script src="js/navigation.js" defer></script>
+  <script src="js/filters.js" defer></script>
+  <script src="js/forms.js" defer></script>
+  <script src="js/gallery.js" defer></script>
+  <script src="js/main.js" defer></script>
+</body>
+</html>

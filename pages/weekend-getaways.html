@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Weekend getaways and stranger trips with YathraNest. Short escapes — enquire to join." />
+  <title>Weekend Getaways | YathraNest</title>
+  <link rel="icon" href="../assets/logo/logo.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+  <link rel="stylesheet" href="../css/responsive.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <a class="logo" href="../index.html" aria-label="YathraNest home"><span class="logo__mark" aria-hidden="true">YN</span><span class="logo__text">Yathra<span>Nest</span></span></a>
+      <nav class="nav-desktop" aria-label="Primary">
+        <a href="kerala-packages.html" data-nav="packages">Packages</a>
+        <a href="taxi-booking.html" data-nav>Taxi</a>
+        <a href="resort-booking.html" data-nav>Resorts</a>
+        <a href="weekend-getaways.html" data-nav>Getaways</a>
+        <a href="gift-cards.html" data-nav>Gift Cards</a>
+        <a href="investment-plans.html" data-nav>Investment Plans</a>
+        <a href="about.html" data-nav>About</a>
+        <a href="contact.html" data-nav>Contact</a>
+      </nav>
+      <div class="header-actions">
+        <a class="btn btn--primary btn--header-cta" href="#enquiry" data-open-modal="enquiry-modal">I'm Interested</a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-drawer" aria-label="Open menu"><span class="nav-toggle__bars" aria-hidden="true"><span></span><span></span><span></span></span></button>
+      </div>
+    </div>
+  </header>
+  <div class="nav-drawer" id="nav-drawer">
+    <div class="nav-drawer__backdrop"></div>
+    <div class="nav-drawer__panel" role="dialog" aria-label="Mobile navigation">
+      <div class="nav-drawer__head">
+        <a class="logo" href="../index.html"><span class="logo__mark" aria-hidden="true">YN</span><span class="logo__text">Yathra<span>Nest</span></span></a>
+        <button class="nav-drawer__close" type="button" aria-label="Close menu">&times;</button>
+      </div>
+      <nav class="nav-drawer__links" aria-label="Mobile">
+        <a href="kerala-packages.html">Packages</a><a href="taxi-booking.html">Taxi</a><a href="resort-booking.html">Resorts</a>
+        <a href="weekend-getaways.html">Getaways</a><a href="gift-cards.html">Gift Cards</a><a href="investment-plans.html">Investment Plans</a>
+        <a href="about.html">About</a><a href="contact.html">Contact</a>
+      </nav>
+      <div class="nav-drawer__cta"><a class="btn btn--primary btn--block" href="#enquiry" data-open-modal="enquiry-modal">I'm Interested</a></div>
+    </div>
+  </div>
+
+  <main id="main">
+    <section class="page-hero page-hero--media" style="background-image:url('../assets/images/friends-travel.jpg')">
+      <div class="container page-hero__inner">
+        <h1>Weekend Getaways / Stranger Trips</h1>
+        <p>Short escapes, group adventures and curated stranger trips — designed for spontaneous weekends.</p>
+      </div>
+    </section>
+
+    <section class="section section--tight section--alt">
+      <div class="container">
+        <div class="section-header">
+          <h2>Break the routine</h2>
+          <p class="section-lead">From quiet hill weekends to lively group trips, tell us what you’re looking for and we’ll share upcoming options with pricing.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container" data-filter-root>
+        <form class="filter-bar" data-filter-form>
+          <div class="filter-bar__row">
+            <div class="form-group">
+              <label for="f-dest">Destination</label>
+              <select class="form-control" id="f-dest" data-filter="destination">
+                <option value="all">All</option>
+                <option value="wayanad">Wayanad</option>
+                <option value="coorg">Coorg</option>
+                <option value="ooty">Ooty</option>
+                <option value="goa">Goa</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="f-duration">Duration</label>
+              <select class="form-control" id="f-duration" data-filter="duration">
+                <option value="all">Any</option>
+                <option value="2">2 days</option>
+                <option value="3">3 days</option>
+                <option value="4">4 days</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="f-type">Trip type</label>
+              <select class="form-control" id="f-type" data-filter="type">
+                <option value="all">All</option>
+                <option value="weekend">Weekend</option>
+                <option value="stranger">Stranger trip</option>
+                <option value="group">Group</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="f-search">Search</label>
+              <input class="form-control" id="f-search" type="search" data-search placeholder="Search trips" />
+            </div>
+            <div class="filter-actions">
+              <button class="btn btn--primary" type="submit">Apply</button>
+              <button class="btn btn--secondary" type="button" data-filter-reset>Reset</button>
+            </div>
+          </div>
+        </form>
+
+        <div class="section-header"><h2>Featured trips</h2></div>
+        <div class="results-meta"><span data-filter-count></span></div>
+        <div class="trip-grid" data-filter-list data-per-page="6">
+          <article class="card" data-filter-item data-name="Wayanad Weekend Trek" data-destination="wayanad" data-duration="2" data-type="weekend">
+            <div class="card__media"><img src="../assets/images/forest.jpg" alt="Wayanad trek" loading="lazy" /></div>
+            <div class="card__body">
+              <span class="badge">Weekend</span>
+              <h3 class="card__title mt-1">Wayanad Weekend Trek</h3>
+              <p class="meta-row"><span>Wayanad</span><span><strong>2 Days</strong></span><span>Weekend</span></p>
+              <p class="card__text">Light trails, viewpoint sunsets and shared campfire evenings.</p>
+              <div class="card__actions">
+                <a class="btn btn--secondary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">View Details</a>
+                <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">I'm Interested</a>
+              </div>
+            </div>
+          </article>
+          <article class="card" data-filter-item data-name="Coorg Stranger Trip" data-destination="coorg" data-duration="3" data-type="stranger">
+            <div class="card__media"><img src="../assets/images/friends-travel.jpg" alt="Coorg group trip" loading="lazy" /></div>
+            <div class="card__body">
+              <span class="badge">Stranger trip</span>
+              <h3 class="card__title mt-1">Coorg Stranger Trip</h3>
+              <p class="meta-row"><span>Coorg</span><span><strong>3 Days</strong></span><span>Stranger trip</span></p>
+              <p class="card__text">Meet new travellers over coffee estates, waterfalls and easy hikes.</p>
+              <div class="card__actions">
+                <a class="btn btn--secondary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">View Details</a>
+                <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">I'm Interested</a>
+              </div>
+            </div>
+          </article>
+          <article class="card" data-filter-item data-name="Ooty Cool Escape" data-destination="ooty" data-duration="2" data-type="weekend">
+            <div class="card__media"><img src="../assets/images/waterfall.jpg" alt="Ooty hills" loading="lazy" /></div>
+            <div class="card__body">
+              <span class="badge">Weekend</span>
+              <h3 class="card__title mt-1">Ooty Cool Escape</h3>
+              <p class="meta-row"><span>Ooty</span><span><strong>2 Days</strong></span><span>Weekend</span></p>
+              <p class="card__text">Garden walks, viewpoints and a leisurely Nilgiri weekend.</p>
+              <div class="card__actions">
+                <a class="btn btn--secondary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">View Details</a>
+                <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">I'm Interested</a>
+              </div>
+            </div>
+          </article>
+          <article class="card" data-filter-item data-name="Goa Group Getaway" data-destination="goa" data-duration="3" data-type="group">
+            <div class="card__media"><img src="../assets/images/goa-beach.jpg" alt="Goa beach" loading="lazy" /></div>
+            <div class="card__body">
+              <span class="badge">Group</span>
+              <h3 class="card__title mt-1">Goa Group Getaway</h3>
+              <p class="meta-row"><span>Goa</span><span><strong>3 Days</strong></span><span>Group</span></p>
+              <p class="card__text">Beach mornings, night markets and shared villa vibes.</p>
+              <div class="card__actions">
+                <a class="btn btn--secondary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">View Details</a>
+                <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">I'm Interested</a>
+              </div>
+            </div>
+          </article>
+          <article class="card" data-filter-item data-name="Wayanad Slow Stay" data-destination="wayanad" data-duration="4" data-type="weekend">
+            <div class="card__media"><img src="../assets/images/hills-mist.jpg" alt="Slow stay" loading="lazy" /></div>
+            <div class="card__body">
+              <span class="badge">Short escape</span>
+              <h3 class="card__title mt-1">Wayanad Slow Stay</h3>
+              <p class="meta-row"><span>Wayanad</span><span><strong>4 Days</strong></span><span>Weekend</span></p>
+              <p class="card__text">Unhurried plantation stay with optional nature walks.</p>
+              <div class="card__actions">
+                <a class="btn btn--secondary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">View Details</a>
+                <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">I'm Interested</a>
+              </div>
+            </div>
+          </article>
+          <article class="card" data-filter-item data-name="Coastal Stranger Weekend" data-destination="goa" data-duration="2" data-type="stranger">
+            <div class="card__media"><img src="../assets/images/beach.jpg" alt="Coastal weekend" loading="lazy" /></div>
+            <div class="card__body">
+              <span class="badge">Stranger trip</span>
+              <h3 class="card__title mt-1">Coastal Stranger Weekend</h3>
+              <p class="meta-row"><span>Goa</span><span><strong>2 Days</strong></span><span>Stranger trip</span></p>
+              <p class="card__text">A social weekend by the sea with curated group activities.</p>
+              <div class="card__actions">
+                <a class="btn btn--secondary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">View Details</a>
+                <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">I'm Interested</a>
+              </div>
+            </div>
+          </article>
+        </div>
+        <div class="empty-state" data-filter-empty hidden>No trips match your filters right now. Enquire and we’ll suggest upcoming dates.</div>
+        <div class="pagination" data-pagination></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a class="logo" href="../index.html"><span class="logo__mark" aria-hidden="true">YN</span><span class="logo__text">Yathra<span>Nest</span></span></a>
+          <p>Curated travel packages, stays, taxi services and unique experiences across India and beyond.</p>
+          <div class="footer-contact">
+            <a href="tel:+919876543210">+91 98765 43210</a>
+            <a href="mailto:hello@yathranest.com">hello@yathranest.com</a>
+            <a href="https://wa.me/919876543210" rel="noopener noreferrer" target="_blank">WhatsApp</a>
+          </div>
+          <div class="social-links"><a href="#" aria-label="Instagram">IG</a><a href="#" aria-label="Facebook">FB</a><a href="#" aria-label="YouTube">YT</a></div>
+        </div>
+        <div class="footer-col"><h4>Explore</h4><ul>
+          <li><a href="kerala-packages.html">Kerala Packages</a></li>
+          <li><a href="south-indian-packages.html">South Indian Packages</a></li>
+          <li><a href="domestic-packages.html">Domestic Packages</a></li>
+          <li><a href="international-packages.html">International Packages</a></li>
+          <li><a href="weekend-getaways.html">Weekend Getaways</a></li>
+        </ul></div>
+        <div class="footer-col"><h4>Services</h4><ul>
+          <li><a href="taxi-booking.html">Taxi Booking</a></li>
+          <li><a href="resort-booking.html">Resort Stays</a></li>
+          <li><a href="gift-cards.html">Gift Cards</a></li>
+          <li><a href="investment-plans.html">Investment Plans</a></li>
+        </ul></div>
+        <div class="footer-col"><h4>Company</h4><ul>
+          <li><a href="about.html">About Us</a></li>
+          <li><a href="contact.html">Contact</a></li>
+          <li><a href="faq.html">FAQ</a></li>
+        </ul></div>
+        <div class="footer-col"><h4>Legal</h4><ul>
+          <li><a href="terms.html">Terms &amp; Conditions</a></li>
+          <li><a href="privacy.html">Privacy Policy</a></li>
+        </ul></div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; <span data-year>2026</span> YathraNest. All rights reserved.</p>
+        <p>Browse · Explore · Enquire — pricing shared personally.</p>
+      </div>
+    </div>
+  </footer>
+
+  <div class="modal" id="enquiry-modal" role="dialog" aria-modal="true" aria-labelledby="enquiry-title">
+    <div class="modal__backdrop"></div>
+    <div class="modal__dialog modal__dialog--lg">
+      <button class="modal__close" type="button" data-close-modal aria-label="Close">&times;</button>
+      <h2 id="enquiry-title">I'm Interested</h2>
+      <p>Tell us which trip you like. We’ll share dates, availability and pricing.</p>
+      <form data-enquiry-form data-success-modal="success-modal" novalidate>
+        <div class="form-grid form-grid--2">
+          <div class="form-group"><label for="enq-name">Full name</label><input class="form-control" id="enq-name" name="name" type="text" required /><span class="field-error"></span></div>
+          <div class="form-group"><label for="enq-phone">Phone</label><input class="form-control" id="enq-phone" name="phone" type="tel" required data-validate="phone" /><span class="field-error"></span></div>
+          <div class="form-group"><label for="enq-email">Email</label><input class="form-control" id="enq-email" name="email" type="email" required /><span class="field-error"></span></div>
+          <div class="form-group"><label for="enq-interest">Trip interest</label><input class="form-control" id="enq-interest" name="interest" type="text" value="Weekend Getaway" data-prefill="interest" /></div>
+          <div class="form-group" style="grid-column:1/-1"><label for="enq-message">Preferred dates / notes</label><textarea class="form-control" id="enq-message" name="message" rows="4"></textarea></div>
+        </div>
+        <div class="btn-group">
+          <button class="btn btn--primary" type="submit">Submit Enquiry</button>
+          <button class="btn btn--secondary" type="button" data-close-modal>Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="modal" id="success-modal" role="dialog" aria-modal="true" aria-labelledby="success-title">
+    <div class="modal__backdrop"></div>
+    <div class="modal__dialog">
+      <button class="modal__close" type="button" data-close-modal aria-label="Close">&times;</button>
+      <div class="modal__icon" aria-hidden="true">✓</div>
+      <h2 id="success-title">Thank you!</h2>
+      <p>Your enquiry has been submitted. Our team will contact you shortly.</p>
+      <button class="btn btn--primary" type="button" data-close-modal>Close</button>
+    </div>
+  </div>
+
+  <script src="../js/navigation.js" defer></script>
+  <script src="../js/filters.js" defer></script>
+  <script src="../js/forms.js" defer></script>
+  <script src="../js/gallery.js" defer></script>
+  <script src="../js/main.js" defer></script>
+</body>
+</html>

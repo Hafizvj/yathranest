@@ -1,0 +1,231 @@
+/* YathraNest — Responsive
+   Mobile-first: 768 / 1024 / 1280 / 1440
+*/
+
+@media (min-width: 480px) {
+  .hero-tiles__grid {
+    gap: 0.6rem;
+  }
+
+  .gallery-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding-inline: 1.75rem;
+  }
+
+  .section {
+    padding-block: 4.5rem;
+  }
+
+  .header-actions .btn--primary {
+    display: inline-flex;
+  }
+
+  .nav-toggle {
+    display: none;
+  }
+
+  .nav-desktop {
+    display: flex;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  }
+
+  .hero-tiles {
+    padding-block: 0.75rem 1.25rem;
+  }
+
+  .hero-tiles__grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.6rem;
+  }
+
+  .hero-tile {
+    aspect-ratio: unset;
+    height: clamp(108px, 11.5vw, 138px);
+  }
+
+  .package-grid,
+  .resort-grid,
+  .trip-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .grid-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .benefit-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .destinations-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+  }
+
+  .filter-bar__row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .form-grid--2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .promo-split {
+    grid-template-columns: 1.1fr 1fr;
+    gap: 2.5rem;
+  }
+
+  .promo-split--reverse .promo-split__media {
+    order: 2;
+  }
+
+  .steps {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .step {
+    grid-template-columns: 1fr;
+    text-align: left;
+  }
+
+  .search-strip__grid {
+    grid-template-columns: repeat(2, 1fr) auto;
+    align-items: end;
+  }
+
+  .cta-band {
+    padding: 3rem 2.5rem;
+  }
+
+  .detail-hero {
+    grid-template-columns: 1.35fr 1fr;
+    align-items: center;
+  }
+}
+
+@media (min-width: 1024px) {
+  .nav-desktop {
+    gap: 0.15rem;
+  }
+
+  .nav-desktop a {
+    padding: 0.5rem 0.65rem;
+    font-size: 0.9rem;
+  }
+
+  .package-grid,
+  .resort-grid,
+  .trip-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .grid-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .benefit-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+  .filter-bar__row {
+    grid-template-columns: repeat(4, 1fr) auto;
+    align-items: end;
+  }
+
+  .search-strip__grid {
+    grid-template-columns: 1.4fr 1fr 1fr 0.8fr auto;
+  }
+
+  .detail-layout {
+    grid-template-columns: 1fr 320px;
+    align-items: start;
+  }
+
+  .hero-tiles {
+    padding-block: 0.85rem 1.5rem;
+  }
+
+  .hero-tiles__grid {
+    gap: 0.65rem;
+  }
+
+  .hero-tile {
+    height: clamp(118px, 10vw, 148px);
+  }
+
+  .hero-tile__body {
+    padding: 0.75rem 1rem 0.85rem;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1.6fr repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .container {
+    padding-inline: 2rem;
+  }
+
+  .hero-tiles__grid {
+    gap: 1.1rem;
+  }
+
+  .nav-desktop a {
+    padding: 0.5rem 0.8rem;
+  }
+}
+
+@media (min-width: 1440px) {
+  :root {
+    --container: 1200px;
+    --container-wide: 1360px;
+  }
+}
+
+/* Hide desktop CTA on very small; show from tablet */
+.header-actions .btn--header-cta {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .header-actions .btn--header-cta {
+    display: inline-flex;
+  }
+}
+
+/* Mobile destinations: 2 col */
+.destinations-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+@media (max-width: 767px) {
+  .hero-tile__desc {
+    display: none;
+  }
+
+  .hero-tile {
+    aspect-ratio: 2 / 1;
+    height: auto;
+  }
+}
