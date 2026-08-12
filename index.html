@@ -13,27 +13,19 @@
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
 
-  <header class="site-header">
+  <header class="site-header site-header--modern">
     <div class="container site-header__inner">
-      <a class="logo" href="index.html" aria-label="YathraNest home">
+      <button class="nav-menu-trigger nav-toggle" type="button" aria-expanded="false" aria-controls="nav-drawer" aria-label="Open menu">
+        <span class="nav-menu-trigger__icon" aria-hidden="true"><span></span><span></span></span>
+        Menu
+      </button>
+      <a class="logo logo--centered" href="index.html" aria-label="YathraNest home">
         <span class="logo__mark" aria-hidden="true">YN</span>
         <span class="logo__text">Yathra<span>Nest</span></span>
       </a>
-      <nav class="nav-desktop" aria-label="Primary">
-        <a href="pages/kerala-packages.html" data-nav="packages">Packages</a>
-        <a href="pages/taxi-booking.html" data-nav>Taxi</a>
-        <a href="pages/resort-booking.html" data-nav>Resorts</a>
-        <a href="pages/weekend-getaways.html" data-nav>Getaways</a>
-        <a href="pages/gift-cards.html" data-nav>Gift Cards</a>
-        <a href="pages/investment-plans.html" data-nav>Investment Plans</a>
-        <a href="pages/about.html" data-nav>About</a>
-        <a href="pages/contact.html" data-nav>Contact</a>
-      </nav>
       <div class="header-actions">
-        <a class="btn btn--primary btn--header-cta" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
-        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-drawer" aria-label="Open menu">
-          <span class="nav-toggle__bars" aria-hidden="true"><span></span><span></span><span></span></span>
-        </button>
+        <a class="header-link" href="pages/contact.html">Contact</a>
+        <a class="btn btn--dark btn--header-cta" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
       </div>
     </div>
   </header>
@@ -65,98 +57,105 @@
   </div>
 
   <main id="main">
-    <!-- Image-tile hero: 9 service categories -->
-    <section class="hero-tiles" aria-labelledby="hero-heading">
-      <h1 id="hero-heading" class="sr-only">Your Journey Starts Here — Explore YathraNest</h1>
-      <div class="container container--wide">
-        <div class="hero-tiles__grid" role="list">
-          <a class="hero-tile" href="pages/kerala-packages.html" role="listitem">
-            <img src="./assets/images/kerala-backwaters.jpg" alt="" width="800" height="600" />
-            <span class="hero-tile__shade" aria-hidden="true"></span>
-            <span class="hero-tile__body">
-              <span class="hero-tile__title">Kerala Packages</span>
-              <span class="hero-tile__desc">Hills, wildlife &amp; backwaters</span>
-              <span class="hero-tile__cta">Explore →</span>
+    <section class="hero-modern" aria-labelledby="hero-heading">
+      <div class="hero-modern__bg" aria-hidden="true"></div>
+      <div class="container hero-modern__content">
+        <h1 id="hero-heading">Plan your <em>perfect journey</em> in just minutes</h1>
+        <p class="hero-modern__lead">Discover curated travel experiences tailored to your style. Browse packages, stays and getaways — enquire for personalised pricing.</p>
+        <div class="hero-modern__actions">
+          <a class="btn btn--outline" href="pages/kerala-packages.html">Explore Packages</a>
+          <a class="btn btn--teal" href="#enquiry" data-open-modal="enquiry-modal">
+            Request Pricing
+            <span class="btn__icon" aria-hidden="true">→</span>
+          </a>
+        </div>
+      </div>
+      <div class="hero-gallery" aria-label="Travel moments">
+        <div class="hero-gallery__track">
+          <a class="hero-gallery__item" href="pages/kerala-packages.html">
+            <img src="./assets/images/kerala-backwaters.jpg" alt="Houseboat on Kerala backwaters" width="440" height="620" />
+          </a>
+          <a class="hero-gallery__item" href="pages/international-packages.html">
+            <img src="./assets/images/mountains.jpg" alt="Mountain landscape from above the clouds" width="440" height="620" />
+          </a>
+          <a class="hero-gallery__item" href="pages/weekend-getaways.html">
+            <img src="./assets/images/friends-travel.jpg" alt="Friends hiking on a weekend trip" width="440" height="620" />
+          </a>
+          <a class="hero-gallery__item" href="pages/resort-booking.html">
+            <img src="./assets/images/resort-pool.jpg" alt="Resort pool and scenic stay" width="440" height="620" />
+          </a>
+          <a class="hero-gallery__item" href="pages/domestic-packages.html">
+            <img src="./assets/images/hills-mist.jpg" alt="Traveller overlooking misty hills" width="440" height="620" />
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="services-strip" aria-labelledby="services-heading">
+      <div class="container">
+        <h2 id="services-heading" class="sr-only">Our services</h2>
+        <div class="services-strip__grid">
+          <a class="service-pill" href="pages/kerala-packages.html">
+            <span class="service-pill__thumb"><img src="./assets/images/kerala-backwaters.jpg" alt="" width="96" height="96" loading="lazy" /></span>
+            <span class="service-pill__text">
+              <span class="service-pill__title">Kerala Packages</span>
+              <span class="service-pill__desc">Hills, wildlife &amp; backwaters</span>
             </span>
           </a>
-
-          <a class="hero-tile" href="pages/south-indian-packages.html" role="listitem">
-            <img src="./assets/images/temple.jpg" alt="" width="800" height="600" />
-            <span class="hero-tile__shade" aria-hidden="true"></span>
-            <span class="hero-tile__body">
-              <span class="hero-tile__title">South Indian Packages</span>
-              <span class="hero-tile__desc">Temples, hills &amp; coasts</span>
-              <span class="hero-tile__cta">Explore →</span>
+          <a class="service-pill" href="pages/south-indian-packages.html">
+            <span class="service-pill__thumb"><img src="./assets/images/temple.jpg" alt="" width="96" height="96" loading="lazy" /></span>
+            <span class="service-pill__text">
+              <span class="service-pill__title">South Indian Packages</span>
+              <span class="service-pill__desc">Temples, hills &amp; coasts</span>
             </span>
           </a>
-
-          <a class="hero-tile" href="pages/domestic-packages.html" role="listitem">
-            <img src="./assets/images/rajasthan.jpg" alt="" width="800" height="600" />
-            <span class="hero-tile__shade" aria-hidden="true"></span>
-            <span class="hero-tile__body">
-              <span class="hero-tile__title">Domestic Packages</span>
-              <span class="hero-tile__desc">Discover India</span>
-              <span class="hero-tile__cta">Explore →</span>
+          <a class="service-pill" href="pages/domestic-packages.html">
+            <span class="service-pill__thumb"><img src="./assets/images/rajasthan.jpg" alt="" width="96" height="96" loading="lazy" /></span>
+            <span class="service-pill__text">
+              <span class="service-pill__title">Domestic Packages</span>
+              <span class="service-pill__desc">Discover India</span>
             </span>
           </a>
-
-          <a class="hero-tile" href="pages/international-packages.html" role="listitem">
-            <img src="./assets/images/dubai.jpg" alt="" width="800" height="600" />
-            <span class="hero-tile__shade" aria-hidden="true"></span>
-            <span class="hero-tile__body">
-              <span class="hero-tile__title">International Packages</span>
-              <span class="hero-tile__desc">Handpicked overseas trips</span>
-              <span class="hero-tile__cta">Explore →</span>
+          <a class="service-pill" href="pages/international-packages.html">
+            <span class="service-pill__thumb"><img src="./assets/images/dubai.jpg" alt="" width="96" height="96" loading="lazy" /></span>
+            <span class="service-pill__text">
+              <span class="service-pill__title">International Packages</span>
+              <span class="service-pill__desc">Handpicked overseas trips</span>
             </span>
           </a>
-
-          <a class="hero-tile" href="pages/taxi-booking.html" role="listitem">
-            <img src="./assets/images/car-taxi.jpg" alt="" width="800" height="600" />
-            <span class="hero-tile__shade" aria-hidden="true"></span>
-            <span class="hero-tile__body">
-              <span class="hero-tile__title">Taxi Cab Booking</span>
-              <span class="hero-tile__desc">Airport &amp; outstation</span>
-              <span class="hero-tile__cta">Get a Quote →</span>
+          <a class="service-pill" href="pages/taxi-booking.html">
+            <span class="service-pill__thumb"><img src="./assets/images/car-taxi.jpg" alt="" width="96" height="96" loading="lazy" /></span>
+            <span class="service-pill__text">
+              <span class="service-pill__title">Taxi Cab Booking</span>
+              <span class="service-pill__desc">Airport &amp; outstation</span>
             </span>
           </a>
-
-          <a class="hero-tile" href="pages/resort-booking.html" role="listitem">
-            <img src="./assets/images/resort.jpg" alt="" width="800" height="600" />
-            <span class="hero-tile__shade" aria-hidden="true"></span>
-            <span class="hero-tile__body">
-              <span class="hero-tile__title">Resort Stay Booking</span>
-              <span class="hero-tile__desc">Scenic stays &amp; escapes</span>
-              <span class="hero-tile__cta">Browse →</span>
+          <a class="service-pill" href="pages/resort-booking.html">
+            <span class="service-pill__thumb"><img src="./assets/images/resort.jpg" alt="" width="96" height="96" loading="lazy" /></span>
+            <span class="service-pill__text">
+              <span class="service-pill__title">Resort Stay Booking</span>
+              <span class="service-pill__desc">Scenic stays &amp; escapes</span>
             </span>
           </a>
-
-          <a class="hero-tile" href="pages/weekend-getaways.html" role="listitem">
-            <img src="./assets/images/friends-travel.jpg" alt="" width="800" height="600" />
-            <span class="hero-tile__shade" aria-hidden="true"></span>
-            <span class="hero-tile__body">
-              <span class="hero-tile__title">Weekend Getaways</span>
-              <span class="hero-tile__desc">Short escapes &amp; stranger trips</span>
-              <span class="hero-tile__cta">Explore →</span>
+          <a class="service-pill" href="pages/weekend-getaways.html">
+            <span class="service-pill__thumb"><img src="./assets/images/camping.jpg" alt="" width="96" height="96" loading="lazy" /></span>
+            <span class="service-pill__text">
+              <span class="service-pill__title">Weekend Getaways</span>
+              <span class="service-pill__desc">Short escapes &amp; group trips</span>
             </span>
           </a>
-
-          <a class="hero-tile" href="pages/gift-cards.html" role="listitem">
-            <img src="./assets/images/gift.jpg" alt="" width="800" height="600" />
-            <span class="hero-tile__shade" aria-hidden="true"></span>
-            <span class="hero-tile__body">
-              <span class="hero-tile__title">Gift Cards</span>
-              <span class="hero-tile__desc">Give the gift of travel</span>
-              <span class="hero-tile__cta">Explore →</span>
+          <a class="service-pill" href="pages/gift-cards.html">
+            <span class="service-pill__thumb"><img src="./assets/images/gift.jpg" alt="" width="96" height="96" loading="lazy" /></span>
+            <span class="service-pill__text">
+              <span class="service-pill__title">Gift Cards</span>
+              <span class="service-pill__desc">Give the gift of travel</span>
             </span>
           </a>
-
-          <a class="hero-tile" href="pages/investment-plans.html" role="listitem">
-            <img src="./assets/images/city.jpg" alt="" width="800" height="600" />
-            <span class="hero-tile__shade" aria-hidden="true"></span>
-            <span class="hero-tile__body">
-              <span class="hero-tile__title">Investment Plans</span>
-              <span class="hero-tile__desc">Request information</span>
-              <span class="hero-tile__cta">Learn More →</span>
+          <a class="service-pill" href="pages/investment-plans.html">
+            <span class="service-pill__thumb"><img src="./assets/images/city.jpg" alt="" width="96" height="96" loading="lazy" /></span>
+            <span class="service-pill__text">
+              <span class="service-pill__title">Investment Plans</span>
+              <span class="service-pill__desc">Request information</span>
             </span>
           </a>
         </div>
@@ -383,8 +382,11 @@
           <h2 id="final-cta-heading">Planning your next journey?</h2>
           <p>Tell us where you want to go and we’ll help you plan it. Pricing is shared personally after your enquiry.</p>
           <div class="btn-group">
-            <a class="btn btn--light" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
-            <a class="btn btn--secondary" href="pages/contact.html" style="border-color:rgba(255,255,255,.35);color:#fff;background:transparent">Contact Us</a>
+            <a class="btn btn--teal" href="#enquiry" data-open-modal="enquiry-modal">
+              Request Pricing
+              <span class="btn__icon" aria-hidden="true">→</span>
+            </a>
+            <a class="btn btn--outline" href="pages/contact.html" style="background:transparent;border-color:rgba(255,255,255,.35);color:#fff">Contact Us</a>
           </div>
         </div>
       </div>

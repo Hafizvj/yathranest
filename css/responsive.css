@@ -3,12 +3,18 @@
 */
 
 @media (min-width: 480px) {
-  .hero-tiles__grid {
-    gap: 0.6rem;
+  .services-strip__grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .gallery-grid {
     grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 640px) {
+  .header-link {
+    display: inline-flex;
   }
 }
 
@@ -25,7 +31,7 @@
     display: inline-flex;
   }
 
-  .nav-toggle {
+  .nav-toggle:not(.nav-menu-trigger) {
     display: none;
   }
 
@@ -37,18 +43,13 @@
     grid-template-columns: 1.4fr 1fr 1fr 1fr;
   }
 
-  .hero-tiles {
-    padding-block: 0.75rem 1.25rem;
+  .hero-gallery__track {
+    justify-content: center;
   }
 
-  .hero-tiles__grid {
+  .services-strip__grid {
     grid-template-columns: repeat(3, 1fr);
-    gap: 0.6rem;
-  }
-
-  .hero-tile {
-    aspect-ratio: unset;
-    height: clamp(108px, 11.5vw, 138px);
+    gap: 1rem;
   }
 
   .package-grid,
@@ -158,20 +159,9 @@
     align-items: start;
   }
 
-  .hero-tiles {
-    padding-block: 0.85rem 1.5rem;
-  }
-
-  .hero-tiles__grid {
-    gap: 0.65rem;
-  }
-
-  .hero-tile {
-    height: clamp(118px, 10vw, 148px);
-  }
-
-  .hero-tile__body {
-    padding: 0.75rem 1rem 0.85rem;
+  .services-strip__grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
   }
 
   .footer-grid {
@@ -185,12 +175,13 @@
     padding-inline: 2rem;
   }
 
-  .hero-tiles__grid {
+  .services-strip__grid {
+    grid-template-columns: repeat(3, 1fr);
     gap: 1.1rem;
   }
 
-  .nav-desktop a {
-    padding: 0.5rem 0.8rem;
+  .hero-gallery__item {
+    flex-basis: 220px;
   }
 }
 
@@ -201,12 +192,15 @@
   }
 }
 
-/* Hide desktop CTA on very small; show from tablet */
+/* Hide header CTA on very small; show from tablet */
 .header-actions .btn--header-cta {
   display: none;
+  min-height: 42px;
+  padding: 0.55rem 1.15rem;
+  font-size: 0.875rem;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 640px) {
   .header-actions .btn--header-cta {
     display: inline-flex;
   }
@@ -220,6 +214,10 @@
 }
 
 @media (max-width: 767px) {
+  .site-header--modern .logo__text {
+    display: none;
+  }
+
   .hero-tile__desc {
     display: none;
   }
