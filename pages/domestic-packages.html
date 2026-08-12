@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="../css/components.css" />
   <link rel="stylesheet" href="../css/responsive.css" />
 </head>
-<body>
+<body data-package-page="domestic" data-asset-prefix="../assets/images/">
   <a class="skip-link" href="#main">Skip to content</a>
   <header class="site-header">
     <div class="container site-header__inner">
@@ -67,8 +67,8 @@
     <section class="section"><div class="container" data-filter-root>
       <div class="section-header"><h2>Package listing</h2><p class="section-lead">Browse options and request pricing for your preferred dates. No online checkout.</p></div>
       <form class="filter-bar" data-filter-form><div class="filter-bar__row">
-  <div class="form-group"><label for="f-dest">Destination</label><select class="form-control" id="f-dest" data-filter="destination"><option value="all">All</option><option value="goa">Goa</option><option value="manali">Manali</option><option value="kashmir">Kashmir</option><option value="rajasthan">Rajasthan</option></select></div>
-  <div class="form-group"><label for="f-state">State / Region</label><select class="form-control" id="f-state" data-filter="state"><option value="all">All</option><option value="goa">Goa</option><option value="himachal">Himachal</option><option value="jk">Jammu &amp; Kashmir</option><option value="rajasthan">Rajasthan</option></select></div>
+  <div class="form-group"><label for="f-dest">Destination</label><select class="form-control" id="f-dest" data-filter="destination"><option value="all">All</option><option value="goa">Goa</option><option value="manali">Manali</option><option value="kashmir">Kashmir</option><option value="rajasthan">Rajasthan</option><option value="lakshadweep">Lakshadweep</option></select></div>
+  <div class="form-group"><label for="f-state">State / Region</label><select class="form-control" id="f-state" data-filter="state"><option value="all">All</option><option value="goa">Goa</option><option value="himachal">Himachal</option><option value="jk">Jammu &amp; Kashmir</option><option value="rajasthan">Rajasthan</option><option value="lakshadweep">Lakshadweep</option></select></div>
   <div class="form-group"><label for="f-duration">Duration</label><select class="form-control" id="f-duration" data-filter="duration"><option value="all">Any</option><option value="2-4">2–4 days</option><option value="5-7">5–7 days</option><option value="8+">8+ days</option></select></div>
   <div class="form-group"><label for="f-type">Travel type</label><select class="form-control" id="f-type" data-filter="type"><option value="all">All</option><option value="family">Family</option><option value="adventure">Adventure</option><option value="leisure">Leisure</option></select></div>
   <div class="filter-actions"><button class="btn btn--primary" type="submit">Apply</button><button class="btn btn--secondary" type="button" data-filter-reset>Reset</button></div>
@@ -238,6 +238,8 @@
       <button class="btn btn--primary" type="button" data-close-modal>Close</button>
     </div>
   </div>
+  <script src="../js/packages-data.js" defer></script>
+  <script src="../js/packages-render.js" defer></script>
   <script src="../js/navigation.js" defer></script>
   <script src="../js/filters.js" defer></script>
   <script src="../js/forms.js" defer></script>

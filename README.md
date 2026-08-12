@@ -1,106 +1,81 @@
-# YathraNest — Frontend Website
+# YathraNest — PHP + MySQL CMS
 
-Static, frontend-only prototype for **YathraNest**, a travel company offering packages, taxi services, resort stays, weekend getaways, gift cards, and investment plan enquiries.
+Travel site for **YathraNest** with a plain PHP admin panel and MySQL database (HostMaria-ready — no Laravel).
 
 ## Stack
 
-- HTML5
-- CSS3
-- Vanilla JavaScript
+- Public site: PHP templates + existing CSS/JS
+- Admin: `/admin` (session login, CSRF)
+- Database: MySQL via PDO
+- Forms: POST to `handlers/enquiry.php` (AJAX)
 
-No frameworks, no backend, no payments, no authentication.
+**Pricing is never displayed online.** CTAs remain enquiry-only.
 
-## Business rule
+## HostMaria setup
 
-**Pricing is never displayed online.** CTAs use enquiry language only:
+1. Create a MySQL database and user in cPanel / HostMaria.
+2. Upload the site (or push to `main` for FTPS deploy).
+3. Copy [`config/config.example.php`](config/config.example.php) to `config/config.php` on the server and set DB credentials + `base_url` if the site lives in a subdirectory.
+4. Import [`sql/schema.sql`](sql/schema.sql) in phpMyAdmin.
+5. On a machine with PHP + Node:
+   - `node scripts/export-packages-json.mjs` (creates `sql/seed-data.json`)
+   - Copy `sql/seed-data.json` to the server (or run locally against remote DB)
+   - `php scripts/seed-from-js.php`
+6. Make `uploads/` writable (`chmod 755` or `775`).
+7. Log in at `/admin/login.php`
 
-- Request Pricing
-- Enquire Now
-- Get a Quote
-- Check Availability
-- I'm Interested
-- Request Information
+**Default admin (change immediately):**
 
-Flow: **Browse → Explore → Enquire → YathraNest provides pricing**
+- Email: `admin@yathranest.com`
+- Password: `ChangeMe123!`
 
-## Quick start
+## Local development
 
-Open `index.html` in a browser, or serve the folder locally:
+1. Install PHP (with PDO MySQL) and MySQL/MariaDB (XAMPP/WAMP/Laragon).
+2. Create DB `yathranest`, import `sql/schema.sql`.
+3. Edit `config/config.php`.
+4. Seed the database (pick one):
 
-```bash
-# Python
-python -m http.server 8080
+   **Option A — HostMaria phpMyAdmin (recommended if PHP is not on PATH):**
+   ```bash
+   node scripts/export-packages-json.mjs
+   node scripts/seed-data-to-sql.mjs
+   ```
+   Then in phpMyAdmin: import `sql/schema.sql`, then `sql/seed-import.sql`.
 
-# Node (if available)
-npx serve .
-```
+   **Option B — PHP CLI (XAMPP on Windows):**
+   ```powershell
+   .\scripts\seed.ps1
+   ```
+   Or: `C:\xampp\php\php.exe scripts/seed-from-js.php`
 
-Then visit `http://localhost:8080`.
+   Note: HostMaria MySQL often blocks connections from your PC. Use Option A for remote hosting.
+5. Serve the project root:
+   ```bash
+   php -S localhost:8080
+   ```
+6. Open `http://localhost:8080/index.php` and `http://localhost:8080/admin/login.php`.
 
 ## Structure
 
 ```text
 yn/
-├── index.html
-├── pages/                  # All inner pages
-├── css/
-│   ├── style.css           # Tokens, base, layout, header/footer
-│   ├── components.css      # Cards, forms, modals, buttons
-│   └── responsive.css      # Breakpoints
-├── js/
-│   ├── main.js
-│   ├── navigation.js
-│   ├── filters.js
-│   ├── forms.js
-│   └── gallery.js
-├── assets/
-│   ├── images/
-│   ├── icons/
-│   └── logo/
-└── README.md
+├── index.php
+├── pages/*.php
+├── admin/                 # CMS
+├── handlers/enquiry.php
+├── includes/              # bootstrap, layouts, models
+├── config/
+├── sql/schema.sql
+├── uploads/
+├── css/ js/ assets/
+└── .htaccess
 ```
 
-## Pages
+## Admin modules
 
-| Page | File |
-|------|------|
-| Homepage | `index.html` |
-| Kerala Packages | `pages/kerala-packages.html` |
-| South Indian Packages | `pages/south-indian-packages.html` |
-| Domestic Packages | `pages/domestic-packages.html` |
-| International Packages | `pages/international-packages.html` |
-| Package Details | `pages/package-details.html` |
-| Taxi Booking (enquiry) | `pages/taxi-booking.html` |
-| Resort Booking | `pages/resort-booking.html` |
-| Resort Details | `pages/resort-details.html` |
-| Weekend Getaways | `pages/weekend-getaways.html` |
-| Gift Cards | `pages/gift-cards.html` |
-| Investment Plans | `pages/investment-plans.html` |
-| About / Contact / FAQ / Legal | `pages/about.html`, `contact.html`, `faq.html`, `terms.html`, `privacy.html` |
+Packages · Places · Resorts · Getaways · Gift cards · Investment · Inquiries · Page content · Settings
 
-## Interactions (frontend-only)
+## Deploy notes
 
-- Mobile navigation drawer
-- Mock filters / search / pagination
-- FAQ & itinerary accordions
-- Image lightbox gallery
-- Enquiry forms with validation + success modal
-- Smooth in-page scrolling
-
-## Design tokens
-
-Defined in `css/style.css` as CSS variables (`--primary`, `--accent`, `--background`, etc.) for easy theming.
-
-## Images
-
-Travel photos live in `assets/images/` (local JPG files). The UI does **not** depend on external CDNs.
-
-To replace any image later, swap the file in `assets/images/` while keeping the same filename, or update the `src` paths in the HTML.
-
-## Next steps for production
-
-1. Replace sample phone/email/WhatsApp details
-2. Connect enquiry forms to an API / CRM
-3. Swap Unsplash images for owned media
-4. Add real map embeds on resort pages
-5. Have legal review Terms & Privacy
+GitHub Actions FTPS deploy excludes secrets (`config/config.php`, `.env`), seed JSON, and `scripts/`. Keep a server-only `config/config.php`. After first deploy, run schema + seed once.

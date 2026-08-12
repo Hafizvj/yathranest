@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="../css/responsive.css" />
   
 </head>
-<body>
+<body data-package-page="kerala" data-asset-prefix="../assets/images/">
   <a class="skip-link" href="#main">Skip to content</a>
   <header class="site-header">
     <div class="container site-header__inner">
@@ -81,7 +81,7 @@
       <div class="container" data-filter-root>
         <div class="section-header">
           <h2>Explore Kerala</h2>
-          <p class="section-lead">Filter by destination, duration and travel style. Pricing is shared after you enquire.</p>
+          <p class="section-lead">Filter by destination, pickup, duration and travel style. Pricing is shared after you enquire.</p>
         </div>
         <form class="filter-bar" data-filter-form>
           <div class="filter-bar__row">
@@ -89,10 +89,12 @@
               <label for="f-dest">Destination</label>
               <select class="form-control" id="f-dest" data-filter="destination">
                 <option value="all">All destinations</option>
-                <option value="munnar">Munnar</option>
-                <option value="alleppey">Alleppey</option>
-                <option value="wayanad">Wayanad</option>
-                <option value="cochin">Cochin</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="f-pickup">Pickup</label>
+              <select class="form-control" id="f-pickup" data-filter="pickup">
+                <option value="all">Any pickup</option>
               </select>
             </div>
             <div class="form-group">
@@ -101,6 +103,7 @@
                 <option value="all">Any duration</option>
                 <option value="2-4">2–4 days</option>
                 <option value="5-7">5–7 days</option>
+                <option value="8-10">8–10 days</option>
               </select>
             </div>
             <div class="form-group">
@@ -111,6 +114,7 @@
                 <option value="couple">Couple</option>
                 <option value="adventure">Adventure</option>
                 <option value="leisure">Leisure</option>
+                <option value="heritage">Heritage</option>
               </select>
             </div>
             <div class="form-group">
@@ -124,104 +128,7 @@
           </div>
         </form>
         <div class="results-meta"><span data-filter-count></span></div>
-        <div class="package-grid" data-filter-list data-per-page="6">
-          <article class="card" data-filter-item data-name="Magical Kerala" data-destination="munnar" data-state="kerala" data-duration="5-7" data-type="family">
-            <div class="card__media">
-              <img src="../assets/images/kerala-backwaters.jpg" alt="Magical Kerala" width="800" height="500" loading="lazy" />
-            </div>
-            <div class="card__body">
-              <p class="card__meta">Munnar · Thekkady · Alleppey</p>
-              <h3 class="card__title"><a href="package-details.html?package=magical-kerala">Magical Kerala</a></h3>
-              <p class="meta-row"><span><strong>5 Days / 4 Nights</strong></span></p>
-              <p class="card__text">Mountains, wildlife and serene backwaters in one classic Kerala circuit.</p>
-              <ul class="highlight-list"><li>Tea gardens</li><li>Houseboat</li><li>Wildlife</li></ul>
-              <div class="card__actions">
-                <a class="btn btn--secondary btn--sm" href="package-details.html?package=magical-kerala">View Details</a>
-                <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
-              </div>
-            </div>
-          </article>
-          <article class="card" data-filter-item data-name="Backwater Bliss" data-destination="alleppey" data-state="kerala" data-duration="2-4" data-type="couple">
-            <div class="card__media">
-              <img src="../assets/images/tea-plantation.jpg" alt="Backwater Bliss" width="800" height="500" loading="lazy" />
-            </div>
-            <div class="card__body">
-              <p class="card__meta">Alleppey · Kumarakom</p>
-              <h3 class="card__title"><a href="package-details.html?package=backwater-bliss">Backwater Bliss</a></h3>
-              <p class="meta-row"><span><strong>3 Days / 2 Nights</strong></span></p>
-              <p class="card__text">Slow travel on the canals with village life and sunset houseboat moments.</p>
-              <ul class="highlight-list"><li>Houseboat</li><li>Village walk</li><li>Cuisine</li></ul>
-              <div class="card__actions">
-                <a class="btn btn--secondary btn--sm" href="package-details.html?package=backwater-bliss">View Details</a>
-                <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
-              </div>
-            </div>
-          </article>
-          <article class="card" data-filter-item data-name="Wayanad Wilderness" data-destination="wayanad" data-state="kerala" data-duration="2-4" data-type="adventure">
-            <div class="card__media">
-              <img src="../assets/images/forest.jpg" alt="Wayanad Wilderness" width="800" height="500" loading="lazy" />
-            </div>
-            <div class="card__body">
-              <p class="card__meta">Wayanad · Edakkal</p>
-              <h3 class="card__title"><a href="package-details.html?package=wayanad-wilderness">Wayanad Wilderness</a></h3>
-              <p class="meta-row"><span><strong>4 Days / 3 Nights</strong></span></p>
-              <p class="card__text">Forest trails, viewpoints and plantation stays in the Western Ghats.</p>
-              <ul class="highlight-list"><li>Trekking</li><li>Caves</li><li>Nature</li></ul>
-              <div class="card__actions">
-                <a class="btn btn--secondary btn--sm" href="package-details.html?package=wayanad-wilderness">View Details</a>
-                <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
-              </div>
-            </div>
-          </article>
-          <article class="card" data-filter-item data-name="Kerala Honeymoon" data-destination="munnar" data-state="kerala" data-duration="5-7" data-type="couple">
-            <div class="card__media">
-              <img src="../assets/images/waterfall.jpg" alt="Kerala Honeymoon" width="800" height="500" loading="lazy" />
-            </div>
-            <div class="card__body">
-              <p class="card__meta">Munnar · Alleppey · Kovalam</p>
-              <h3 class="card__title"><a href="package-details.html?package=kerala-honeymoon">Kerala Honeymoon</a></h3>
-              <p class="meta-row"><span><strong>6 Days / 5 Nights</strong></span></p>
-              <p class="card__text">Romantic pacing with private experiences, beaches and hill-station calm.</p>
-              <ul class="highlight-list"><li>Private boat</li><li>Beach</li><li>Spa</li></ul>
-              <div class="card__actions">
-                <a class="btn btn--secondary btn--sm" href="package-details.html?package=kerala-honeymoon">View Details</a>
-                <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
-              </div>
-            </div>
-          </article>
-          <article class="card" data-filter-item data-name="Gods Own Country Classic" data-destination="cochin" data-state="kerala" data-duration="5-7" data-type="family">
-            <div class="card__media">
-              <img src="../assets/images/temple.jpg" alt="Gods Own Country Classic" width="800" height="500" loading="lazy" />
-            </div>
-            <div class="card__body">
-              <p class="card__meta">Cochin · Munnar · Thekkady · Alleppey</p>
-              <h3 class="card__title"><a href="package-details.html?package=gods-own-country">Gods Own Country Classic</a></h3>
-              <p class="meta-row"><span><strong>7 Days / 6 Nights</strong></span></p>
-              <p class="card__text">A complete introduction to Kerala for first-time visitors.</p>
-              <ul class="highlight-list"><li>City walk</li><li>Hills</li><li>Backwaters</li></ul>
-              <div class="card__actions">
-                <a class="btn btn--secondary btn--sm" href="package-details.html?package=gods-own-country">View Details</a>
-                <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
-              </div>
-            </div>
-          </article>
-          <article class="card" data-filter-item data-name="North Kerala Discovery" data-destination="wayanad" data-state="kerala" data-duration="5-7" data-type="leisure">
-            <div class="card__media">
-              <img src="../assets/images/hills-mist.jpg" alt="North Kerala Discovery" width="800" height="500" loading="lazy" />
-            </div>
-            <div class="card__body">
-              <p class="card__meta">Kannur · Bekal · Wayanad</p>
-              <h3 class="card__title"><a href="package-details.html?package=north-kerala">North Kerala Discovery</a></h3>
-              <p class="meta-row"><span><strong>5 Days / 4 Nights</strong></span></p>
-              <p class="card__text">Quieter coasts, forts and green hinterlands beyond the usual trail.</p>
-              <ul class="highlight-list"><li>Forts</li><li>Beaches</li><li>Hills</li></ul>
-              <div class="card__actions">
-                <a class="btn btn--secondary btn--sm" href="package-details.html?package=north-kerala">View Details</a>
-                <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
-              </div>
-            </div>
-          </article>
-        </div>
+        <div class="package-grid" data-filter-list data-per-page="9"></div>
         <div class="empty-state" data-filter-empty hidden>No packages match your filters. Try resetting or enquire for a custom plan.</div>
         <div class="pagination" data-pagination></div>
         <div class="cta-band mt-3" style="margin-top:3rem">
@@ -342,6 +249,8 @@
       <button class="btn btn--primary" type="button" data-close-modal>Close</button>
     </div>
   </div>
+  <script src="../js/packages-data.js" defer></script>
+  <script src="../js/packages-render.js" defer></script>
   <script src="../js/navigation.js" defer></script>
   <script src="../js/filters.js" defer></script>
   <script src="../js/forms.js" defer></script>

@@ -6,9 +6,15 @@
   <meta name="description" content="YathraNest — curated travel packages, taxi services, resort stays, weekend getaways, gift cards and investment plans. Browse, explore and enquire for personalised pricing." />
   <title>YathraNest — Your Journey Starts Here</title>
   <link rel="icon" href="assets/logo/logo.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="css/style.css?v=7" />
-  <link rel="stylesheet" href="css/components.css?v=7" />
-  <link rel="stylesheet" href="css/responsive.css?v=7" />
+  <link rel="stylesheet" href="css/style.css?v=8" />
+  <link rel="stylesheet" href="css/components.css?v=8" />
+  <link rel="stylesheet" href="css/responsive.css?v=8" />
+  <link rel="stylesheet" href="css/motion.css?v=8" />
+  <script>
+    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      document.documentElement.classList.add("has-motion");
+    }
+  </script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -96,13 +102,16 @@
       <div class="container container--wide hero-v2__inner">
         <div class="hero-v2__copy">
           <p class="hero-v2__eyebrow">Journeys designed for you</p>
-          <h1 id="hero-heading">Travel more.<br />Worry less.</h1>
+          <h1 id="hero-heading">
+            <span class="hero-line"><span>Travel more.</span></span>
+            <span class="hero-line"><span>Worry less.</span></span>
+          </h1>
           <p class="hero-v2__lead">Handpicked experiences, comfortable stays, and seamless journeys — all in one place.</p>
         </div>
 
         <h2 id="services-heading" class="sr-only">Our services</h2>
         <div class="hero-v2__grid">
-          <a class="hero-card" href="pages/kerala-packages.html">
+          <a class="hero-card" href="pages/kerala-packages.html" style="--i:0">
             <img src="./assets/images/hills-mist.jpg" alt="" width="640" height="360" />
             <span class="hero-card__icon" aria-hidden="true">
               <svg viewBox="0 0 24 24"><path d="M12 14c-3.2-.8-6-3.4-7-5.6 2.6.2 5.1 1.8 7 5.6 1.9-3.8 4.4-5.4 7-5.6-1 2.2-3.8 4.8-7 5.6z"/><path d="M12 13.6c-1.4-2.8-.9-5.5.3-7.2-2.1 1-3.2 3.8-.3 7.2 2.9-3.4 1.8-6.2-.3-7.2 1.2 1.7 1.7 4.4.3 7.2z"/><path d="M11.4 13.4h1.2v6.2a.9.9 0 0 1-.9.9h.6a.9.9 0 0 1-.9-.9v-6.2z"/></svg>
@@ -116,7 +125,7 @@
             </span>
           </a>
 
-          <a class="hero-card" href="pages/domestic-packages.html">
+          <a class="hero-card" href="pages/domestic-packages.html" style="--i:1">
             <img src="./assets/images/lake.jpg" alt="" width="640" height="360" />
             <span class="hero-card__icon" aria-hidden="true">
               <svg viewBox="0 0 24 24"><path d="M9.2 3.2 12 4.4l2.2.6 1.4 2.4-.2 1.5 1.7 1.2.3 2.2-1.5 1.3.5 2.3-1.3 1.7.3 2.1-1.7 1.5-1.4-1.1-1.2 1.7-1.8-.9-1.2 1.1-1.6-2.1-1.8.3-1.2-2.1.8-1.7-1.5-1.5.2-2.1 1.5-1.2-.4-2.1 1.4-1.5.2-1.7 1.7-1.2z"/></svg>
@@ -130,7 +139,7 @@
             </span>
           </a>
 
-          <a class="hero-card" href="pages/international-packages.html">
+          <a class="hero-card" href="pages/international-packages.html" style="--i:2">
             <img src="./assets/images/dubai.jpg" alt="" width="640" height="360" />
             <span class="hero-card__icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="8"/><path d="M4 12h16M12 4c2.4 2.6 3.6 5.4 3.6 8s-1.2 5.4-3.6 8c-2.4-2.6-3.6-5.4-3.6-8s1.2-5.4 3.6-8z"/></svg>
@@ -144,7 +153,7 @@
             </span>
           </a>
 
-          <a class="hero-card" href="pages/resort-booking.html">
+          <a class="hero-card" href="pages/resort-booking.html" style="--i:3">
             <img src="./assets/images/resort-pool.jpg" alt="" width="640" height="360" />
             <span class="hero-card__icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18v-5.5A2.5 2.5 0 0 1 6.5 10H18a2 2 0 0 1 2 2v6"/><path d="M4 15h16"/><path d="M7 10V7a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v3"/></svg>
@@ -158,7 +167,7 @@
             </span>
           </a>
 
-          <a class="hero-card" href="pages/taxi-booking.html">
+          <a class="hero-card" href="pages/taxi-booking.html" style="--i:4">
             <img src="./assets/images/car-taxi.jpg" alt="" width="640" height="360" />
             <span class="hero-card__icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15v2.5A1.5 1.5 0 0 0 5.5 19h.7"/><path d="M17.8 19h.7A1.5 1.5 0 0 0 20 17.5V15"/><path d="M4 15 6.2 9.8A2 2 0 0 1 8 8.5h8a2 2 0 0 1 1.8 1.3L20 15"/><path d="M7 15h10"/><circle cx="7.5" cy="18.5" r="1.5"/><circle cx="16.5" cy="18.5" r="1.5"/></svg>
@@ -172,7 +181,7 @@
             </span>
           </a>
 
-          <a class="hero-card" href="pages/weekend-getaways.html">
+          <a class="hero-card" href="pages/weekend-getaways.html" style="--i:5">
             <img src="./assets/images/friends-travel.jpg" alt="" width="640" height="360" />
             <span class="hero-card__icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8.2" cy="8" r="2.1"/><circle cx="15.8" cy="8.4" r="2.1"/><circle cx="12" cy="9.2" r="2.2"/><path d="M4.6 18c.4-2.6 2.2-4 4.2-4 1.2 0 2.2.4 3 .1.8.4 1.9.1 3.2.1 2.1 0 3.9 1.4 4.4 4"/></svg>
@@ -234,20 +243,41 @@
         <div class="package-grid">
           <article class="card">
             <div class="card__media">
-              <img src="./assets/images/kerala-backwaters.jpg" alt="Kerala backwaters with houseboat" width="800" height="500" loading="lazy" />
+              <img src="./assets/images/packages/clt-wayanad-4d.jpg" alt="Wayanad forests and plantations" width="800" height="500" loading="lazy" />
+            </div>
+            <div class="card__body">
+              <p class="card__meta">Wayanad</p>
+              <h3 class="card__title"><a href="pages/package-details.html?package=clt-wayanad-4d">Wayanad · 4 Days</a></h3>
+              <p class="meta-row"><span><strong>4 Days</strong> / 3 Nights</span></p>
+              <p class="card__text">Forest trails, caves and plantation stays, pickup and drop at Calicut.</p>
+              <ul class="highlight-list">
+                <li>Edakkal Caves</li>
+                <li>Waterfalls</li>
+                <li>Plantations</li>
+              </ul>
+              <div class="card__actions">
+                <a class="btn btn--secondary btn--sm" href="pages/package-details.html?package=clt-wayanad-4d">View Package</a>
+                <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card__media">
+              <img src="./assets/images/packages/allk-kochi-mta-5d.jpg" alt="Kerala hills and backwaters circuit" width="800" height="500" loading="lazy" />
             </div>
             <div class="card__body">
               <p class="card__meta">Munnar · Thekkady · Alleppey</p>
-              <h3 class="card__title"><a href="pages/package-details.html?package=magical-kerala">Magical Kerala</a></h3>
+              <h3 class="card__title"><a href="pages/package-details.html?package=allk-kochi-mta-5d">Munnar, Thekkady &amp; Alleppey · 5 Days</a></h3>
               <p class="meta-row"><span><strong>5 Days</strong> / 4 Nights</span></p>
-              <p class="card__text">Explore the best of Kerala through mountains, wildlife and backwaters.</p>
+              <p class="card__text">The classic Kerala circuit from Kochi — tea hills, wildlife and a houseboat night.</p>
               <ul class="highlight-list">
                 <li>Tea gardens</li>
                 <li>Houseboat</li>
                 <li>Wildlife</li>
               </ul>
               <div class="card__actions">
-                <a class="btn btn--secondary btn--sm" href="pages/package-details.html?package=magical-kerala">View Package</a>
+                <a class="btn btn--secondary btn--sm" href="pages/package-details.html?package=allk-kochi-mta-5d">View Package</a>
                 <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
               </div>
             </div>
@@ -255,41 +285,20 @@
 
           <article class="card">
             <div class="card__media">
-              <img src="./assets/images/temple.jpg" alt="South Indian temple architecture" width="800" height="500" loading="lazy" />
+              <img src="./assets/images/packages/tn-ooty-3d.jpg" alt="Nilgiri hills around Ooty" width="800" height="500" loading="lazy" />
             </div>
             <div class="card__body">
-              <p class="card__meta">Madurai · Rameswaram · Kanyakumari</p>
-              <h3 class="card__title"><a href="pages/package-details.html?package=tamil-trail">Tamil Heritage Trail</a></h3>
-              <p class="meta-row"><span><strong>6 Days</strong> / 5 Nights</span></p>
-              <p class="card__text">A cultural journey through sacred temples, coastal towns and heritage streets.</p>
+              <p class="card__meta">Ooty</p>
+              <h3 class="card__title"><a href="pages/package-details.html?package=tn-ooty-3d">Ooty · 3 Days</a></h3>
+              <p class="meta-row"><span><strong>3 Days</strong> / 2 Nights</span></p>
+              <p class="card__text">A cool Nilgiri break from Coimbatore — gardens, lake and tea estates.</p>
               <ul class="highlight-list">
-                <li>Temple visits</li>
-                <li>Coastal drive</li>
-                <li>Local cuisine</li>
+                <li>Nilgiri hills</li>
+                <li>Botanical garden</li>
+                <li>Tea estates</li>
               </ul>
               <div class="card__actions">
-                <a class="btn btn--secondary btn--sm" href="pages/package-details.html?package=tamil-trail">View Package</a>
-                <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
-              </div>
-            </div>
-          </article>
-
-          <article class="card">
-            <div class="card__media">
-              <img src="./assets/images/hills-mist.jpg" alt="Himalayan mountain landscape" width="800" height="500" loading="lazy" />
-            </div>
-            <div class="card__body">
-              <p class="card__meta">Manali · Solang · Kasol</p>
-              <h3 class="card__title"><a href="pages/package-details.html?package=himachal-escape">Himachal Escape</a></h3>
-              <p class="meta-row"><span><strong>7 Days</strong> / 6 Nights</span></p>
-              <p class="card__text">Snow peaks, pine forests and valley views for a refreshing mountain holiday.</p>
-              <ul class="highlight-list">
-                <li>Mountain views</li>
-                <li>Adventure</li>
-                <li>Cafe trail</li>
-              </ul>
-              <div class="card__actions">
-                <a class="btn btn--secondary btn--sm" href="pages/package-details.html?package=himachal-escape">View Package</a>
+                <a class="btn btn--secondary btn--sm" href="pages/package-details.html?package=tn-ooty-3d">View Package</a>
                 <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
               </div>
             </div>
@@ -569,5 +578,6 @@
   <script src="js/forms.js" defer></script>
   <script src="js/gallery.js" defer></script>
   <script src="js/main.js" defer></script>
+  <script src="js/motion.js" defer></script>
 </body>
 </html>

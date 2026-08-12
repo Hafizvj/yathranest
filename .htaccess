@@ -1,0 +1,29 @@
+# YathraNest — HostMaria / Apache
+
+DirectoryIndex index.php index.html
+
+# Protect config and SQL dumps
+<IfModule mod_authz_core.c>
+  <FilesMatch "^(config\.php)$">
+    Require all denied
+  </FilesMatch>
+</IfModule>
+RedirectMatch 403 (?i)/config/
+RedirectMatch 403 (?i)/sql/
+RedirectMatch 403 (?i)/scripts/
+
+# Legacy .html → .php
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  RewriteRule ^index\.html$ index.php [R=301,L]
+  RewriteRule ^pages/(.+)\.html$ pages/$1.php [R=301,L]
+
+  # Block direct access to includes
+  RewriteRule ^includes/ - [F,L]
+</IfModule>
+
+# Disallow PHP execution in uploads (Apache 2.4+)
+<IfModule mod_rewrite.c>
+  RewriteRule ^uploads/.*\.(?i:php)$ - [F,L]
+</IfModule>

@@ -41,13 +41,14 @@
             dataset.country,
             dataset.type,
             dataset.duration,
+            dataset.pickup,
             item.textContent,
           ].join(" ")
         );
         if (!hay.includes(filters.q)) return false;
       }
 
-      const keys = ["destination", "state", "country", "duration", "type", "location", "amenities"];
+      const keys = ["destination", "state", "country", "duration", "type", "location", "amenities", "pickup"];
       for (let i = 0; i < keys.length; i++) {
         const key = keys[i];
         if (filters[key] && filters[key] !== "all") {

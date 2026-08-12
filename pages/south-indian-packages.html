@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="../css/components.css" />
   <link rel="stylesheet" href="../css/responsive.css" />
 </head>
-<body>
+<body data-package-page="south" data-asset-prefix="../assets/images/">
   <a class="skip-link" href="#main">Skip to content</a>
   <header class="site-header">
     <div class="container site-header__inner">
@@ -67,97 +67,15 @@
     <section class="section"><div class="container" data-filter-root>
       <div class="section-header"><h2>Package listing</h2><p class="section-lead">Browse options and request pricing for your preferred dates. No online checkout.</p></div>
       <form class="filter-bar" data-filter-form><div class="filter-bar__row">
-  <div class="form-group"><label for="f-dest">Destination</label><select class="form-control" id="f-dest" data-filter="destination"><option value="all">All</option><option value="ooty">Ooty</option><option value="coorg">Coorg</option><option value="madurai">Madurai</option><option value="pondicherry">Pondicherry</option></select></div>
-  <div class="form-group"><label for="f-state">State</label><select class="form-control" id="f-state" data-filter="state"><option value="all">All</option><option value="tamil-nadu">Tamil Nadu</option><option value="karnataka">Karnataka</option><option value="pondicherry">Pondicherry</option></select></div>
-  <div class="form-group"><label for="f-duration">Duration</label><select class="form-control" id="f-duration" data-filter="duration"><option value="all">Any</option><option value="2-4">2–4 days</option><option value="5-7">5–7 days</option></select></div>
-  <div class="form-group"><label for="f-type">Travel type</label><select class="form-control" id="f-type" data-filter="type"><option value="all">All</option><option value="family">Family</option><option value="couple">Couple</option><option value="heritage">Heritage</option></select></div>
+  <div class="form-group"><label for="f-dest">Destination</label><select class="form-control" id="f-dest" data-filter="destination"><option value="all">All destinations</option></select></div>
+  <div class="form-group"><label for="f-pickup">Pickup</label><select class="form-control" id="f-pickup" data-filter="pickup"><option value="all">Any pickup</option></select></div>
+  <div class="form-group"><label for="f-state">State</label><select class="form-control" id="f-state" data-filter="state"><option value="all">All</option><option value="tamil-nadu">Tamil Nadu</option><option value="karnataka">Karnataka</option><option value="kerala">Kerala</option></select></div>
+  <div class="form-group"><label for="f-duration">Duration</label><select class="form-control" id="f-duration" data-filter="duration"><option value="all">Any</option><option value="2-4">2–4 days</option><option value="5-7">5–7 days</option><option value="8-10">8–10 days</option></select></div>
+  <div class="form-group"><label for="f-type">Travel type</label><select class="form-control" id="f-type" data-filter="type"><option value="all">All</option><option value="family">Family</option><option value="couple">Couple</option><option value="heritage">Heritage</option><option value="adventure">Adventure</option><option value="leisure">Leisure</option></select></div>
   <div class="filter-actions"><button class="btn btn--primary" type="submit">Apply</button><button class="btn btn--secondary" type="button" data-filter-reset>Reset</button></div>
 </div></form>
       <div class="results-meta"><span data-filter-count></span></div>
-      <div class="package-grid" data-filter-list data-per-page="6">          <article class="card" data-filter-item data-name="Nilgiri Hills Escape" data-destination="ooty" data-state="tamil-nadu" data-country="" data-duration="2-4" data-type="family">
-            <div class="card__media"><img src="../assets/images/waterfall.jpg" alt="Nilgiri Hills Escape" width="800" height="500" loading="lazy" /></div>
-            <div class="card__body">
-              <p class="card__meta">Ooty · Coonoor</p>
-              <h3 class="card__title"><a href="package-details.html?package=nilgiri-hills">Nilgiri Hills Escape</a></h3>
-              <p class="meta-row"><span><strong>4 Days / 3 Nights</strong></span></p>
-              <p class="card__text">Cool climate, botanical gardens and toy-train charm.</p>
-              <ul class="highlight-list"><li>Gardens</li><li>Viewpoints</li><li>Tea estates</li></ul>
-              <div class="card__actions">
-                <a class="btn btn--secondary btn--sm" href="package-details.html?package=nilgiri-hills">View Details</a>
-                <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
-              </div>
-            </div>
-          </article>
-          <article class="card" data-filter-item data-name="Coorg Coffee Trails" data-destination="coorg" data-state="karnataka" data-country="" data-duration="2-4" data-type="couple">
-            <div class="card__media"><img src="../assets/images/forest.jpg" alt="Coorg Coffee Trails" width="800" height="500" loading="lazy" /></div>
-            <div class="card__body">
-              <p class="card__meta">Madikeri · Abbey Falls</p>
-              <h3 class="card__title"><a href="package-details.html?package=coorg-coffee">Coorg Coffee Trails</a></h3>
-              <p class="meta-row"><span><strong>3 Days / 2 Nights</strong></span></p>
-              <p class="card__text">Plantation stays, misty hills and waterfall walks.</p>
-              <ul class="highlight-list"><li>Plantations</li><li>Waterfalls</li><li>Local food</li></ul>
-              <div class="card__actions">
-                <a class="btn btn--secondary btn--sm" href="package-details.html?package=coorg-coffee">View Details</a>
-                <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
-              </div>
-            </div>
-          </article>
-          <article class="card" data-filter-item data-name="Tamil Heritage Trail" data-destination="madurai" data-state="tamil-nadu" data-country="" data-duration="5-7" data-type="heritage">
-            <div class="card__media"><img src="../assets/images/temple.jpg" alt="Tamil Heritage Trail" width="800" height="500" loading="lazy" /></div>
-            <div class="card__body">
-              <p class="card__meta">Madurai · Rameswaram · Kanyakumari</p>
-              <h3 class="card__title"><a href="package-details.html?package=tamil-trail">Tamil Heritage Trail</a></h3>
-              <p class="meta-row"><span><strong>6 Days / 5 Nights</strong></span></p>
-              <p class="card__text">Temples, coastal towns and living heritage.</p>
-              <ul class="highlight-list"><li>Temples</li><li>Coast</li><li>Cuisine</li></ul>
-              <div class="card__actions">
-                <a class="btn btn--secondary btn--sm" href="package-details.html?package=tamil-trail">View Details</a>
-                <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
-              </div>
-            </div>
-          </article>
-          <article class="card" data-filter-item data-name="Pondicherry French Quarters" data-destination="pondicherry" data-state="pondicherry" data-country="" data-duration="2-4" data-type="couple">
-            <div class="card__media"><img src="../assets/images/goa-beach.jpg" alt="Pondicherry French Quarters" width="800" height="500" loading="lazy" /></div>
-            <div class="card__body">
-              <p class="card__meta">Pondicherry · Auroville</p>
-              <h3 class="card__title"><a href="package-details.html?package=pondy-escape">Pondicherry French Quarters</a></h3>
-              <p class="meta-row"><span><strong>3 Days / 2 Nights</strong></span></p>
-              <p class="card__text">Promenade walks, cafes and quiet beach mornings.</p>
-              <ul class="highlight-list"><li>Beach</li><li>Cafes</li><li>Architecture</li></ul>
-              <div class="card__actions">
-                <a class="btn btn--secondary btn--sm" href="package-details.html?package=pondy-escape">View Details</a>
-                <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
-              </div>
-            </div>
-          </article>
-          <article class="card" data-filter-item data-name="Chennai & Mahabalipuram" data-destination="madurai" data-state="tamil-nadu" data-country="" data-duration="2-4" data-type="family">
-            <div class="card__media"><img src="../assets/images/rajasthan.jpg" alt="Chennai & Mahabalipuram" width="800" height="500" loading="lazy" /></div>
-            <div class="card__body">
-              <p class="card__meta">Chennai · Mahabalipuram</p>
-              <h3 class="card__title"><a href="package-details.html?package=chennai-maha">Chennai & Mahabalipuram</a></h3>
-              <p class="meta-row"><span><strong>4 Days / 3 Nights</strong></span></p>
-              <p class="card__text">City energy meets UNESCO shore temples.</p>
-              <ul class="highlight-list"><li>City</li><li>Shore temple</li><li>Food</li></ul>
-              <div class="card__actions">
-                <a class="btn btn--secondary btn--sm" href="package-details.html?package=chennai-maha">View Details</a>
-                <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
-              </div>
-            </div>
-          </article>
-          <article class="card" data-filter-item data-name="Mysore Royal Circuit" data-destination="coorg" data-state="karnataka" data-country="" data-duration="2-4" data-type="heritage">
-            <div class="card__media"><img src="../assets/images/temple.jpg" alt="Mysore Royal Circuit" width="800" height="500" loading="lazy" /></div>
-            <div class="card__body">
-              <p class="card__meta">Mysore · Srirangapatna</p>
-              <h3 class="card__title"><a href="package-details.html?package=mysore-royal">Mysore Royal Circuit</a></h3>
-              <p class="meta-row"><span><strong>3 Days / 2 Nights</strong></span></p>
-              <p class="card__text">Palaces, gardens and a leisurely heritage weekend.</p>
-              <ul class="highlight-list"><li>Palace</li><li>Gardens</li><li>Markets</li></ul>
-              <div class="card__actions">
-                <a class="btn btn--secondary btn--sm" href="package-details.html?package=mysore-royal">View Details</a>
-                <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
-              </div>
-            </div>
-          </article></div>
+      <div class="package-grid" data-filter-list data-per-page="9"></div>
       <div class="empty-state" data-filter-empty hidden>No packages match your filters. Reset filters or enquire for a custom plan.</div>
       <div class="pagination" data-pagination></div>
       <div class="cta-band" style="margin-top:3rem"><h2>Need something more personal?</h2><p>Tell us your dates and destinations — we'll send a tailored quote.</p><div class="btn-group"><a class="btn btn--light" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a></div></div>
@@ -238,6 +156,8 @@
       <button class="btn btn--primary" type="button" data-close-modal>Close</button>
     </div>
   </div>
+  <script src="../js/packages-data.js" defer></script>
+  <script src="../js/packages-render.js" defer></script>
   <script src="../js/navigation.js" defer></script>
   <script src="../js/filters.js" defer></script>
   <script src="../js/forms.js" defer></script>

@@ -22,11 +22,20 @@
   window.YN.openModal = openModal;
   window.YN.closeModal = closeModal;
 
-  document.querySelectorAll("[data-open-modal]").forEach(function (btn) {
-    btn.addEventListener("click", function (e) {
-      e.preventDefault();
-      openModal(btn.getAttribute("data-open-modal"));
-    });
+  document.addEventListener("click", function (e) {
+    const btn = e.target.closest("[data-open-modal]");
+    if (!btn) return;
+    e.preventDefault();
+    const title = btn.getAttribute("data-package-title");
+    if (title) {
+      document.querySelectorAll("[data-prefill='package'], [data-prefill='interest']").forEach(function (el) {
+        el.value = title;
+      });
+      document.querySelectorAll("[data-interest-label]").forEach(function (el) {
+        el.textContent = title;
+      });
+    }
+    openModal(btn.getAttribute("data-open-modal"));
   });
 
   document.querySelectorAll(".modal").forEach(function (modal) {
@@ -127,14 +136,42 @@
       }
 
       const successId = form.getAttribute("data-success-modal") || "success-modal";
-      form.reset();
-      form.querySelectorAll(".form-group").forEach(clearError);
+      const action = form.getAttribute("action") || "../handlers/enquiry.php";
+      const submitBtn = form.querySelector('[type="submit"]');
+      if (submitBtn) submitBtn.disabled = true;
 
-      // Close enquiry modal if form is inside one
-      const parentModal = form.closest(".modal");
-      if (parentModal) closeModal(parentModal);
+      const body = new FormData(form);
+      body.append("ajax", "1");
 
-      openModal(successId);
+      fetch(action, {
+        method: "POST",
+        body: body,
+        headers: { Accept: "application/json", "X-Requested-With": "XMLHttpRequest" },
+        credentials: "same-origin",
+      })
+        .then(function (res) {
+          return res.json().then(function (data) {
+            return { ok: res.ok && data && data.ok, data: data };
+          });
+        })
+        .then(function (result) {
+          if (!result.ok) {
+            const msg = (result.data && result.data.error) || "Could not submit enquiry. Please try again.";
+            alert(msg);
+            return;
+          }
+          form.reset();
+          form.querySelectorAll(".form-group").forEach(clearError);
+          const parentModal = form.closest(".modal");
+          if (parentModal) closeModal(parentModal);
+          openModal(successId);
+        })
+        .catch(function () {
+          alert("Could not submit enquiry. Please try again.");
+        })
+        .finally(function () {
+          if (submitBtn) submitBtn.disabled = false;
+        });
     });
 
     form.querySelectorAll(".form-control").forEach(function (field) {
@@ -149,8 +186,13 @@
   function prefillEnquiry() {
     const params = new URLSearchParams(window.location.search);
     const interest = params.get("interest") || "";
-    const packageName = params.get("package") || "";
+    const packageSlug = params.get("package") || "";
     const resort = params.get("resort") || "";
+    let packageName = packageSlug;
+    if (packageSlug && window.YNPackages && typeof window.YNPackages.byId === "function") {
+      const pkg = window.YNPackages.byId(packageSlug);
+      if (pkg) packageName = pkg.title;
+    }
 
     document.querySelectorAll("[data-prefill='interest']").forEach(function (el) {
       if (interest) el.value = interest;

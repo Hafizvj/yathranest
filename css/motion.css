@@ -1,0 +1,521 @@
+/* YathraNest — Motion
+   Premium entrance, hover, and scroll animation
+*/
+
+:root {
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+html.has-motion.is-cursor-on {
+  cursor: none;
+}
+
+html.has-motion.is-cursor-on a,
+html.has-motion.is-cursor-on button,
+html.has-motion.is-cursor-on input,
+html.has-motion.is-cursor-on textarea,
+html.has-motion.is-cursor-on select,
+html.has-motion.is-cursor-on label,
+html.has-motion.is-cursor-on [role="button"] {
+  cursor: none;
+}
+
+/* Custom cursor */
+.cursor {
+  display: none;
+}
+
+html.has-motion .cursor {
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 4000;
+  pointer-events: none;
+  mix-blend-mode: difference;
+}
+
+.cursor__dot,
+.cursor__ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 50%;
+  translate: -50% -50%;
+}
+
+.cursor__dot {
+  width: 8px;
+  height: 8px;
+  background: #fff;
+}
+
+.cursor__ring {
+  width: 36px;
+  height: 36px;
+  border: 1.5px solid rgba(255, 255, 255, 0.85);
+  transition: width 0.35s var(--ease-out), height 0.35s var(--ease-out), background 0.35s ease,
+    border-color 0.35s ease;
+}
+
+html.has-motion.is-cursor-hover .cursor__ring {
+  width: 64px;
+  height: 64px;
+  background: rgba(255, 255, 255, 0.12);
+  border-color: #fff;
+}
+
+html.has-motion.is-cursor-down .cursor__ring {
+  width: 22px;
+  height: 22px;
+}
+
+/* Intro states — only while JS has marked the page */
+html.has-motion .site-header--hero {
+  opacity: 0;
+  transform: translateY(-16px);
+}
+
+html.has-motion.is-ready .site-header--hero {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.9s var(--ease-out) 0.15s, transform 0.9s var(--ease-out) 0.15s;
+}
+
+html.has-motion .hero-v2__visual {
+  clip-path: inset(12% 0 12% 0);
+  opacity: 0.35;
+}
+
+html.has-motion.is-ready .hero-v2__visual {
+  clip-path: inset(0);
+  opacity: 1;
+  transition: clip-path 1.45s var(--ease-in-out) 0.1s, opacity 1.2s ease 0.1s;
+}
+
+html.has-motion .hero-v2__visual img {
+  transform: scale(1.2);
+}
+
+html.has-motion.is-ready .hero-v2__visual img {
+  transform: scale(1.05);
+  transition: transform 2.6s var(--ease-out);
+}
+
+html.has-motion .hero-v2__topo path {
+  stroke-dasharray: 420;
+  stroke-dashoffset: 420;
+}
+
+html.has-motion.is-ready .hero-v2__topo path {
+  animation: topo-draw 2.4s var(--ease-out) 0.4s forwards;
+}
+
+@keyframes topo-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+html.has-motion .hero-v2__eyebrow {
+  opacity: 0;
+  transform: translateY(18px);
+}
+
+html.has-motion.is-ready .hero-v2__eyebrow {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.8s var(--ease-out) 0.35s, transform 0.8s var(--ease-out) 0.35s;
+}
+
+html.has-motion .hero-v2__eyebrow::before {
+  width: 0;
+}
+
+html.has-motion.is-ready .hero-v2__eyebrow::before {
+  width: 2rem;
+  transition: width 0.7s var(--ease-out) 0.55s;
+}
+
+.hero-line {
+  display: block;
+  overflow: hidden;
+}
+
+.hero-line > span {
+  display: block;
+}
+
+html.has-motion .hero-line > span {
+  transform: translateY(110%);
+}
+
+html.has-motion.is-ready .hero-line:nth-child(1) > span {
+  transform: none;
+  transition: transform 1.15s var(--ease-out) 0.45s;
+}
+
+html.has-motion.is-ready .hero-line:nth-child(2) > span {
+  transform: none;
+  transition: transform 1.15s var(--ease-out) 0.58s;
+}
+
+html.has-motion .hero-v2__lead {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+html.has-motion.is-ready .hero-v2__lead {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.85s var(--ease-out) 0.85s, transform 0.85s var(--ease-out) 0.85s;
+}
+
+html.has-motion .hero-card {
+  opacity: 0;
+  transform: translateY(36px) scale(0.96);
+}
+
+html.has-motion.is-ready .hero-card {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.85s var(--ease-out), transform 0.85s var(--ease-out), box-shadow 0.4s ease;
+  transition-delay: calc(0.95s + var(--i, 0) * 0.08s);
+}
+
+html.has-motion.is-live .hero-card {
+  transition: transform 0.35s var(--ease-out), box-shadow 0.4s ease;
+  transition-delay: 0s;
+}
+
+html.has-motion .hero-trust {
+  opacity: 0;
+  transform: translateY(28px);
+}
+
+html.has-motion.is-ready .hero-trust {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.9s var(--ease-out) 1.45s, transform 0.9s var(--ease-out) 1.45s, box-shadow 0.4s ease;
+}
+
+/* Hero card hover — shine, lift, glow */
+.hero-card {
+  transition: transform 0.45s var(--ease-out), box-shadow 0.45s ease;
+}
+
+.hero-card img {
+  transition: transform 0.9s var(--ease-out);
+}
+
+.hero-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, 0.2) 50%, transparent 65%);
+  transform: translateX(-140%);
+  transition: transform 0.8s var(--ease-out);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hero-card:hover::after,
+.hero-card:focus-visible::after {
+  transform: translateX(140%);
+}
+
+.hero-card__icon,
+.hero-card__text,
+.hero-card__arrow {
+  position: relative;
+  z-index: 2;
+}
+
+.hero-card__arrow {
+  position: absolute;
+  z-index: 2;
+  transition: transform 0.45s var(--ease-out), background 0.3s ease, color 0.3s ease;
+}
+
+.hero-card:hover {
+  box-shadow: 0 22px 50px rgba(22, 58, 66, 0.22);
+}
+
+.hero-card:hover img {
+  transform: scale(1.12);
+}
+
+.hero-card:hover .hero-card__arrow {
+  transform: translateX(4px) scale(1.08);
+  background: var(--hero-teal, #1f8a86);
+  color: #fff;
+}
+
+.hero-card:hover .hero-card__icon {
+  transform: scale(1.08);
+  transition: transform 0.4s var(--ease-out);
+}
+
+.hero-trust {
+  transition: transform 0.45s var(--ease-out), box-shadow 0.45s ease;
+}
+
+.hero-trust:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 40px rgba(22, 58, 66, 0.12);
+}
+
+.hero-trust__icon {
+  transition: transform 0.4s var(--ease-out), background 0.3s ease;
+}
+
+.hero-trust__item:hover .hero-trust__icon {
+  transform: scale(1.12) rotate(-8deg);
+  background: rgba(31, 138, 134, 0.18);
+}
+
+/* Magnetic menu button */
+.nav-toggle--circle {
+  transition: transform 0.35s var(--ease-out), background 0.25s ease, box-shadow 0.35s ease;
+}
+
+.nav-toggle--circle:hover {
+  box-shadow: 0 8px 24px rgba(22, 58, 66, 0.28);
+}
+
+.nav-explore__menu {
+  transform-origin: top right;
+  animation: menu-in 0.35s var(--ease-out);
+}
+
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Scroll reveals */
+html.has-motion .section-header,
+html.has-motion .package-grid .card,
+html.has-motion .destination-card,
+html.has-motion .benefit-item,
+html.has-motion .promo-split,
+html.has-motion .cta-band,
+html.has-motion .investment-banner {
+  opacity: 0;
+  transform: translateY(40px);
+}
+
+html.has-motion .section-header.is-in,
+html.has-motion .package-grid .card.is-in,
+html.has-motion .destination-card.is-in,
+html.has-motion .benefit-item.is-in,
+html.has-motion .promo-split.is-in,
+html.has-motion .cta-band.is-in,
+html.has-motion .investment-banner.is-in {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.9s var(--ease-out), transform 0.9s var(--ease-out);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+html.has-motion .package-grid .card.is-in:hover {
+  transform: translateY(-8px);
+}
+
+html.has-motion .destination-card.is-in:hover {
+  transform: translateY(-6px);
+}
+
+html.has-motion .benefit-item.is-in:hover {
+  transform: translateY(-6px);
+}
+
+/* Buttons */
+.btn {
+  position: relative;
+  overflow: hidden;
+  transition: background 0.35s ease, color 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease,
+    transform 0.35s var(--ease-out);
+}
+
+.btn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, 0.18) 50%, transparent 70%);
+  transform: translateX(-120%);
+  pointer-events: none;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(22, 58, 66, 0.16);
+}
+
+.btn:hover::after {
+  transform: translateX(120%);
+  transition: transform 0.65s var(--ease-out);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+/* Cards & destinations */
+.card {
+  transition: transform 0.5s var(--ease-out), box-shadow 0.5s ease, border-color 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 18px 40px rgba(22, 58, 66, 0.1);
+}
+
+.card__media img {
+  transition: transform 0.9s var(--ease-out);
+}
+
+.card:hover .card__media img {
+  transform: scale(1.08);
+}
+
+.destination-card {
+  transition: transform 0.5s var(--ease-out), box-shadow 0.5s ease;
+}
+
+.destination-card img {
+  transition: transform 1s var(--ease-out);
+}
+
+.destination-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px rgba(22, 58, 66, 0.16);
+  color: #fff;
+}
+
+.destination-card:hover img {
+  transform: scale(1.12);
+}
+
+.destination-card__overlay {
+  transition: background 0.45s ease;
+}
+
+.destination-card:hover .destination-card__overlay {
+  background: linear-gradient(180deg, transparent 20%, rgba(22, 58, 66, 0.82) 100%);
+}
+
+.destination-card h3,
+.destination-card span {
+  transition: transform 0.45s var(--ease-out);
+}
+
+.destination-card:hover h3,
+.destination-card:hover span {
+  transform: translateY(-4px);
+}
+
+.benefit-item {
+  transition: transform 0.45s var(--ease-out);
+}
+
+.benefit-item:hover {
+  transform: translateY(-6px);
+}
+
+.benefit-item__num {
+  transition: color 0.35s ease, letter-spacing 0.35s ease;
+}
+
+.benefit-item:hover .benefit-item__num {
+  color: #1f8a86;
+  letter-spacing: 0.06em;
+}
+
+.promo-split__media {
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+}
+
+.promo-split__media img {
+  transition: transform 1s var(--ease-out);
+}
+
+.promo-split:hover .promo-split__media img {
+  transform: scale(1.06);
+}
+
+.logo__icon {
+  transition: transform 0.5s var(--ease-out);
+}
+
+.logo:hover .logo__icon {
+  transform: rotate(-12deg) scale(1.08);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  html.has-motion.is-cursor-on,
+  html.has-motion.is-cursor-on a,
+  html.has-motion.is-cursor-on button,
+  html.has-motion.is-cursor-on input,
+  html.has-motion.is-cursor-on textarea,
+  html.has-motion.is-cursor-on select,
+  html.has-motion.is-cursor-on label {
+    cursor: auto;
+  }
+
+  .cursor,
+  html.has-motion .cursor {
+    display: none !important;
+  }
+
+  html.has-motion .site-header--hero,
+  html.has-motion .hero-v2__visual,
+  html.has-motion .hero-v2__visual img,
+  html.has-motion .hero-v2__eyebrow,
+  html.has-motion .hero-line > span,
+  html.has-motion .hero-v2__lead,
+  html.has-motion .hero-card,
+  html.has-motion .hero-trust,
+  html.has-motion .section-header,
+  html.has-motion .package-grid .card,
+  html.has-motion .destination-card,
+  html.has-motion .benefit-item,
+  html.has-motion .promo-split,
+  html.has-motion .cta-band,
+  html.has-motion .investment-banner {
+    opacity: 1 !important;
+    transform: none !important;
+    clip-path: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+
+  .btn:hover,
+  .card:hover,
+  .hero-card:hover,
+  .destination-card:hover {
+    transform: none;
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  html.has-motion.is-cursor-on,
+  html.has-motion.is-cursor-on a,
+  html.has-motion.is-cursor-on button {
+    cursor: auto;
+  }
+
+  .cursor,
+  html.has-motion .cursor {
+    display: none !important;
+  }
+}

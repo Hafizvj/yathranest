@@ -38,6 +38,13 @@ jobs:
             .github/**
             README.md
             tools/**
+            .env
+            .env.example
+            config/config.php
+            sql/seed-data.json
+            scripts/**
+            node_modules/**
+            .cursor/**
 
       - name: Retry deploy if connection dropped
         if: steps.deploy.outcome == 'failure'
@@ -56,3 +63,10 @@ jobs:
             .github/**
             README.md
             tools/**
+            .env
+            .env.example
+            config/config.php
+            sql/seed-data.json
+            scripts/**
+            node_modules/**
+            .cursor/**
