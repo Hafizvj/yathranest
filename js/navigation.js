@@ -46,4 +46,39 @@
       closeNav();
     }
   });
+
+  const explore = document.querySelector(".nav-explore");
+  if (explore) {
+    const exploreBtn = explore.querySelector(".nav-explore__btn");
+    const exploreMenu = explore.querySelector(".nav-explore__menu");
+
+    function closeExplore() {
+      if (!exploreBtn || !exploreMenu) return;
+      exploreBtn.setAttribute("aria-expanded", "false");
+      exploreMenu.hidden = true;
+    }
+
+    function toggleExplore() {
+      const open = exploreBtn.getAttribute("aria-expanded") === "true";
+      if (open) {
+        closeExplore();
+        return;
+      }
+      exploreBtn.setAttribute("aria-expanded", "true");
+      exploreMenu.hidden = false;
+    }
+
+    exploreBtn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      toggleExplore();
+    });
+
+    document.addEventListener("click", function (e) {
+      if (!explore.contains(e.target)) closeExplore();
+    });
+
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") closeExplore();
+    });
+  }
 })();
