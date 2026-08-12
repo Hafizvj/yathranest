@@ -17,15 +17,40 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Deploy site via FTP
+      # Shared hosts often drop plain FTP data sockets (ECONNRESET).
+      # FTPS + longer timeout + one automatic retry handles most cases.
+      - name: Deploy site via FTPS
+        id: deploy
+        continue-on-error: true
         uses: SamKirkland/FTP-Deploy-Action@v4.3.6
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          # FTP account already opens in public_html/uat-yathranest — do NOT repeat that path
+          protocol: ftps
+          security: loose
+          timeout: 120000
+          # FTP account already opens in public_html/uat-yathranest
           server-dir: ./
-          log-level: minimal
+          log-level: standard
+          exclude: |
+            .git/**
+            .github/**
+            README.md
+            tools/**
+
+      - name: Retry deploy if connection dropped
+        if: steps.deploy.outcome == 'failure'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          security: loose
+          timeout: 120000
+          server-dir: ./
+          log-level: standard
           exclude: |
             .git/**
             .github/**
