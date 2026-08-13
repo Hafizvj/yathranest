@@ -5,7 +5,10 @@
  */
 return [
     'db' => [
-        'host' => 'localhost',
+        // StackCP tip: prefer 127.0.0.1 over localhost (avoids unix socket errors).
+        // If needed, use the hostname from cPanel (e.g. sdb-XX.hosting.stackcp.net).
+        'host' => '127.0.0.1',
+        'port' => 3306,
         'name' => 'yathranest',
         'user' => 'root',
         'pass' => '',
