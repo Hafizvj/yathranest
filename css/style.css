@@ -4,6 +4,10 @@
 
 @import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap");
 
+html {
+  overflow-x: clip;
+}
+
 :root {
   --primary: #3a6464;
   --primary-dark: #2a4a4a;
@@ -512,6 +516,7 @@ h3 {
   z-index: 200;
   pointer-events: none;
   visibility: hidden;
+  overflow: hidden;
 }
 
 .nav-drawer.is-open {

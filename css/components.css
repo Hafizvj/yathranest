@@ -805,6 +805,11 @@ textarea.form-control {
 .filter-bar__row {
   display: grid;
   gap: 0.85rem;
+  min-width: 0;
+}
+
+.filter-bar__row > * {
+  min-width: 0;
 }
 
 .filter-actions {

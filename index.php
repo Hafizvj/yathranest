@@ -122,7 +122,7 @@ $csrf = csrf_token();
         <div class="hero-v2__copy">
           <p class="hero-v2__eyebrow">Journeys designed for you</p>
           <h1 id="hero-heading">
-            <span class="hero-line"><span>Travel more.</span></span>
+            <span class="hero-line"><span>Traveled more.</span></span>
             <span class="hero-line"><span>Worry less.</span></span>
           </h1>
           <p class="hero-v2__lead">Handpicked experiences, comfortable stays, and seamless journeys — all in one place.</p>

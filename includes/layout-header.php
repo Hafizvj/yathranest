@@ -23,9 +23,9 @@ $phoneHref = 'tel:' . preg_replace('/\s+/', '', $phone);
   <meta name="description" content="<?= e($metaDescription) ?>" />
   <title><?= e($pageTitle) ?></title>
   <link rel="icon" href="<?= e($assetDepth) ?>assets/logo/logo.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="<?= e($assetDepth) ?>css/style.css" />
-  <link rel="stylesheet" href="<?= e($assetDepth) ?>css/components.css" />
-  <link rel="stylesheet" href="<?= e($assetDepth) ?>css/responsive.css" />
+  <link rel="stylesheet" href="<?= e($assetDepth) ?>css/style.css?v=9" />
+  <link rel="stylesheet" href="<?= e($assetDepth) ?>css/components.css?v=9" />
+  <link rel="stylesheet" href="<?= e($assetDepth) ?>css/responsive.css?v=9" />
   <?php if (!empty($extraHead)) echo $extraHead; ?>
 </head>
 <body<?= $bodyAttrs !== '' ? ' ' . $bodyAttrs : '' ?>>

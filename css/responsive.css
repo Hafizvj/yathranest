@@ -120,14 +120,14 @@
   .cta-band {
     padding: 3rem 2.5rem;
   }
+}
 
+@media (min-width: 1024px) {
   .detail-hero {
     grid-template-columns: 1.35fr 1fr;
     align-items: center;
   }
-}
 
-@media (min-width: 1024px) {
   .nav-desktop {
     gap: 0.15rem;
   }
@@ -156,7 +156,7 @@
   }
 
   .filter-bar__row {
-    grid-template-columns: repeat(4, 1fr) auto;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
     align-items: end;
   }
 

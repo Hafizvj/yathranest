@@ -88,7 +88,7 @@ require dirname(__DIR__) . '/includes/layout-header.php';
             <p class="text-muted"><?= e($pkg['overview']) ?></p>
             <div class="btn-group">
               <a class="btn btn--primary" href="#enquiry" data-open-modal="enquiry-modal" data-package-title="<?= e($pkg['title']) ?>">Request Pricing</a>
-              <a class="btn btn--secondary" href="itinerary-print.php?package=<?= e(rawurlencode($pkg['slug'])) ?>&print=1" target="_blank" rel="noopener">Download Itinerary PDF</a>
+              <a class="btn btn--secondary" href="contact.php">Enquire Now</a>
             </div>
           </div>
         </div>
@@ -194,7 +194,6 @@ require dirname(__DIR__) . '/includes/layout-header.php';
               <h3>Request Pricing</h3>
               <p>Share your preferred dates and traveller count. Our team will respond with availability and a personalised quote.</p>
               <a class="btn btn--primary btn--block" href="#enquiry" data-open-modal="enquiry-modal" data-package-title="<?= e($pkg['title']) ?>">Request Pricing</a>
-              <a class="btn btn--secondary btn--block mt-1" href="itinerary-print.php?package=<?= e(rawurlencode($pkg['slug'])) ?>&print=1" target="_blank" rel="noopener">Download Itinerary PDF</a>
               <a class="btn btn--secondary btn--block mt-1" href="https://wa.me/<?= e($whatsapp) ?>" target="_blank" rel="noopener noreferrer">WhatsApp Us</a>
             </div>
           </aside>

@@ -23,6 +23,7 @@ function package_map_row(array $row): array
 function packages_for_page(string $page, bool $publishedOnly = true): array
 {
     $sql = 'SELECT * FROM packages';
+    $params = [];
     if ($publishedOnly) {
         $sql .= ' WHERE is_published = 1';
     }
@@ -36,64 +37,6 @@ function packages_for_page(string $page, bool $publishedOnly = true): array
         }
     }
     return $out;
-}
-
-function packages_for_destination(string $page, string $destinationSlug, bool $publishedOnly = true): array
-{
-    $destinationSlug = strtolower(trim($destinationSlug));
-    $out = [];
-    foreach (packages_for_page($page, $publishedOnly) as $pkg) {
-        $dests = array_map('strtolower', $pkg['destinations'] ?? []);
-        if (in_array($destinationSlug, $dests, true)) {
-            $out[] = $pkg;
-        }
-    }
-    return $out;
-}
-
-/**
- * Destinations that appear in packages for a given page (e.g. kerala).
- * @return array<int, array{slug:string,label:string,count:int,image:string,tags:array}>
- */
-function destinations_for_page(string $page): array
-{
-    $places = places_all();
-    $counts = [];
-    foreach (packages_for_page($page, true) as $pkg) {
-        foreach ($pkg['destinations'] as $slug) {
-            $slug = strtolower((string) $slug);
-            if ($slug === '') {
-                continue;
-            }
-            if (!isset($counts[$slug])) {
-                $counts[$slug] = 0;
-            }
-            $counts[$slug]++;
-        }
-    }
-
-    $out = [];
-    foreach ($counts as $slug => $count) {
-        $place = $places[$slug] ?? null;
-        $images = $place['images'] ?? [];
-        $image = $images[0] ?? 'beach.jpg';
-        $out[] = [
-            'slug' => $slug,
-            'label' => $place['label'] ?? ucwords(str_replace('-', ' ', $slug)),
-            'count' => $count,
-            'image' => $image,
-            'tags' => $place['tags'] ?? [],
-        ];
-    }
-
-    usort($out, static fn($a, $b) => strcasecmp($a['label'], $b['label']));
-    return $out;
-}
-
-function place_by_slug(string $slug): ?array
-{
-    $places = places_all();
-    return $places[strtolower(trim($slug))] ?? null;
 }
 
 function package_by_slug(string $slug, bool $publishedOnly = true): ?array
