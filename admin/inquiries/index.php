@@ -40,9 +40,9 @@ ob_start();
     </div>
   </form>
   <table class="admin-table">
-    <thead><tr><th>When</th><th>Type</th><th>Name</th><th>Phone</th><th>Interest</th><th>Status</th><th></th></tr></thead>
+    <thead><tr><th>When</th><th>Type</th><th>Name</th><th>Phone</th><th>Interest</th><th>Travel from</th><th>Status</th><th></th></tr></thead>
     <tbody>
-      <?php if (!$rows): ?><tr><td colspan="7">No inquiries.</td></tr><?php endif; ?>
+      <?php if (!$rows): ?><tr><td colspan="8">No inquiries.</td></tr><?php endif; ?>
       <?php foreach ($rows as $row): ?>
         <tr>
           <td><?= e($row['created_at']) ?></td>
@@ -50,6 +50,7 @@ ob_start();
           <td><?= e($row['name']) ?></td>
           <td><?= e($row['phone']) ?></td>
           <td><?= e($row['interest']) ?></td>
+          <td><?= e(enquiry_date_label($row['travel_date'] ?? '')) ?></td>
           <td><span class="badge badge--<?= e($row['status']) ?>"><?= e($row['status']) ?></span></td>
           <td><a class="btn btn--secondary btn--sm" href="<?= e(url('admin/inquiries/view.php?id=' . (int) $row['id'])) ?>">Open</a></td>
         </tr>

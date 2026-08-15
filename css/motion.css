@@ -239,7 +239,7 @@ html.has-motion.is-ready .hero-trust {
 }
 
 .hero-card:hover {
-  box-shadow: 0 22px 50px rgba(22, 58, 66, 0.22);
+  box-shadow: 0 22px 50px rgba(21, 45, 39, 0.22);
 }
 
 .hero-card:hover img {
@@ -248,7 +248,7 @@ html.has-motion.is-ready .hero-trust {
 
 .hero-card:hover .hero-card__arrow {
   transform: translateX(4px) scale(1.08);
-  background: var(--hero-teal, #1f8a86);
+  background: var(--hero-teal, #346356);
   color: #fff;
 }
 
@@ -263,7 +263,7 @@ html.has-motion.is-ready .hero-trust {
 
 .hero-trust:hover {
   transform: translateY(-3px);
-  box-shadow: 0 16px 40px rgba(22, 58, 66, 0.12);
+  box-shadow: 0 16px 40px rgba(21, 45, 39, 0.12);
 }
 
 .hero-trust__icon {
@@ -272,7 +272,7 @@ html.has-motion.is-ready .hero-trust {
 
 .hero-trust__item:hover .hero-trust__icon {
   transform: scale(1.12) rotate(-8deg);
-  background: rgba(31, 138, 134, 0.18);
+  background: rgba(52, 99, 86, 0.18);
 }
 
 /* Magnetic menu button */
@@ -281,7 +281,7 @@ html.has-motion.is-ready .hero-trust {
 }
 
 .nav-toggle--circle:hover {
-  box-shadow: 0 8px 24px rgba(22, 58, 66, 0.28);
+  box-shadow: 0 8px 24px rgba(21, 45, 39, 0.28);
 }
 
 .nav-explore__menu {
@@ -356,7 +356,7 @@ html.has-motion .benefit-item.is-in:hover {
 
 .btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 24px rgba(22, 58, 66, 0.16);
+  box-shadow: 0 10px 24px rgba(21, 45, 39, 0.16);
 }
 
 .btn:hover::after {
@@ -375,7 +375,7 @@ html.has-motion .benefit-item.is-in:hover {
 
 .card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 18px 40px rgba(22, 58, 66, 0.1);
+  box-shadow: 0 18px 40px rgba(21, 45, 39, 0.1);
 }
 
 .card__media img {
@@ -396,7 +396,7 @@ html.has-motion .benefit-item.is-in:hover {
 
 .destination-card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 20px 40px rgba(22, 58, 66, 0.16);
+  box-shadow: 0 20px 40px rgba(21, 45, 39, 0.16);
   color: #fff;
 }
 
@@ -409,7 +409,7 @@ html.has-motion .benefit-item.is-in:hover {
 }
 
 .destination-card:hover .destination-card__overlay {
-  background: linear-gradient(180deg, transparent 20%, rgba(22, 58, 66, 0.82) 100%);
+  background: linear-gradient(180deg, transparent 20%, rgba(21, 45, 39, 0.82) 100%);
 }
 
 .destination-card h3,
@@ -435,7 +435,7 @@ html.has-motion .benefit-item.is-in:hover {
 }
 
 .benefit-item:hover .benefit-item__num {
-  color: #1f8a86;
+  color: #346356;
   letter-spacing: 0.06em;
 }
 
@@ -452,12 +452,14 @@ html.has-motion .benefit-item.is-in:hover {
   transform: scale(1.06);
 }
 
-.logo__icon {
+.logo__img,
+.logo__badge {
   transition: transform 0.5s var(--ease-out);
 }
 
-.logo:hover .logo__icon {
-  transform: rotate(-12deg) scale(1.08);
+.logo:hover .logo__img,
+.logo:hover .logo__badge {
+  transform: scale(1.04);
 }
 
 /* Reduced motion */

@@ -1,6 +1,7 @@
 .env
 .env.example
 config/config.php
+config/config.hostmaria.php
 scripts/.unsplash-place-cache.json
 scripts/.place-image-cache.json
 uploads/**

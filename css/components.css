@@ -170,7 +170,7 @@
 .card__media {
   aspect-ratio: 16 / 10;
   background:
-    linear-gradient(135deg, rgba(31, 107, 79, 0.12), rgba(233, 162, 59, 0.12)),
+    linear-gradient(135deg, rgba(52, 99, 86, 0.12), rgba(233, 162, 59, 0.12)),
     #d9e0db;
   overflow: hidden;
 }
@@ -234,8 +234,8 @@
 
 /* Homepage hero */
 .hero-v2 {
-  --hero-ink: #163a42;
-  --hero-teal: #1f8a86;
+  --hero-ink: #1d3f36;
+  --hero-teal: #346356;
   --hero-wash: #f4f2ee;
   position: relative;
   background: var(--hero-wash);
@@ -357,7 +357,7 @@
   border-radius: 18px;
   overflow: hidden;
   color: #fff;
-  background: #1c3338;
+  background: #1d3f36;
   isolation: isolate;
 }
 
@@ -381,7 +381,7 @@
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: linear-gradient(165deg, rgba(12, 28, 34, 0.42) 0%, rgba(8, 18, 24, 0.62) 100%);
+  background: linear-gradient(165deg, rgba(14, 32, 26, 0.42) 0%, rgba(10, 20, 16, 0.62) 100%);
 }
 
 .hero-card:hover img {
@@ -462,7 +462,7 @@
   padding: 1.1rem 1.25rem;
   background: #fff;
   border-radius: 22px;
-  box-shadow: 0 10px 32px rgba(22, 58, 66, 0.08);
+  box-shadow: 0 10px 32px rgba(21, 45, 39, 0.08);
 }
 
 .hero-trust__item {
@@ -475,7 +475,7 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: rgba(31, 138, 134, 0.1);
+  background: rgba(52, 99, 86, 0.1);
   color: var(--hero-teal);
   display: grid;
   place-items: center;
@@ -522,7 +522,7 @@
   aspect-ratio: 16 / 9;
   min-height: 0;
   color: #fff;
-  background: #1a2e26;
+  background: #16302a;
   isolation: isolate;
 }
 
@@ -593,8 +593,8 @@
   background: linear-gradient(
     180deg,
     rgba(10, 18, 14, 0.12) 10%,
-    rgba(21, 75, 56, 0.5) 55%,
-    rgba(15, 40, 30, 0.92) 100%
+    rgba(36, 72, 62, 0.5) 55%,
+    rgba(20, 44, 37, 0.92) 100%
   );
 }
 
@@ -619,7 +619,7 @@
   display: block;
   color: #fff;
   background:
-    linear-gradient(135deg, #1f6b4f, #154b38);
+    linear-gradient(135deg, #346356, #24483e);
 }
 
 .destination-card img {
@@ -724,7 +724,7 @@
 .form-control:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(31, 107, 79, 0.15);
+  box-shadow: 0 0 0 3px rgba(52, 99, 86, 0.15);
 }
 
 .form-control.is-invalid {
@@ -774,7 +774,7 @@ textarea.form-control {
 .choice-card:has(input:checked),
 .choice-card.is-selected {
   border-color: var(--primary);
-  background: rgba(31, 107, 79, 0.06);
+  background: rgba(52, 99, 86, 0.06);
 }
 
 .choice-card input {
@@ -860,7 +860,7 @@ textarea.form-control {
 .pagination a[aria-current="page"] {
   border-color: var(--primary);
   color: var(--primary);
-  background: rgba(31, 107, 79, 0.08);
+  background: rgba(52, 99, 86, 0.08);
 }
 
 .pagination button:disabled {
@@ -894,7 +894,8 @@ textarea.form-control {
   color: var(--text);
 }
 
-.accordion__trigger span {
+/* Label only — the icon is a span too, and flex: 1 would stretch it into an oval. */
+.accordion__trigger span:not(.accordion__icon) {
   flex: 1;
 }
 
@@ -902,13 +903,13 @@ textarea.form-control {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: rgba(31, 107, 79, 0.1);
+  background: rgba(52, 99, 86, 0.1);
   color: var(--primary);
   display: grid;
   place-items: center;
   font-size: 1.1rem;
   line-height: 1;
-  flex-shrink: 0;
+  flex: 0 0 auto;
   transition: transform var(--transition);
 }
 
@@ -981,7 +982,7 @@ textarea.form-control {
   width: 52px;
   height: 52px;
   border-radius: 50%;
-  background: rgba(31, 107, 79, 0.12);
+  background: rgba(52, 99, 86, 0.12);
   color: var(--primary);
   display: grid;
   place-items: center;
@@ -1120,7 +1121,7 @@ body.modal-open {
   overflow: hidden;
   aspect-ratio: 16 / 10;
   background:
-    linear-gradient(135deg, rgba(31, 107, 79, 0.15), rgba(233, 162, 59, 0.15)),
+    linear-gradient(135deg, rgba(52, 99, 86, 0.15), rgba(233, 162, 59, 0.15)),
     #d9e0db;
 }
 
@@ -1271,7 +1272,7 @@ body.modal-open {
   overflow: hidden;
   aspect-ratio: 16 / 11;
   background:
-    linear-gradient(135deg, rgba(31, 107, 79, 0.15), rgba(233, 162, 59, 0.15)),
+    linear-gradient(135deg, rgba(52, 99, 86, 0.15), rgba(233, 162, 59, 0.15)),
     #d9e0db;
 }
 
@@ -1282,8 +1283,8 @@ body.modal-open {
 }
 
 .investment-banner {
-  background: #1a2e26;
-  color: #e8efeB;
+  background: #16302a;
+  color: #e9efec;
   border-radius: var(--radius-lg);
   padding: 2rem 1.5rem;
 }

@@ -7,6 +7,7 @@ require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/settings.php';
 require_once __DIR__ . '/models.php';
+require_once __DIR__ . '/ui.php';
 
 $tz = config('timezone', 'Asia/Kolkata');
 if (is_string($tz) && $tz !== '') {

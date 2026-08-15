@@ -29,11 +29,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Admin Login | YathraNest</title>
-  <link rel="stylesheet" href="<?= e(url('admin/assets/admin.css')) ?>" />
+  <link rel="icon" type="image/png" sizes="32x32" href="<?= e(url('assets/logo/favicon-32.png')) ?>" />
+  <link rel="icon" type="image/png" sizes="150x150" href="<?= e(url('assets/logo/logo-mark.png')) ?>" />
+  <meta name="theme-color" content="#346356" />
+  <link rel="stylesheet" href="<?= e(url('admin/assets/admin.css')) ?>?v=2" />
 </head>
 <body class="login-page">
   <div class="login-card">
-    <h1>YathraNest Admin</h1>
+    <img class="login-card__logo" src="<?= e(url('assets/logo/logo-wordmark.png')) ?>" alt="YathraNest" width="293" height="98" />
+    <h1>Admin</h1>
     <p>Sign in to manage packages, inquiries and site content.</p>
     <?php if ($error): ?>
       <div class="admin-alert admin-alert--err"><?= e($error) ?></div>

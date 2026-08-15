@@ -19,6 +19,7 @@ $bodyAttrs = 'data-package-page="kerala" data-asset-prefix="../assets/images/" d
 $enquiryType = 'general';
 $enquiryInterest = 'Kerala Packages';
 $enquirySource = 'pages/kerala-packages.php' . ($location !== '' ? '?location=' . rawurlencode($location) : '');
+$navActive = 'kerala';
 
 $places = [];
 $destinations = [];
@@ -63,42 +64,71 @@ foreach ($packages as $pkg) {
 ksort($destOptions);
 ksort($pickupOptions);
 
+$crumbTrail = ['Home' => '../index.php'];
+if ($location !== '') {
+    $crumbTrail['Kerala Packages'] = 'kerala-packages.php';
+    $crumbTrail[$activePlace['label'] ?? ucwords($location)] = null;
+} else {
+    $crumbTrail['Kerala Packages'] = null;
+}
+
 require dirname(__DIR__) . '/includes/layout-header.php';
 ?>
 <main id="main">
-  <nav class="breadcrumb" aria-label="Breadcrumb">
-    <div class="container">
-      <ol>
-        <li><a href="../index.php">Home</a></li>
-        <?php if ($location !== ''): ?>
-          <li><a href="kerala-packages.php">Kerala Packages</a></li>
-          <li><span aria-current="page"><?= e($activePlace['label'] ?? ucwords($location)) ?></span></li>
-        <?php else: ?>
-          <li><span aria-current="page">Kerala Packages</span></li>
-        <?php endif; ?>
-      </ol>
+  <section class="page-head page-head--media">
+    <div class="page-head__media" aria-hidden="true">
+      <img src="../assets/images/<?= e($heroImage) ?>" alt="" width="1600" height="900" />
     </div>
-  </nav>
-
-  <section class="page-hero page-hero--media" style="background-image:url('../assets/images/<?= e($heroImage) ?>')">
-    <div class="container page-hero__inner">
-      <h1><?= e($pageHeading) ?></h1>
-      <p><?= e($pageLead) ?></p>
+    <div class="container page-head__inner">
+      <?= yn_crumbs($crumbTrail, true) ?>
+      <div class="page-head__body">
+        <p class="page-head__eyebrow"><?= $location !== '' ? 'Kerala · ' . e($activePlace['label'] ?? ucwords($location)) : 'God’s own country' ?></p>
+        <h1><?= e($pageHeading) ?></h1>
+        <p class="page-head__lead"><?= e($pageLead) ?></p>
+        <div class="page-head__chips">
+          <?php if ($location === ''): ?>
+            <?= yn_chip('pin', count($destinations) . ' destinations') ?>
+          <?php else: ?>
+            <?= yn_chip('compass', count($packages) . ' itinerar' . (count($packages) === 1 ? 'y' : 'ies')) ?>
+          <?php endif; ?>
+          <?= yn_chip('leaf', 'Backwaters & hills') ?>
+          <?= yn_chip('tag', 'Pricing on enquiry') ?>
+        </div>
+      </div>
     </div>
   </section>
 
   <section class="section">
     <div class="container">
+      <?= yn_package_subnav('kerala') ?>
+
       <?php if (!$dbOk): ?>
-        <div class="empty-state"><p>Catalog temporarily unavailable. Please try again later or contact us.</p></div>
+        <div class="empty-state">
+          <div class="empty-state__icon"><?= yn_icon('info') ?></div>
+          <h2>Catalog temporarily unavailable</h2>
+          <p>Please try again shortly, or send us an enquiry and we'll share options directly.</p>
+          <div class="btn-group" style="justify-content:center">
+            <a class="btn btn--primary" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
+          </div>
+        </div>
 
       <?php elseif ($location === ''): ?>
-        <div class="section-header">
-          <h2>Choose a location</h2>
-          <p class="section-lead">Pick a destination to see Kerala packages that include that place.</p>
+        <div class="section-head">
+          <div>
+            <p class="section-head__eyebrow">Step 1</p>
+            <h2>Choose a location</h2>
+            <p>Pick a destination to see the Kerala packages that include that place.</p>
+          </div>
         </div>
         <?php if (!$destinations): ?>
-          <div class="empty-state"><p>No Kerala locations found yet.</p></div>
+          <div class="empty-state">
+            <div class="empty-state__icon"><?= yn_icon('pin') ?></div>
+            <h2>No Kerala locations yet</h2>
+            <p>Our catalogue is being updated. Tell us where you'd like to go and we'll plan it.</p>
+            <div class="btn-group" style="justify-content:center">
+              <a class="btn btn--primary" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
+            </div>
+          </div>
         <?php else: ?>
           <div class="destinations-grid">
             <?php foreach ($destinations as $dest):
@@ -118,15 +148,16 @@ require dirname(__DIR__) . '/includes/layout-header.php';
         <?php endif; ?>
 
       <?php else: ?>
-        <div class="section-header">
-          <h2><?= e($activePlace['label'] ?? 'Packages') ?></h2>
-          <p class="section-lead">
-            Showing packages that include this location.
-            <a href="kerala-packages.php">← All Kerala locations</a>
-          </p>
-        </div>
-
         <div data-filter-root>
+          <div class="section-head">
+            <div>
+              <p class="section-head__eyebrow">Step 2</p>
+              <h2><?= e($activePlace['label'] ?? 'Packages') ?></h2>
+              <p>Showing packages that include this location.</p>
+            </div>
+            <a class="btn btn--secondary btn--sm" href="kerala-packages.php">All Kerala locations</a>
+          </div>
+
           <form class="filter-bar" data-filter-form>
             <div class="filter-bar__row">
               <div class="form-group">
@@ -175,16 +206,28 @@ require dirname(__DIR__) . '/includes/layout-header.php';
             } ?>
           </div>
           <div class="empty-state" data-filter-empty <?= $packages ? 'hidden' : '' ?>>
-            No packages for this location yet. <a href="kerala-packages.php">Browse other locations</a> or enquire for a custom plan.
+            <div class="empty-state__icon"><?= yn_icon('search') ?></div>
+            <h2>Nothing here yet</h2>
+            <p>No packages for this location match your filters. <a href="kerala-packages.php">Browse other locations</a> or enquire for a custom plan.</p>
+            <div class="btn-group" style="justify-content:center">
+              <a class="btn btn--primary" href="#enquiry" data-open-modal="enquiry-modal">Request a custom plan</a>
+            </div>
           </div>
           <div class="pagination" data-pagination></div>
         </div>
       <?php endif; ?>
 
-      <div class="cta-band mt-3" style="margin-top:3rem">
+      <div class="cta-band" style="margin-top:3.5rem">
+        <p class="cta-band__eyebrow">Tailor-made</p>
         <h2>Looking for a custom Kerala itinerary?</h2>
-        <p>Share your dates and preferences — we'll craft a plan and send pricing.</p>
-        <div class="btn-group"><a class="btn btn--light" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a></div>
+        <p>Share your dates and preferences — we'll craft a plan and send pricing personally.</p>
+        <div class="btn-group">
+          <a class="btn btn--teal" href="#enquiry" data-open-modal="enquiry-modal">
+            Request Pricing
+            <span class="btn__icon" aria-hidden="true">→</span>
+          </a>
+          <a class="btn btn--outline" href="contact.php" style="background:transparent;border-color:rgba(255,255,255,.35);color:#fff">Contact Us</a>
+        </div>
       </div>
     </div>
   </section>

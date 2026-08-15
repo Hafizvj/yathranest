@@ -144,6 +144,79 @@ function json_response(array $data, int $code = 200): void
     exit;
 }
 
+/**
+ * Turns a stored enquiry into a wa.me link carrying a pre-written message.
+ * The message is phrased from the visitor's side, since they are the sender.
+ */
+function enquiry_whatsapp_url(array $enquiry): string
+{
+    $number = preg_replace('/\D/', '', setting('whatsapp', ''));
+    if ($number === '') {
+        return '';
+    }
+
+    $lines = [];
+    $add = static function (string $emoji, string $label, ?string $value) use (&$lines): void {
+        $value = trim((string) $value);
+        if ($value !== '') {
+            $lines[] = $emoji . ' *' . $label . ':* ' . $value;
+        }
+    };
+
+    $intro = [
+        'taxi' => "\u{1F44B} Hi YathraNest! I'd like to book a taxi.",
+        'resort' => "\u{1F44B} Hi YathraNest! I'd like to enquire about a resort stay.",
+        'gift' => "\u{1F44B} Hi YathraNest! I'd like to know more about gift cards.",
+        'investment' => "\u{1F44B} Hi YathraNest! I'd like details on your investment plans.",
+        'contact' => "\u{1F44B} Hi YathraNest! I have an enquiry.",
+    ];
+    $lines[] = $intro[$enquiry['type'] ?? ''] ?? "\u{1F44B} Hi YathraNest! I'd like pricing for a trip.";
+    $lines[] = '';
+
+    $add("\u{1F9ED}", 'Interest', $enquiry['interest'] ?? '');
+    $add("\u{1F4C5}", 'Travel from', enquiry_date_label($enquiry['travel_date'] ?? ''));
+    $add("\u{1F464}", 'Name', $enquiry['name'] ?? '');
+    $add("\u{1F4DE}", 'Phone', $enquiry['phone'] ?? '');
+    $add("\u{2709}\u{FE0F}", 'Email', $enquiry['email'] ?? '');
+
+    $extraLabels = [
+        'pickup' => ["\u{1F4CD}", 'Pickup'],
+        'drop' => ["\u{1F3C1}", 'Drop'],
+        'date' => ["\u{1F4C5}", 'Date'],
+        'time' => ["\u{23F0}", 'Time'],
+        'tripType' => ["\u{1F504}", 'Trip type'],
+        'vehicle' => ["\u{1F697}", 'Vehicle'],
+        'passengers' => ["\u{1F465}", 'Passengers'],
+        'notes' => ["\u{1F4DD}", 'Notes'],
+    ];
+    foreach ($extraLabels as $key => [$emoji, $label]) {
+        $value = $enquiry['extra'][$key] ?? '';
+        $add($emoji, $label, $key === 'date' ? enquiry_date_label($value) : $value);
+    }
+
+    $add("\u{1F4AC}", 'Message', $enquiry['message'] ?? '');
+
+    if (!empty($enquiry['id'])) {
+        $lines[] = '';
+        $lines[] = "\u{1F516} Ref #" . (int) $enquiry['id'];
+    }
+
+    // api.whatsapp.com rather than wa.me: the wa.me redirect re-encodes the query
+    // as latin-1 and turns every emoji into a replacement character.
+    return 'https://api.whatsapp.com/send?phone=' . $number . '&text=' . rawurlencode(implode("\n", $lines));
+}
+
+/** Formats a Y-m-d date for humans, leaving anything unparseable untouched. */
+function enquiry_date_label(?string $date): string
+{
+    $date = trim((string) $date);
+    if ($date === '') {
+        return '';
+    }
+    $parsed = DateTimeImmutable::createFromFormat('Y-m-d', $date);
+    return $parsed ? $parsed->format('D, j M Y') : $date;
+}
+
 function post(string $key, $default = ''): string
 {
     return isset($_POST[$key]) ? trim((string) $_POST[$key]) : $default;

@@ -31,6 +31,12 @@ $message = post('message');
 $source = post('source_page');
 $packageSlug = post('package_slug');
 
+$travelDate = post('travel_date');
+if ($travelDate !== '') {
+    $parsed = DateTimeImmutable::createFromFormat('Y-m-d', $travelDate);
+    $travelDate = $parsed && $parsed->format('Y-m-d') === $travelDate ? $travelDate : '';
+}
+
 $errors = [];
 if ($name === '') {
     $errors[] = 'Name is required.';
@@ -61,8 +67,8 @@ if ($errors) {
 }
 
 $stmt = db()->prepare(
-    'INSERT INTO inquiries (type, name, phone, email, interest, message, extra_json, source_page, package_slug, status)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+    'INSERT INTO inquiries (type, name, phone, email, interest, travel_date, message, extra_json, source_page, package_slug, status)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
 );
 $stmt->execute([
     $type,
@@ -70,6 +76,7 @@ $stmt->execute([
     $phone,
     $email,
     $interest,
+    $travelDate !== '' ? $travelDate : null,
     $message,
     $extra ? json_encode($extra, JSON_UNESCAPED_UNICODE) : null,
     $source,
@@ -77,9 +84,25 @@ $stmt->execute([
     'new',
 ]);
 
-$payload = ['ok' => true, 'message' => 'Enquiry submitted.'];
+$whatsapp = enquiry_whatsapp_url([
+    'id' => (int) db()->lastInsertId(),
+    'type' => $type,
+    'name' => $name,
+    'phone' => $phone,
+    'email' => $email,
+    'interest' => $interest,
+    'travel_date' => $travelDate,
+    'message' => $message,
+    'extra' => $extra,
+]);
+
+$payload = ['ok' => true, 'message' => 'Enquiry submitted.', 'whatsapp' => $whatsapp];
 if (request_is_json() || isset($_POST['ajax'])) {
     json_response($payload);
+}
+
+if ($whatsapp !== '') {
+    redirect($whatsapp);
 }
 
 flash_set('success', 'Enquiry submitted. We will contact you shortly.');

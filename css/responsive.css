@@ -232,16 +232,12 @@
   }
 }
 
-/* Mobile destinations: 2 col */
-.destinations-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.75rem;
-}
-
 @media (max-width: 767px) {
-  .site-header--modern:not(.site-header--hero) .logo__text {
-    display: none;
+  /* Mobile destinations: 2 col */
+  .destinations-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
   }
 
   .hero-v2__visual {

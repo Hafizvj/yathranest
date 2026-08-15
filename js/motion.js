@@ -24,9 +24,19 @@
   }
   setTimeout(ready, 800);
 
+  /* Solid header treatment once the page is scrolled */
+  const header = document.querySelector(".site-header");
+  if (header && !header.classList.contains("site-header--hero")) {
+    const syncStuck = function () {
+      header.classList.toggle("is-stuck", window.scrollY > 8);
+    };
+    syncStuck();
+    window.addEventListener("scroll", syncStuck, { passive: true });
+  }
+
   /* Scroll reveals */
   const revealEls = document.querySelectorAll(
-    ".section-header, .card, .destination-card, .benefit-item, .promo-split, .cta-band, .investment-banner"
+    ".section-header, .section-head, .card, .destination-card, .benefit-item, .promo-split, .cta-band, .investment-banner, [data-reveal]"
   );
 
   if ("IntersectionObserver" in window && revealEls.length) {
@@ -86,61 +96,63 @@
 
   if (!finePointer) return;
 
-  /* Custom cursor */
-  const cursor = document.createElement("div");
-  cursor.className = "cursor";
-  cursor.setAttribute("aria-hidden", "true");
-  cursor.innerHTML = '<span class="cursor__dot"></span><span class="cursor__ring"></span>';
-  document.body.appendChild(cursor);
+  /* Custom cursor — landing hero only, so text carets stay native on form pages */
+  if (document.querySelector(".hero-v2")) {
+    const cursor = document.createElement("div");
+    cursor.className = "cursor";
+    cursor.setAttribute("aria-hidden", "true");
+    cursor.innerHTML = '<span class="cursor__dot"></span><span class="cursor__ring"></span>';
+    document.body.appendChild(cursor);
 
-  const dot = cursor.querySelector(".cursor__dot");
-  const ring = cursor.querySelector(".cursor__ring");
-  let mouseX = 0;
-  let mouseY = 0;
-  let ringX = 0;
-  let ringY = 0;
-  let cursorOn = false;
+    const dot = cursor.querySelector(".cursor__dot");
+    const ring = cursor.querySelector(".cursor__ring");
+    let mouseX = 0;
+    let mouseY = 0;
+    let ringX = 0;
+    let ringY = 0;
+    let cursorOn = false;
 
-  document.addEventListener(
-    "mousemove",
-    function (e) {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-      if (!cursorOn) {
-        cursorOn = true;
-        ringX = mouseX;
-        ringY = mouseY;
-        document.documentElement.classList.add("is-cursor-on");
-      }
-      dot.style.transform = "translate3d(" + mouseX + "px," + mouseY + "px,0)";
-    },
-    { passive: true }
-  );
+    document.addEventListener(
+      "mousemove",
+      function (e) {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        if (!cursorOn) {
+          cursorOn = true;
+          ringX = mouseX;
+          ringY = mouseY;
+          document.documentElement.classList.add("is-cursor-on");
+        }
+        dot.style.transform = "translate3d(" + mouseX + "px," + mouseY + "px,0)";
+      },
+      { passive: true }
+    );
 
-  function loopCursor() {
-    ringX += (mouseX - ringX) * 0.18;
-    ringY += (mouseY - ringY) * 0.18;
-    ring.style.transform = "translate3d(" + ringX + "px," + ringY + "px,0)";
+    const loopCursor = function () {
+      ringX += (mouseX - ringX) * 0.18;
+      ringY += (mouseY - ringY) * 0.18;
+      ring.style.transform = "translate3d(" + ringX + "px," + ringY + "px,0)";
+      requestAnimationFrame(loopCursor);
+    };
     requestAnimationFrame(loopCursor);
-  }
-  requestAnimationFrame(loopCursor);
 
-  function hoverable(el) {
-    return el.closest("a, button, [data-magnetic], .hero-card, .destination-card, .nav-explore__btn");
-  }
+    const hoverable = function (el) {
+      return el.closest("a, button, [data-magnetic], .hero-card, .destination-card, .nav-explore__btn");
+    };
 
-  document.addEventListener("mouseover", function (e) {
-    if (hoverable(e.target)) document.documentElement.classList.add("is-cursor-hover");
-  });
-  document.addEventListener("mouseout", function (e) {
-    if (hoverable(e.target)) document.documentElement.classList.remove("is-cursor-hover");
-  });
-  document.addEventListener("mousedown", function () {
-    document.documentElement.classList.add("is-cursor-down");
-  });
-  document.addEventListener("mouseup", function () {
-    document.documentElement.classList.remove("is-cursor-down");
-  });
+    document.addEventListener("mouseover", function (e) {
+      if (hoverable(e.target)) document.documentElement.classList.add("is-cursor-hover");
+    });
+    document.addEventListener("mouseout", function (e) {
+      if (hoverable(e.target)) document.documentElement.classList.remove("is-cursor-hover");
+    });
+    document.addEventListener("mousedown", function () {
+      document.documentElement.classList.add("is-cursor-down");
+    });
+    document.addEventListener("mouseup", function () {
+      document.documentElement.classList.remove("is-cursor-down");
+    });
+  }
 
   /* Magnetic elements */
   function magnetic(el, strength) {

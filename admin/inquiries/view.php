@@ -34,10 +34,13 @@ ob_start();
   <p><strong>Phone:</strong> <a href="tel:<?= e(preg_replace('/\s+/', '', $row['phone'])) ?>"><?= e($row['phone']) ?></a></p>
   <p><strong>Email:</strong> <a href="mailto:<?= e($row['email']) ?>"><?= e($row['email']) ?></a></p>
   <p><strong>Interest:</strong> <?= e($row['interest']) ?></p>
+  <?php if (!empty($row['travel_date'])): ?><p><strong>Travel from:</strong> <?= e(enquiry_date_label($row['travel_date'])) ?></p><?php endif; ?>
   <p><strong>Source:</strong> <?= e($row['source_page']) ?></p>
   <?php if ($row['package_slug']): ?><p><strong>Package:</strong> <?= e($row['package_slug']) ?></p><?php endif; ?>
-  <p><strong>Message:</strong></p>
-  <p><?= nl2br(e($row['message'] ?? '')) ?></p>
+  <?php if (trim((string) ($row['message'] ?? '')) !== ''): ?>
+    <p><strong>Message:</strong></p>
+    <p><?= nl2br(e($row['message'])) ?></p>
+  <?php endif; ?>
   <?php if ($extra): ?>
     <h3>Extra fields</h3>
     <ul>
@@ -57,6 +60,9 @@ ob_start();
     </div>
     <div class="btn-group" style="margin-top:0.75rem">
       <button class="btn btn--primary" type="submit">Update</button>
+      <?php if ($row['phone'] !== ''): ?>
+        <a class="btn btn--secondary" href="https://wa.me/<?= e(preg_replace('/\D/', '', $row['phone'])) ?>" target="_blank" rel="noopener">WhatsApp</a>
+      <?php endif; ?>
       <a class="btn btn--secondary" href="<?= e(url('admin/inquiries/index.php')) ?>">Back</a>
     </div>
   </form>

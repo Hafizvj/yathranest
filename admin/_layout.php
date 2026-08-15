@@ -12,12 +12,18 @@ $activeNav = $activeNav ?? '';
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title><?= e($pageTitle) ?> | YathraNest Admin</title>
-  <link rel="icon" href="<?= e(url('assets/logo/logo.svg')) ?>" type="image/svg+xml" />
-  <link rel="stylesheet" href="<?= e(url('admin/assets/admin.css')) ?>" />
+  <link rel="icon" type="image/png" sizes="32x32" href="<?= e(url('assets/logo/favicon-32.png')) ?>" />
+  <link rel="icon" type="image/png" sizes="150x150" href="<?= e(url('assets/logo/logo-mark.png')) ?>" />
+  <link rel="apple-touch-icon" href="<?= e(url('assets/logo/apple-touch-icon.png')) ?>" />
+  <meta name="theme-color" content="#346356" />
+  <link rel="stylesheet" href="<?= e(url('admin/assets/admin.css')) ?>?v=2" />
 </head>
 <body class="admin">
   <aside class="admin-sidebar">
-    <a class="admin-brand" href="<?= e(url('admin/index.php')) ?>">YN Admin</a>
+    <a class="admin-brand" href="<?= e(url('admin/index.php')) ?>">
+      <img src="<?= e(url('assets/logo/logo-mark.png')) ?>" alt="" width="150" height="150" />
+      <span>YathraNest Admin</span>
+    </a>
     <nav class="admin-nav">
       <a class="<?= $activeNav === 'dashboard' ? 'is-active' : '' ?>" href="<?= e(url('admin/index.php')) ?>">Dashboard</a>
       <a class="<?= $activeNav === 'packages' ? 'is-active' : '' ?>" href="<?= e(url('admin/packages/index.php')) ?>">Packages</a>

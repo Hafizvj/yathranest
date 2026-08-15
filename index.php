@@ -24,11 +24,14 @@ $csrf = csrf_token();
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="YathraNest — curated travel packages, taxi services, resort stays, weekend getaways, gift cards and investment plans. Browse, explore and enquire for personalised pricing." />
   <title>YathraNest — Your Journey Starts Here</title>
-  <link rel="icon" href="assets/logo/logo.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="css/style.css?v=8" />
-  <link rel="stylesheet" href="css/components.css?v=8" />
-  <link rel="stylesheet" href="css/responsive.css?v=8" />
-  <link rel="stylesheet" href="css/motion.css?v=8" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/logo/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="150x150" href="assets/logo/logo-mark.png" />
+  <link rel="apple-touch-icon" href="assets/logo/apple-touch-icon.png" />
+  <meta name="theme-color" content="#346356" />
+  <link rel="stylesheet" href="css/style.css?v=12" />
+  <link rel="stylesheet" href="css/components.css?v=12" />
+  <link rel="stylesheet" href="css/responsive.css?v=12" />
+  <link rel="stylesheet" href="css/motion.css?v=12" />
   <script>
     if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       document.documentElement.classList.add("has-motion");
@@ -41,13 +44,7 @@ $csrf = csrf_token();
   <header class="site-header site-header--modern site-header--hero">
     <div class="container container--wide site-header__inner">
       <a class="logo" href="index.php" aria-label="YathraNest home">
-        <span class="logo__text">Yathra<span>Nest</span></span>
-        <svg class="logo__icon" viewBox="0 0 36 36" aria-hidden="true" focusable="false">
-          <path fill="#1f8a86" d="M18 20c-4.2-1.2-7.8-4.6-9.2-7.2 3.4.2 6.6 2.2 9.2 7.2 2.6-5 5.8-7 9.2-7.2C25.8 15.4 22.2 18.8 18 20z"/>
-          <path fill="#1f8a86" d="M18 19.5c-1.8-3.8-1.2-7.4.4-9.6-2.8 1.4-4.2 5.2-.4 9.6 3.8-4.4 2.4-8.2-.4-9.6 1.6 2.2 2.2 5.8.4 9.6z"/>
-          <path fill="#163a42" d="M17.2 19.2h1.6v9.2c0 .6-.5 1.1-1.1 1.2h.6c-.6-.1-1.1-.6-1.1-1.2v-9.2z"/>
-          <path fill="none" stroke="#1f8a86" stroke-width="1.6" stroke-linecap="round" d="M8 30c3.2-2.2 7.2-3.2 10-3.2S24.8 27.8 28 30"/>
-        </svg>
+        <img class="logo__img" src="assets/logo/logo-wordmark.png" alt="YathraNest" width="293" height="98" />
       </a>
       <div class="header-actions">
         <div class="nav-explore">
@@ -81,9 +78,8 @@ $csrf = csrf_token();
     <div class="nav-drawer__backdrop"></div>
     <div class="nav-drawer__panel" role="dialog" aria-label="Mobile navigation">
       <div class="nav-drawer__head">
-        <a class="logo" href="index.php">
-          <span class="logo__mark" aria-hidden="true">YN</span>
-          <span class="logo__text">Yathra<span>Nest</span></span>
+        <a class="logo" href="index.php" aria-label="YathraNest home">
+          <img class="logo__img" src="assets/logo/logo-wordmark.png" alt="YathraNest" width="293" height="98" />
         </a>
         <button class="nav-drawer__close" type="button" aria-label="Close menu">&times;</button>
       </div>
@@ -111,10 +107,10 @@ $csrf = csrf_token();
           <path fill="var(--hero-wash)" d="M280 0C210 36 188 78 168 124c-22 50-48 72-42 128 6 58 44 78 22 132-18 44-70 62-108 86-20 12-40 28-40 50V0h280z"/>
         </svg>
         <svg class="hero-v2__topo" viewBox="0 0 320 480" preserveAspectRatio="none">
-          <path d="M40 20c70 40 90 90 70 150s-10 90 40 140 20 90-10 150" fill="none" stroke="#1f8a86" stroke-width="1.2"/>
-          <path d="M18 8c80 48 104 100 82 164s-6 96 48 148 16 96-18 160" fill="none" stroke="#1f8a86" stroke-width="1.1"/>
-          <path d="M8 0c88 56 112 112 90 178s2 100 54 154 10 100-24 148" fill="none" stroke="#1f8a86" stroke-width="1"/>
-          <path d="M70 36c60 36 78 82 60 136s-8 84 32 128 18 84-8 140" fill="none" stroke="#1f8a86" stroke-width="1"/>
+          <path d="M40 20c70 40 90 90 70 150s-10 90 40 140 20 90-10 150" fill="none" stroke="#346356" stroke-width="1.2"/>
+          <path d="M18 8c80 48 104 100 82 164s-6 96 48 148 16 96-18 160" fill="none" stroke="#346356" stroke-width="1.1"/>
+          <path d="M8 0c88 56 112 112 90 178s2 100 54 154 10 100-24 148" fill="none" stroke="#346356" stroke-width="1"/>
+          <path d="M70 36c60 36 78 82 60 136s-8 84 32 128 18 84-8 140" fill="none" stroke="#346356" stroke-width="1"/>
         </svg>
       </div>
 
@@ -482,9 +478,9 @@ $csrf = csrf_token();
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">
-          <a class="logo" href="index.php">
-            <span class="logo__mark" aria-hidden="true">YN</span>
-            <span class="logo__text">Yathra<span>Nest</span></span>
+          <a class="logo" href="index.php" aria-label="YathraNest home">
+            <img class="logo__badge" src="assets/logo/logo-mark.png" alt="" width="150" height="150" />
+            <img class="logo__img logo__img--text" src="assets/logo/logo-text-light.png" alt="YathraNest" width="207" height="98" />
           </a>
           <p>Curated travel packages, stays, taxi services and unique experiences across India and beyond.</p>
           <div class="footer-contact">
@@ -546,7 +542,7 @@ $csrf = csrf_token();
     <div class="modal__dialog modal__dialog--lg">
       <button class="modal__close" type="button" data-close-modal aria-label="Close">&times;</button>
       <h2 id="enquiry-title">Request Pricing</h2>
-      <p>Tell us what you’re planning. We’ll get back with a personalised quote — no online payment required.</p>
+      <p>Share a few details and we’ll continue the conversation on WhatsApp with a personalised quote — no online payment required.</p>
       <form data-enquiry-form data-success-modal="success-modal" novalidate action="handlers/enquiry.php" method="post">
         <input type="hidden" name="_csrf" value="<?= e($csrf) ?>" />
         <input type="hidden" name="type" value="general" />
@@ -568,16 +564,17 @@ $csrf = csrf_token();
             <span class="field-error"></span>
           </div>
           <div class="form-group">
+            <label for="enq-date">Travel from</label>
+            <input class="form-control" id="enq-date" name="travel_date" type="date" required min="<?= e(date('Y-m-d')) ?>" />
+            <span class="field-error"></span>
+          </div>
+          <div class="form-group" style="grid-column:1/-1">
             <label for="enq-interest">Interest</label>
             <input class="form-control" id="enq-interest" name="interest" type="text" value="General travel enquiry" data-prefill="interest" />
           </div>
-          <div class="form-group" style="grid-column:1/-1">
-            <label for="enq-message">Tell us more</label>
-            <textarea class="form-control" id="enq-message" name="message" rows="4" placeholder="Destination, dates, travellers, preferences..."></textarea>
-          </div>
         </div>
         <div class="btn-group">
-          <button class="btn btn--primary" type="submit">Submit Enquiry</button>
+          <button class="btn btn--primary" type="submit">Continue on WhatsApp</button>
           <button class="btn btn--secondary" type="button" data-close-modal>Cancel</button>
         </div>
       </form>
@@ -590,16 +587,19 @@ $csrf = csrf_token();
       <button class="modal__close" type="button" data-close-modal aria-label="Close">&times;</button>
       <div class="modal__icon" aria-hidden="true">✓</div>
       <h2 id="success-title">Thank you!</h2>
-      <p>Your enquiry has been submitted. Our team will contact you shortly with availability and pricing.</p>
-      <button class="btn btn--primary" type="button" data-close-modal>Close</button>
+      <p data-success-note>Your enquiry has been submitted. Our team will contact you shortly with availability and pricing.</p>
+      <div class="btn-group">
+        <a class="btn btn--primary" data-whatsapp-link href="#" target="_blank" rel="noopener" hidden>Open WhatsApp</a>
+        <button class="btn btn--secondary" type="button" data-close-modal>Close</button>
+      </div>
     </div>
   </div>
 
-  <script src="js/navigation.js" defer></script>
-  <script src="js/filters.js" defer></script>
-  <script src="js/forms.js" defer></script>
-  <script src="js/gallery.js" defer></script>
-  <script src="js/main.js" defer></script>
-  <script src="js/motion.js" defer></script>
+  <script src="js/navigation.js?v=11" defer></script>
+  <script src="js/filters.js?v=11" defer></script>
+  <script src="js/forms.js?v=11" defer></script>
+  <script src="js/gallery.js?v=11" defer></script>
+  <script src="js/main.js?v=11" defer></script>
+  <script src="js/motion.js?v=11" defer></script>
 </body>
 </html>

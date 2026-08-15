@@ -15,9 +15,9 @@ $handlerPath = ($assetDepth === '' ? '' : '../') . 'handlers/enquiry.php';
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">
-          <a class="logo" href="<?= e($homeHref) ?>">
-            <span class="logo__mark" aria-hidden="true">YN</span>
-            <span class="logo__text">Yathra<span>Nest</span></span>
+          <a class="logo" href="<?= e($homeHref) ?>" aria-label="YathraNest home">
+            <img class="logo__badge" src="<?= e($assetDepth) ?>assets/logo/logo-mark.png" alt="" width="150" height="150" />
+            <img class="logo__img logo__img--text" src="<?= e($assetDepth) ?>assets/logo/logo-text-light.png" alt="YathraNest" width="207" height="98" />
           </a>
           <p>Curated travel packages, stays, taxi services and unique experiences across India and beyond.</p>
           <div class="footer-contact">
@@ -78,7 +78,7 @@ $handlerPath = ($assetDepth === '' ? '' : '../') . 'handlers/enquiry.php';
     <div class="modal__dialog modal__dialog--lg">
       <button class="modal__close" type="button" data-close-modal aria-label="Close">&times;</button>
       <h2 id="enquiry-title">Request Pricing</h2>
-      <p>Tell us what you're planning. We'll get back with a personalised quote — no online payment required.</p>
+      <p>Share a few details and we'll continue the conversation on WhatsApp with a personalised quote — no online payment required.</p>
       <form data-enquiry-form data-success-modal="success-modal" action="<?= e($handlerPath) ?>" method="post" novalidate>
         <?= csrf_field() ?>
         <input type="hidden" name="type" value="<?= e($enquiryType) ?>" />
@@ -100,16 +100,17 @@ $handlerPath = ($assetDepth === '' ? '' : '../') . 'handlers/enquiry.php';
             <span class="field-error"></span>
           </div>
           <div class="form-group">
+            <label for="enq-date">Travel from</label>
+            <input class="form-control" id="enq-date" name="travel_date" type="date" required min="<?= e(date('Y-m-d')) ?>" />
+            <span class="field-error"></span>
+          </div>
+          <div class="form-group" style="grid-column:1/-1">
             <label for="enq-interest">Interest</label>
             <input class="form-control" id="enq-interest" name="interest" type="text" value="<?= e($enquiryInterest) ?>" data-prefill="interest" />
           </div>
-          <div class="form-group" style="grid-column:1/-1">
-            <label for="enq-message">Tell us more</label>
-            <textarea class="form-control" id="enq-message" name="message" rows="4" placeholder="Destination, dates, travellers, preferences..."></textarea>
-          </div>
         </div>
         <div class="btn-group">
-          <button class="btn btn--primary" type="submit">Submit Enquiry</button>
+          <button class="btn btn--primary" type="submit">Continue on WhatsApp</button>
           <button class="btn btn--secondary" type="button" data-close-modal>Cancel</button>
         </div>
       </form>
@@ -121,15 +122,19 @@ $handlerPath = ($assetDepth === '' ? '' : '../') . 'handlers/enquiry.php';
       <button class="modal__close" type="button" data-close-modal aria-label="Close">&times;</button>
       <div class="modal__icon" aria-hidden="true">✓</div>
       <h2 id="success-title">Thank you!</h2>
-      <p>Your enquiry has been submitted. Our team will contact you shortly with availability and pricing.</p>
-      <button class="btn btn--primary" type="button" data-close-modal>Close</button>
+      <p data-success-note>Your enquiry has been submitted. Our team will contact you shortly with availability and pricing.</p>
+      <div class="btn-group">
+        <a class="btn btn--primary" data-whatsapp-link href="#" target="_blank" rel="noopener" hidden>Open WhatsApp</a>
+        <button class="btn btn--secondary" type="button" data-close-modal>Close</button>
+      </div>
     </div>
   </div>
-  <script src="<?= e($assetDepth) ?>js/navigation.js" defer></script>
-  <script src="<?= e($assetDepth) ?>js/filters.js" defer></script>
-  <script src="<?= e($assetDepth) ?>js/forms.js" defer></script>
-  <script src="<?= e($assetDepth) ?>js/gallery.js" defer></script>
-  <script src="<?= e($assetDepth) ?>js/main.js" defer></script>
+  <script src="<?= e($assetDepth) ?>js/navigation.js?v=11" defer></script>
+  <script src="<?= e($assetDepth) ?>js/filters.js?v=11" defer></script>
+  <script src="<?= e($assetDepth) ?>js/forms.js?v=11" defer></script>
+  <script src="<?= e($assetDepth) ?>js/gallery.js?v=11" defer></script>
+  <script src="<?= e($assetDepth) ?>js/main.js?v=11" defer></script>
+  <script src="<?= e($assetDepth) ?>js/motion.js?v=11" defer></script>
   <?php if (!empty($extraScripts)) echo $extraScripts; ?>
 </body>
 </html>

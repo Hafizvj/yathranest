@@ -126,6 +126,34 @@
     return valid;
   }
 
+  const SUCCESS_NOTE = {
+    handed_over:
+      "Your enquiry is saved. WhatsApp has opened in a new tab — send the message there and we'll reply with pricing.",
+    blocked:
+      "Your enquiry is saved. Your browser blocked the new tab, so open WhatsApp below to send us the details.",
+    saved_only: "Your enquiry has been submitted. Our team will contact you shortly with availability and pricing.",
+  };
+
+  function prepareSuccessModal(id, whatsappUrl, blocked) {
+    const modal = document.getElementById(id);
+    if (!modal) return;
+
+    const note = modal.querySelector("[data-success-note]");
+    if (note) {
+      note.textContent = whatsappUrl
+        ? blocked
+          ? SUCCESS_NOTE.blocked
+          : SUCCESS_NOTE.handed_over
+        : SUCCESS_NOTE.saved_only;
+    }
+
+    const link = modal.querySelector("[data-whatsapp-link]");
+    if (link) {
+      link.hidden = !whatsappUrl;
+      if (whatsappUrl) link.href = whatsappUrl;
+    }
+  }
+
   document.querySelectorAll("form[data-enquiry-form]").forEach(function (form) {
     form.addEventListener("submit", function (e) {
       e.preventDefault();
@@ -139,6 +167,19 @@
       const action = form.getAttribute("action") || "../handlers/enquiry.php";
       const submitBtn = form.querySelector('[type="submit"]');
       if (submitBtn) submitBtn.disabled = true;
+
+      // Claim the tab while we are still inside the click that submitted the
+      // form: window.open is blocked once the fetch promise resolves.
+      let waTab = null;
+      try {
+        waTab = window.open("", "_blank");
+      } catch (err) {
+        waTab = null;
+      }
+      if (waTab && waTab.document) {
+        waTab.document.write("<title>Opening WhatsApp</title>");
+        waTab.document.close();
+      }
 
       const body = new FormData(form);
       body.append("ajax", "1");
@@ -156,6 +197,7 @@
         })
         .then(function (result) {
           if (!result.ok) {
+            if (waTab) waTab.close();
             const msg = (result.data && result.data.error) || "Could not submit enquiry. Please try again.";
             alert(msg);
             return;
@@ -164,9 +206,21 @@
           form.querySelectorAll(".form-group").forEach(clearError);
           const parentModal = form.closest(".modal");
           if (parentModal) closeModal(parentModal);
+
+          // The enquiry is already stored. Send the visitor's pre-written message
+          // to the reserved tab and keep this one on the confirmation.
+          const whatsapp = (result.data && result.data.whatsapp) || "";
+          if (whatsapp && waTab) {
+            waTab.location.replace(whatsapp);
+          } else if (waTab) {
+            waTab.close();
+          }
+
+          prepareSuccessModal(successId, whatsapp, !waTab);
           openModal(successId);
         })
         .catch(function () {
+          if (waTab) waTab.close();
           alert("Could not submit enquiry. Please try again.");
         })
         .finally(function () {

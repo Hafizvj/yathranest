@@ -127,6 +127,7 @@ CREATE TABLE IF NOT EXISTS inquiries (
   phone VARCHAR(40) NOT NULL DEFAULT '',
   email VARCHAR(190) NOT NULL DEFAULT '',
   interest VARCHAR(255) NOT NULL DEFAULT '',
+  travel_date DATE NULL,
   message TEXT NULL,
   extra_json JSON NULL,
   source_page VARCHAR(255) NOT NULL DEFAULT '',
