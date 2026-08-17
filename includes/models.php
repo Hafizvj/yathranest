@@ -10,7 +10,7 @@ function package_type_options(): array
     ];
 }
 
-/** Listing pages a place can belong to, used to derive a package's pages. */
+/** Listing categories a place can belong to, used to derive a package's pages. */
 function catalog_scope_options(): array
 {
     return [
@@ -19,6 +19,37 @@ function catalog_scope_options(): array
         'domestic' => 'Domestic',
         'international' => 'International',
     ];
+}
+
+/** Every category a place row belongs to, falling back to its single scope. */
+function place_catalog_scopes(?array $row): array
+{
+    $scopes = json_decode_array($row['catalog_scopes_json'] ?? null);
+    if (!$scopes) {
+        $scopes = [(string) ($row['catalog_scope'] ?? '')];
+    }
+    $out = [];
+    foreach ($scopes as $scope) {
+        $scope = strtolower(trim((string) $scope));
+        if (isset(catalog_scope_options()[$scope]) && !in_array($scope, $out, true)) {
+            $out[] = $scope;
+        }
+    }
+    if (!$out) {
+        $out = [place_default_catalog_scope((string) ($row['slug'] ?? ''))];
+    }
+    return $out;
+}
+
+/** "Kerala · South India" for listings. */
+function catalog_scopes_label(array $scopes): string
+{
+    $options = catalog_scope_options();
+    $labels = [];
+    foreach ($scopes as $scope) {
+        $labels[] = $options[$scope] ?? ucfirst((string) $scope);
+    }
+    return implode(' · ', $labels);
 }
 
 function place_default_catalog_scope(string $slug): string
@@ -199,6 +230,7 @@ function places_all(): array
             'slug' => $row['slug'],
             'label' => $row['label'],
             'catalog_scope' => $row['catalog_scope'] ?? place_default_catalog_scope((string) $row['slug']),
+            'catalog_scopes' => place_catalog_scopes($row),
             'tags' => json_decode_array($row['tags_json'] ?? null),
             'arrive' => $row['arrive_text'],
             'sightseeing' => $row['sightseeing_text'],

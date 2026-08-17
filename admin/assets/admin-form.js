@@ -1,13 +1,14 @@
 /**
- * Progressive enhancement for the package form.
- * Everything here degrades to plain inputs when JS is unavailable:
- * pickers stay open lists, highlights stay a chip list with a text entry,
- * itinerary days stay editable rows, and dropzones stay file inputs.
+ * Progressive enhancement for the card-based admin forms (packages, places).
+ * Each widget only runs when its markup is present, and everything degrades to
+ * plain inputs when JS is unavailable: pickers stay open checkbox lists, chip
+ * inputs stay a text field, itinerary days stay editable rows, and dropzones
+ * stay file inputs.
  */
 (function () {
   'use strict';
 
-  var form = document.querySelector('[data-package-form]');
+  var form = document.querySelector('[data-rich-form]');
   if (!form) {
     return;
   }
@@ -108,17 +109,14 @@
     renderChips();
   });
 
-  /* ---------- highlights as chips ---------- */
+  /* ---------- free text values as chips (highlights, tags) ---------- */
 
-  (function () {
-    var root = form.querySelector('[data-highlights]');
-    if (!root) {
-      return;
-    }
-    var list = root.querySelector('[data-highlight-list]');
-    var entry = root.querySelector('[data-highlight-entry]');
-    var addBtn = root.querySelector('[data-highlight-add]');
-    if (!list || !entry) {
+  form.querySelectorAll('[data-chips]').forEach(function (root) {
+    var list = root.querySelector('[data-chips-list]');
+    var entry = root.querySelector('[data-chips-entry]');
+    var addBtn = root.querySelector('[data-chips-add]');
+    var fieldName = root.getAttribute('data-chips');
+    if (!list || !entry || !fieldName) {
       return;
     }
 
@@ -133,7 +131,7 @@
 
       var input = document.createElement('input');
       input.type = 'hidden';
-      input.name = 'highlights[]';
+      input.name = fieldName + '[]';
       input.value = value;
       chip.appendChild(input);
 
@@ -183,7 +181,7 @@
         commit(true);
       });
     }
-  })();
+  });
 
   /* ---------- stays: one select per night ---------- */
 

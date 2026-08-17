@@ -83,26 +83,44 @@ function package_days_nights_from_post(?array $existing = null): array
     return ['days' => $days, 'nights' => max(0, (int) ($existing['nights'] ?? max(0, $days - 1)))];
 }
 
-/** Highlights arrive as chips, plus whatever is still sitting in the entry box. */
-function package_highlights_from_post(): array
+/**
+ * Values from a chip field: the chips themselves, plus whatever is still
+ * sitting in the entry box. Falls back to the older one-per-line textarea.
+ */
+function chips_from_post(string $name): array
 {
     $out = [];
-    if (isset($_POST['highlights']) && is_array($_POST['highlights'])) {
-        foreach ($_POST['highlights'] as $value) {
+    if (isset($_POST[$name]) && is_array($_POST[$name])) {
+        foreach ($_POST[$name] as $value) {
             $value = trim((string) $value);
             if ($value !== '' && !in_array($value, $out, true)) {
                 $out[] = $value;
             }
         }
     } else {
-        $out = lines_to_array(post('highlights'));
+        $out = lines_to_array(post($name));
     }
-    foreach (lines_to_array(post('highlights_extra')) as $value) {
+    foreach (lines_to_array(post($name . '_extra')) as $value) {
         if (!in_array($value, $out, true)) {
             $out[] = $value;
         }
     }
     return $out;
+}
+
+function package_highlights_from_post(): array
+{
+    return chips_from_post('highlights');
+}
+
+function place_tags_from_post(): array
+{
+    $tags = chips_from_post('tags');
+    // Tags used to be one comma-separated field.
+    if (count($tags) === 1 && strpos($tags[0], ',') !== false) {
+        $tags = array_values(array_filter(array_map('trim', explode(',', $tags[0]))));
+    }
+    return $tags;
 }
 
 /** One itinerary entry per day row; empty rows are dropped. */
@@ -138,10 +156,11 @@ function package_duration_bucket(int $days): string
     return '8-10';
 }
 
-function unique_package_slug(string $base, int $excludeId = 0): string
+/** Appends -2, -3 ... until the slug is free in the given table. */
+function unique_slug(string $table, string $base, string $fallback, int $excludeId = 0): string
 {
-    $slug = $base !== '' ? $base : 'package';
-    $check = db()->prepare('SELECT id FROM packages WHERE slug = ? AND id <> ? LIMIT 1');
+    $slug = $base !== '' ? $base : $fallback;
+    $check = db()->prepare('SELECT id FROM ' . $table . ' WHERE slug = ? AND id <> ? LIMIT 1');
     $candidate = $slug;
     $i = 2;
     while (true) {
@@ -152,6 +171,16 @@ function unique_package_slug(string $base, int $excludeId = 0): string
         $candidate = $slug . '-' . $i;
         $i++;
     }
+}
+
+function unique_package_slug(string $base, int $excludeId = 0): string
+{
+    return unique_slug('packages', $base, 'package', $excludeId);
+}
+
+function unique_place_slug(string $base, int $excludeId = 0): string
+{
+    return unique_slug('places', $base, 'place', $excludeId);
 }
 
 function package_selected_types(?array $row = null): array
@@ -329,9 +358,11 @@ function package_form_data_from_post(?array $existing = null): array
     foreach ($destSlugs as $destSlug) {
         $place = $places[$destSlug] ?? null;
         $destLabels[] = $place['label'] ?? $destSlug;
-        $scope = $place['catalog_scope'] ?? place_default_catalog_scope((string) $destSlug);
-        if ($scope !== '' && !in_array($scope, $pages, true)) {
-            $pages[] = $scope;
+        $scopes = $place['catalog_scopes'] ?? [place_default_catalog_scope((string) $destSlug)];
+        foreach ($scopes as $scope) {
+            if ($scope !== '' && !in_array($scope, $pages, true)) {
+                $pages[] = $scope;
+            }
         }
     }
     if (!$pages) {

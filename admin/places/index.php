@@ -17,7 +17,7 @@ ob_start();
   <?php else: ?>
   <div class="admin-table-wrap">
     <table class="admin-table">
-      <thead><tr><th></th><th>Label</th><th>Slug</th><th>Listing page</th><th></th></tr></thead>
+      <thead><tr><th></th><th>Label</th><th>Slug</th><th>Category</th><th></th></tr></thead>
       <tbody>
         <?php foreach ($rows as $row):
           $images = json_decode_array($row['images_json'] ?? null);
@@ -31,8 +31,7 @@ ob_start();
             </td>
             <td><?= e($row['label']) ?></td>
             <td><?= e($row['slug']) ?></td>
-            <?php $scope = (string) ($row['catalog_scope'] ?? place_default_catalog_scope((string) $row['slug'])); ?>
-            <td><?= e(catalog_scope_options()[$scope] ?? $scope) ?></td>
+            <td><?= e(catalog_scopes_label(place_catalog_scopes($row))) ?></td>
             <td class="admin-row-actions">
               <a class="btn btn--secondary btn--sm" href="<?= e(url('admin/places/edit.php?id=' . (int) $row['id'])) ?>">Edit</a>
               <form method="post" action="<?= e(url('admin/places/delete.php')) ?>" data-confirm="Delete this place?">

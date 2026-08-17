@@ -120,7 +120,7 @@ foreach ($places as $place) {
 
 ob_start();
 ?>
-<form class="form-cards" method="post" enctype="multipart/form-data" data-package-form>
+<form class="form-cards" method="post" enctype="multipart/form-data" data-rich-form>
   <?= csrf_field() ?>
   <?php if ($errors): ?>
     <div class="admin-alert admin-alert--err" role="alert"><span><?= e(implode(' ', $errors)) ?></span></div>
@@ -149,9 +149,9 @@ ob_start();
         <textarea class="form-control" id="overview" name="overview" rows="5" maxlength="500" required placeholder="Describe this package in brief..."><?= e($row['overview'] ?? '') ?></textarea>
         <span class="field__counter" data-counter-for="overview"></span>
       </div>
-      <div class="field" data-highlights>
+      <div class="field" data-chips="highlights">
         <label for="highlight-entry">Highlights</label>
-        <div class="chips-input" data-highlight-list>
+        <div class="chips-input" data-chips-list>
           <?php foreach ($highlights as $highlight): ?>
             <span class="chip">
               <?= e((string) $highlight) ?>
@@ -159,9 +159,9 @@ ob_start();
               <button class="chip__remove" type="button" data-chip-remove aria-label="Remove <?= e((string) $highlight) ?>">&times;</button>
             </span>
           <?php endforeach; ?>
-          <input class="chips-input__entry" id="highlight-entry" type="text" name="highlights_extra" data-highlight-entry placeholder="Add a highlight and press Enter" />
+          <input class="chips-input__entry" id="highlight-entry" type="text" name="highlights_extra" data-chips-entry placeholder="Add a highlight and press Enter" />
         </div>
-        <button class="chips-add" type="button" data-highlight-add><?= yn_icon('plus') ?>Add highlight</button>
+        <button class="chips-add" type="button" data-chips-add><?= yn_icon('plus') ?>Add highlight</button>
       </div>
     </div>
   </section>
@@ -416,6 +416,6 @@ ob_start();
 $adminContent = ob_get_clean();
 $pageTitle = $id ? 'Edit Package' : 'Add Package';
 $pageSubtitle = $id ? 'Update this travel package.' : 'Create and publish a new travel package.';
-$adminScripts = ['admin/assets/package-form.js'];
+$adminScripts = ['admin/assets/admin-form.js'];
 $activeNav = 'packages';
 require dirname(__DIR__) . '/_layout.php';

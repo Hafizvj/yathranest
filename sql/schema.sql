@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS places (
   slug VARCHAR(80) NOT NULL UNIQUE,
   label VARCHAR(120) NOT NULL,
   catalog_scope VARCHAR(40) NOT NULL DEFAULT 'kerala',
+  catalog_scopes_json JSON NULL,
   tags_json JSON NULL,
   arrive_text TEXT NULL,
   sightseeing_text TEXT NULL,
