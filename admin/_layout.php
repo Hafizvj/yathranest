@@ -4,6 +4,8 @@
 /** @var string $adminContent */
 $admin = admin_user();
 $pageTitle = $pageTitle ?? 'Admin';
+$pageSubtitle = $pageSubtitle ?? '';
+$adminScripts = $adminScripts ?? [];
 $activeNav = $activeNav ?? '';
 $logoMark = setting('logo_mark', 'assets/logo/logo-mark.png');
 $favicon = setting('favicon', 'assets/logo/favicon-32.png');
@@ -31,7 +33,7 @@ $navItems = [
   <link rel="icon" type="image/png" sizes="150x150" href="<?= e(image_url($logoMark, '')) ?>" />
   <link rel="apple-touch-icon" href="<?= e(image_url($appleTouch, '')) ?>" />
   <meta name="theme-color" content="#346356" />
-  <link rel="stylesheet" href="<?= e(url('admin/assets/admin.css')) ?>?v=3" />
+  <link rel="stylesheet" href="<?= e(url('admin/assets/admin.css')) ?>?v=4" />
 </head>
 <body class="admin">
   <a class="skip-link" href="#admin-main">Skip to content</a>
@@ -61,10 +63,19 @@ $navItems = [
         <button class="admin-menu-btn" type="button" data-admin-menu aria-controls="admin-sidebar" aria-expanded="false" aria-label="Open menu">
           <span></span>
         </button>
-        <h1><?= e($pageTitle) ?></h1>
+        <div class="admin-top__titles">
+          <h1><?= e($pageTitle) ?></h1>
+          <?php if ($pageSubtitle !== ''): ?>
+            <p class="admin-top__subtitle"><?= e($pageSubtitle) ?></p>
+          <?php endif; ?>
+        </div>
       </div>
       <?php if ($admin): ?>
-        <p class="admin-user"><?= e($admin['name'] ?? $admin['email']) ?></p>
+        <?php $adminName = (string) ($admin['name'] ?? $admin['email']); ?>
+        <p class="admin-user">
+          <span class="admin-user__avatar" aria-hidden="true"><?= e(strtoupper(substr($adminName, 0, 1))) ?></span>
+          <span><?= e($adminName) ?></span>
+        </p>
       <?php endif; ?>
     </header>
     <?php if ($msg = flash_get('success')): ?>
@@ -83,6 +94,9 @@ $navItems = [
       <?= $adminContent ?? '' ?>
     </div>
   </div>
-  <script src="<?= e(url('admin/assets/admin.js')) ?>?v=3" defer></script>
+  <script src="<?= e(url('admin/assets/admin.js')) ?>?v=4" defer></script>
+  <?php foreach ($adminScripts as $script): ?>
+    <script src="<?= e(url($script)) ?>?v=4" defer></script>
+  <?php endforeach; ?>
 </body>
 </html>

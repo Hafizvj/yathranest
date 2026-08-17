@@ -27,8 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $oldGallery = json_decode_array($row['gallery_json'] ?? null);
 
         $data = package_form_data_from_post($row);
-        $duration = parse_package_duration(post('duration'));
-        $errors = array_merge($errors, package_form_validate($data, $duration));
+        $errors = array_merge($errors, package_form_validate($data));
 
         $takeUploadError = static function () use (&$errors): void {
             $message = admin_upload_last_error();
@@ -102,15 +101,17 @@ foreach ($selectedTypes as $type) {
     }
 }
 $selectedDestinations = package_selected_destinations($row);
-$highlights = implode("\n", json_decode_array($row['highlights_json'] ?? null));
-$itineraryText = itinerary_to_textarea(json_decode_array($row['itinerary_json'] ?? null));
+$highlights = json_decode_array($row['highlights_json'] ?? null);
 $galleryPaths = json_decode_array($row['gallery_json'] ?? null);
 
-$durationValue = post('duration') !== ''
-    ? post('duration')
-    : format_package_duration((int) ($row['days'] ?? 4), (int) ($row['nights'] ?? 3));
-$nights = (int) (parse_package_duration($durationValue)['nights'] ?? 0);
+$days = max(1, (int) ($row['days'] ?? 4));
+$nights = max(0, (int) ($row['nights'] ?? 3));
 $stays = package_stays_from_row($row, $nights);
+
+$itinerary = json_decode_array($row['itinerary_json'] ?? null);
+if (!$itinerary) {
+    $itinerary = array_fill(0, $days, ['title' => '', 'text' => '']);
+}
 
 $placeOptions = [];
 foreach ($places as $place) {
@@ -119,223 +120,302 @@ foreach ($places as $place) {
 
 ob_start();
 ?>
-<div class="admin-panel">
-  <form method="post" enctype="multipart/form-data">
-    <?= csrf_field() ?>
-    <?php if ($errors): ?>
-      <div class="admin-alert admin-alert--err"><?= e(implode(' ', $errors)) ?></div>
-    <?php endif; ?>
+<form class="form-cards" method="post" enctype="multipart/form-data" data-package-form>
+  <?= csrf_field() ?>
+  <?php if ($errors): ?>
+    <div class="admin-alert admin-alert--err" role="alert"><span><?= e(implode(' ', $errors)) ?></span></div>
+  <?php endif; ?>
 
-    <div class="form-grid">
-      <section class="form-section">
-        <h2 class="form-section__title">Package</h2>
-        <div class="form-group full">
-          <label for="title">Title</label>
-          <input class="form-control" id="title" name="title" required value="<?= e($row['title'] ?? '') ?>" placeholder="Wayanad 4 Days 3 Nights" />
+  <section class="form-card">
+    <div class="form-card__head">
+      <span class="form-card__icon"><?= yn_icon('file-text') ?></span>
+      <div class="form-card__titles">
+        <h2 class="form-card__title">Basic Information</h2>
+        <p class="form-card__hint">Give your package a title and short description.</p>
+      </div>
+    </div>
+    <div class="form-card__body">
+      <div class="field">
+        <label for="title">Title <span class="field__req">*</span></label>
+        <input class="form-control" id="title" name="title" required value="<?= e($row['title'] ?? '') ?>" placeholder="e.g., Wayanad 4 Days 3 Nights" />
+      </div>
+      <div class="field">
+        <label for="card_text">Card Text (one line)</label>
+        <input class="form-control" id="card_text" name="card_text" maxlength="90" value="<?= e($row['card_text'] ?? '') ?>" placeholder="Short text shown on package card" />
+        <span class="field__counter" data-counter-for="card_text"></span>
+      </div>
+      <div class="field">
+        <label for="overview">Overview <span class="field__req">*</span></label>
+        <textarea class="form-control" id="overview" name="overview" rows="5" maxlength="500" required placeholder="Describe this package in brief..."><?= e($row['overview'] ?? '') ?></textarea>
+        <span class="field__counter" data-counter-for="overview"></span>
+      </div>
+      <div class="field" data-highlights>
+        <label for="highlight-entry">Highlights</label>
+        <div class="chips-input" data-highlight-list>
+          <?php foreach ($highlights as $highlight): ?>
+            <span class="chip">
+              <?= e((string) $highlight) ?>
+              <input type="hidden" name="highlights[]" value="<?= e((string) $highlight) ?>" />
+              <button class="chip__remove" type="button" data-chip-remove aria-label="Remove <?= e((string) $highlight) ?>">&times;</button>
+            </span>
+          <?php endforeach; ?>
+          <input class="chips-input__entry" id="highlight-entry" type="text" name="highlights_extra" data-highlight-entry placeholder="Add a highlight and press Enter" />
         </div>
-        <div class="form-group full">
-          <label for="card_text">Card text</label>
-          <textarea class="form-control" id="card_text" name="card_text" rows="3"><?= e($row['card_text'] ?? '') ?></textarea>
-          <p class="help-text">Short line shown on listing cards.</p>
-        </div>
-        <div class="form-group full">
-          <label for="overview">Overview</label>
-          <textarea class="form-control" id="overview" name="overview" rows="5"><?= e($row['overview'] ?? '') ?></textarea>
-        </div>
-        <div class="form-group full">
-          <label for="highlights">Highlights (one per line)</label>
-          <textarea class="form-control" id="highlights" name="highlights" rows="4"><?= e($highlights) ?></textarea>
-        </div>
-        <div class="form-group full">
-          <label>Type</label>
-          <div class="checks">
+        <button class="chips-add" type="button" data-highlight-add><?= yn_icon('plus') ?>Add highlight</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="form-card">
+    <div class="form-card__head">
+      <span class="form-card__icon"><?= yn_icon('compass') ?></span>
+      <div class="form-card__titles">
+        <h2 class="form-card__title">Package Details</h2>
+        <p class="form-card__hint">Select type, destinations, duration and pickup point.</p>
+      </div>
+    </div>
+    <div class="form-card__body">
+      <div class="field">
+        <span class="field__label">Type <span class="field__req">*</span></span>
+        <div class="picker" data-picker>
+          <div class="picker__control" data-picker-control>
+            <span class="picker__chips" data-picker-chips></span>
+            <button class="picker__toggle" type="button" data-picker-toggle aria-expanded="false">
+              <span class="picker__placeholder" data-picker-empty>Select types</span>
+              <span class="picker__caret"><?= yn_icon('chevron-down') ?></span>
+            </button>
+          </div>
+          <div class="picker__panel" data-picker-panel>
             <?php foreach ($typeOptions as $value => $label): ?>
               <label><input type="checkbox" name="types[]" value="<?= e($value) ?>" <?= in_array($value, $selectedTypes, true) ? 'checked' : '' ?> /> <?= e($label) ?></label>
             <?php endforeach; ?>
           </div>
-          <p class="help-text">Pick every group this trip suits.</p>
         </div>
-        <div class="form-group full">
-          <label>Destinations</label>
-          <?php if (!$places): ?>
-            <p class="help-text">Add places first so they can be selected here.</p>
-          <?php else: ?>
-            <div class="checks">
+      </div>
+      <div class="field">
+        <span class="field__label">Destinations <span class="field__req">*</span></span>
+        <?php if (!$places): ?>
+          <p class="field__hint">Add places first so they can be selected here.</p>
+        <?php else: ?>
+          <div class="picker" data-picker>
+            <div class="picker__control" data-picker-control>
+              <span class="picker__chips" data-picker-chips></span>
+              <button class="picker__toggle" type="button" data-picker-toggle aria-expanded="false">
+                <span class="picker__placeholder" data-picker-empty>Select destinations</span>
+                <span class="picker__caret"><?= yn_icon('chevron-down') ?></span>
+              </button>
+            </div>
+            <div class="picker__panel" data-picker-panel>
               <?php foreach ($places as $place): ?>
                 <label><input type="checkbox" name="destinations[]" value="<?= e($place['slug']) ?>" <?= in_array($place['slug'], $selectedDestinations, true) ? 'checked' : '' ?> /> <?= e($place['label']) ?></label>
               <?php endforeach; ?>
             </div>
-            <p class="help-text">Listing pages are set from these places.</p>
+          </div>
+          <p class="field__hint">Listing pages are set from these places.</p>
+        <?php endif; ?>
+      </div>
+      <div class="field">
+        <label for="pickup">Pickup / Drop <span class="field__req">*</span></label>
+        <input class="form-control" id="pickup" name="pickup" required value="<?= e($row['pickup'] ?? '') ?>" placeholder="Calicut" />
+        <p class="field__hint">Pickup and drop are the same place.</p>
+      </div>
+      <div class="field full">
+        <label for="days">Duration <span class="field__req">*</span></label>
+        <div class="duration-grid">
+          <span class="input-icon">
+            <?= yn_icon('sun') ?>
+            <input class="form-control" id="days" type="number" name="days" min="1" max="60" required value="<?= $days ?>" aria-label="Days" data-days-count />
+            <span class="input-icon__suffix">Days</span>
+          </span>
+          <span class="input-icon">
+            <?= yn_icon('moon') ?>
+            <input class="form-control" id="nights" type="number" name="nights" min="0" max="60" required value="<?= $nights ?>" aria-label="Nights" data-nights />
+            <span class="input-icon__suffix">Nights</span>
+          </span>
+        </div>
+      </div>
+      <div class="field full" data-stays data-places="<?= e(json_encode($placeOptions, JSON_UNESCAPED_UNICODE)) ?>">
+        <span class="field__label">Stays <span class="field__req">*</span></span>
+        <div class="stay-grid" data-stay-grid>
+          <?php if ($nights < 1): ?>
+            <p class="field__hint">No overnight stays for this duration.</p>
+          <?php else: ?>
+            <?php for ($i = 0; $i < $nights; $i++): ?>
+              <div class="stay-grid__item">
+                <label for="stay-<?= $i ?>">Night <?= $i + 1 ?></label>
+                <select class="form-control" id="stay-<?= $i ?>" name="stays[]">
+                  <option value="">Select a place</option>
+                  <?php foreach ($places as $place): ?>
+                    <option value="<?= e($place['slug']) ?>" <?= (($stays[$i] ?? '') === $place['slug']) ? 'selected' : '' ?>><?= e($place['label']) ?></option>
+                  <?php endforeach; ?>
+                </select>
+              </div>
+            <?php endfor; ?>
           <?php endif; ?>
         </div>
-      </section>
+        <p class="field__hint">Where guests sleep each night — this becomes the stay summary.</p>
+      </div>
+    </div>
+  </section>
 
-      <section class="form-section">
-        <h2 class="form-section__title">Trip</h2>
-        <div class="form-group">
-          <label for="duration">Duration</label>
-          <input class="form-control" id="duration" name="duration" required value="<?= e($durationValue) ?>" placeholder="4D 3N" />
-        </div>
-        <div class="form-group">
-          <label for="pickup">Pickup / Drop</label>
-          <input class="form-control" id="pickup" name="pickup" required value="<?= e($row['pickup'] ?? '') ?>" placeholder="Calicut" />
-          <p class="help-text">Pickup and drop are the same place.</p>
-        </div>
-        <div class="form-group full" id="stays-field" data-places="<?= e(json_encode($placeOptions, JSON_UNESCAPED_UNICODE)) ?>">
-          <label>Stays</label>
-          <div class="stay-fields" data-stay-fields>
-            <?php if ($nights < 1): ?>
-              <p class="help-text">No overnight stays for this duration.</p>
-            <?php else: ?>
-              <?php for ($i = 0; $i < $nights; $i++): ?>
-                <div class="stay-fields__item">
-                  <label for="stay-<?= $i ?>">Night <?= $i + 1 ?></label>
-                  <select class="form-control" id="stay-<?= $i ?>" name="stays[]">
-                    <option value="">Select a place</option>
-                    <?php foreach ($places as $place): ?>
-                      <option value="<?= e($place['slug']) ?>" <?= (($stays[$i] ?? '') === $place['slug']) ? 'selected' : '' ?>><?= e($place['label']) ?></option>
-                    <?php endforeach; ?>
-                  </select>
-                </div>
-              <?php endfor; ?>
-            <?php endif; ?>
-          </div>
-          <p class="help-text">One stay per night, from the duration above.</p>
-        </div>
-        <div class="form-group full">
-          <label for="itinerary">Itinerary (Day N | Title | Text — one day per line)</label>
-          <textarea class="form-control" id="itinerary" name="itinerary" rows="8" placeholder="1 | Arrival | Drive to Wayanad and check in"><?= e($itineraryText) ?></textarea>
-        </div>
-      </section>
-
-      <section class="form-section">
-        <h2 class="form-section__title">Media</h2>
-        <p class="form-section__hint">Images up to 5 MB (JPG, PNG, WEBP, GIF). Uncheck Keep to remove a gallery image.</p>
-        <div class="form-group full media-field">
-          <label>Cover image</label>
-          <?= admin_hero_preview($row['image'] ?? null) ?>
-          <div class="media-live-preview" hidden>
-            <div class="media-preview">
-              <div class="media-preview__item media-preview__item--hero">
-                <img id="package-hero-preview" alt="New cover preview" hidden />
-              </div>
+  <section class="form-card" data-days>
+    <div class="form-card__head">
+      <span class="form-card__icon"><?= yn_icon('list') ?></span>
+      <div class="form-card__titles">
+        <h2 class="form-card__title">Itinerary</h2>
+        <p class="form-card__hint">Add a day by day plan for this package.</p>
+      </div>
+      <button class="btn btn--primary btn--sm" type="button" data-day-add><?= yn_icon('plus') ?>Add Day</button>
+    </div>
+    <div class="form-card__body">
+      <div class="day-list full" data-day-list>
+        <?php foreach (array_values($itinerary) as $index => $day): ?>
+          <div class="day-item<?= $index === 0 ? '' : ' is-collapsed' ?>">
+            <div class="day-item__head">
+              <span class="day-item__no"><?= $index + 1 ?></span>
+              <span class="day-item__label">Day <?= $index + 1 ?></span>
+              <input class="day-item__title" type="text" name="itinerary_title[]" value="<?= e((string) ($day['title'] ?? '')) ?>" placeholder="Day title" aria-label="Day <?= $index + 1 ?> title" />
+              <span class="day-item__actions">
+                <button class="icon-btn" type="button" data-day-copy aria-label="Duplicate day"><?= yn_icon('copy') ?></button>
+                <button class="icon-btn icon-btn--danger" type="button" data-day-remove aria-label="Delete day"><?= yn_icon('trash') ?></button>
+                <button class="icon-btn day-toggle" type="button" data-day-toggle aria-expanded="<?= $index === 0 ? 'true' : 'false' ?>" aria-label="Toggle day details"><?= yn_icon('chevron-down') ?></button>
+              </span>
+            </div>
+            <div class="day-item__body">
+              <label class="field__label" for="day-text-<?= $index ?>">Details (optional)</label>
+              <textarea class="form-control" id="day-text-<?= $index ?>" name="itinerary_text[]" rows="3" maxlength="1000" placeholder="Add more details about this day (activities, places, meals, etc.)"><?= e((string) ($day['text'] ?? '')) ?></textarea>
             </div>
           </div>
-          <div class="media-drop">
-            <label for="image_file">Upload cover image</label>
-            <input class="form-control" id="image_file" type="file" name="image_file" accept="image/jpeg,image/png,image/webp,image/gif" data-preview-target="#package-hero-preview" <?= empty($row['image']) ? 'required' : '' ?> />
-          </div>
-          <?php if (!empty($row['image'])): ?>
-            <label class="checks"><input type="checkbox" name="remove_image" value="1" /> Remove current cover image</label>
-          <?php endif; ?>
-        </div>
-        <div class="form-group full media-field">
-          <label>Gallery</label>
-          <?= admin_media_preview_items($galleryPaths, 'gallery_keep') ?>
-          <div class="media-drop">
-            <label for="gallery_files">Upload gallery images</label>
-            <input class="form-control" id="gallery_files" type="file" name="gallery_files[]" accept="image/jpeg,image/png,image/webp,image/gif" multiple data-preview-list="#package-gallery-new" />
-            <div id="package-gallery-new" class="media-preview" style="margin-top:0.75rem"></div>
-          </div>
-        </div>
-      </section>
+        <?php endforeach; ?>
+      </div>
+    </div>
+  </section>
 
-      <section class="form-section">
-        <h2 class="form-section__title">Downloads &amp; publishing</h2>
-        <p class="form-section__hint">PDFs up to 10 MB. Visitors can download whichever you upload.</p>
-        <div class="form-group">
-          <label for="itinerary_pdf_file">Itinerary PDF</label>
-          <?php if (!empty($row['itinerary_pdf'])): ?>
-            <p class="help-text"><a href="<?= e(asset_url((string) $row['itinerary_pdf'])) ?>" target="_blank" rel="noopener">Current itinerary PDF</a></p>
-            <label class="checks"><input type="checkbox" name="remove_itinerary_pdf" value="1" /> Remove</label>
-          <?php endif; ?>
-          <input class="form-control" id="itinerary_pdf_file" type="file" name="itinerary_pdf_file" accept="application/pdf,.pdf" />
+  <section class="form-card">
+    <div class="form-card__head">
+      <span class="form-card__icon"><?= yn_icon('image') ?></span>
+      <div class="form-card__titles">
+        <h2 class="form-card__title">Media</h2>
+        <p class="form-card__hint">Upload images to showcase your package.</p>
+      </div>
+    </div>
+    <div class="form-card__body">
+      <div class="field media-field">
+        <span class="field__label">Cover Image <span class="field__req">*</span></span>
+        <p class="field__hint">This will be shown as the main image on package cards.</p>
+        <?php if (!empty($row['image'])): ?>
+          <?= admin_hero_preview($row['image']) ?>
+        <?php endif; ?>
+        <div class="media-live-preview" hidden>
+          <div class="media-preview">
+            <div class="media-preview__item media-preview__item--hero">
+              <img id="package-hero-preview" alt="New cover preview" hidden />
+            </div>
+          </div>
         </div>
-        <div class="form-group">
-          <label for="price_chart_pdf_file">Price chart PDF</label>
-          <?php if (!empty($row['price_chart_pdf'])): ?>
-            <p class="help-text"><a href="<?= e(asset_url((string) $row['price_chart_pdf'])) ?>" target="_blank" rel="noopener">Current price chart PDF</a></p>
-            <label class="checks"><input type="checkbox" name="remove_price_chart_pdf" value="1" /> Remove</label>
-          <?php endif; ?>
-          <input class="form-control" id="price_chart_pdf_file" type="file" name="price_chart_pdf_file" accept="application/pdf,.pdf" />
+        <label class="dropzone" data-dropzone>
+          <span class="dropzone__icon"><?= yn_icon('upload') ?></span>
+          <span class="dropzone__body">
+            <span class="dropzone__text">Upload cover image</span>
+            <span class="dropzone__hint">JPG, PNG, WEBP up to 5MB</span>
+          </span>
+          <input id="image_file" type="file" name="image_file" accept="image/jpeg,image/png,image/webp,image/gif" data-preview-target="#package-hero-preview" <?= empty($row['image']) ? 'data-cover-required' : '' ?> />
+        </label>
+        <span class="file-pick__name" data-file-name-for="image_file"><?= empty($row['image']) ? 'No file chosen' : 'Keeping current image' ?></span>
+        <p class="field__error" data-cover-error hidden>Choose a cover image before saving.</p>
+        <?php if (!empty($row['image'])): ?>
+          <label class="checks"><input type="checkbox" name="remove_image" value="1" /> Remove current cover image</label>
+        <?php endif; ?>
+      </div>
+      <div class="field media-field">
+        <span class="field__label">Gallery Images</span>
+        <p class="field__hint">Add multiple images to showcase this package.</p>
+        <?= admin_media_preview_items($galleryPaths, 'gallery_keep') ?>
+        <label class="dropzone" data-dropzone>
+          <span class="dropzone__icon"><?= yn_icon('upload') ?></span>
+          <span class="dropzone__body">
+            <span class="dropzone__text">Upload gallery images</span>
+            <span class="dropzone__hint">Up to 10 images (5MB each)</span>
+          </span>
+          <input id="gallery_files" type="file" name="gallery_files[]" accept="image/jpeg,image/png,image/webp,image/gif" multiple data-preview-list="#package-gallery-new" />
+        </label>
+        <span class="file-pick__name" data-file-name-for="gallery_files">No files chosen</span>
+        <div id="package-gallery-new" class="media-preview"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="form-card">
+    <div class="form-card__head">
+      <span class="form-card__icon"><?= yn_icon('download') ?></span>
+      <div class="form-card__titles">
+        <h2 class="form-card__title">Downloads &amp; Publishing</h2>
+        <p class="form-card__hint">Upload documents and set listing preferences.</p>
+      </div>
+    </div>
+    <div class="form-card__body">
+      <div class="field">
+        <span class="field__label">Itinerary PDF</span>
+        <p class="field__hint">Visitors can download this file.</p>
+        <div class="file-pick">
+          <label class="file-pick__btn"><?= yn_icon('upload') ?>Upload PDF
+            <input id="itinerary_pdf_file" type="file" name="itinerary_pdf_file" accept="application/pdf,.pdf" />
+          </label>
+          <span class="file-pick__name" data-file-name-for="itinerary_pdf_file">No file chosen</span>
         </div>
-        <div class="form-group">
-          <label for="sort_order">Order</label>
+        <?php if (!empty($row['itinerary_pdf'])): ?>
+          <p class="field__hint"><a href="<?= e(asset_url((string) $row['itinerary_pdf'])) ?>" target="_blank" rel="noopener">Current itinerary PDF</a></p>
+          <label class="checks"><input type="checkbox" name="remove_itinerary_pdf" value="1" /> Remove</label>
+        <?php endif; ?>
+      </div>
+      <div class="field">
+        <span class="field__label">Price Chart PDF</span>
+        <p class="field__hint">Upload price chart / rate details.</p>
+        <div class="file-pick">
+          <label class="file-pick__btn"><?= yn_icon('upload') ?>Upload PDF
+            <input id="price_chart_pdf_file" type="file" name="price_chart_pdf_file" accept="application/pdf,.pdf" />
+          </label>
+          <span class="file-pick__name" data-file-name-for="price_chart_pdf_file">No file chosen</span>
+        </div>
+        <?php if (!empty($row['price_chart_pdf'])): ?>
+          <p class="field__hint"><a href="<?= e(asset_url((string) $row['price_chart_pdf'])) ?>" target="_blank" rel="noopener">Current price chart PDF</a></p>
+          <label class="checks"><input type="checkbox" name="remove_price_chart_pdf" value="1" /> Remove</label>
+        <?php endif; ?>
+      </div>
+      <div class="field">
+        <label for="sort_order">Display Order</label>
+        <p class="field__hint">Set display order in listings.</p>
+        <span class="input-icon">
+          <?= yn_icon('list') ?>
           <input class="form-control" id="sort_order" type="number" name="sort_order" value="<?= e((string) ($row['sort_order'] ?? '0')) ?>" />
+        </span>
+      </div>
+      <div class="field">
+        <span class="field__label">Featured Package</span>
+        <p class="field__hint">Show on homepage and rank first in listings.</p>
+        <div class="switch-field">
+          <span class="switch">
+            <input id="is_featured" type="checkbox" name="is_featured" value="1" aria-label="Featured package" <?= !empty($row['is_featured']) ? 'checked' : '' ?> />
+            <span class="switch__track"></span>
+          </span>
+          <span class="switch-field__state" data-switch-state="is_featured">No</span>
         </div>
-        <div class="form-group">
-          <label>Featured</label>
-          <div class="checks">
-            <label><input type="checkbox" name="is_featured" value="1" <?= !empty($row['is_featured']) ? 'checked' : '' ?> /> Featured</label>
-          </div>
-          <p class="help-text">Featured packages rank first in listings and show on the homepage.</p>
-        </div>
-      </section>
+      </div>
     </div>
+  </section>
 
-    <div class="form-actions">
-      <button class="btn btn--primary" type="submit">Save package</button>
-      <a class="btn btn--secondary" href="<?= e(url('admin/packages/index.php')) ?>">Cancel</a>
-    </div>
-  </form>
-</div>
-<script>
-(function () {
-  var duration = document.getElementById("duration");
-  var root = document.getElementById("stays-field");
-  if (!duration || !root) return;
-  var fields = root.querySelector("[data-stay-fields]");
-  var places = [];
-  try {
-    places = JSON.parse(root.getAttribute("data-places") || "[]");
-  } catch (err) {
-    places = [];
-  }
-
-  function nightsFromDuration(value) {
-    var text = String(value || "");
-    var match = text.match(/(\d+)\s*[dD](?:ays?)?[^\d]*(\d+)\s*[nN](?:ights?)?/) || text.match(/^(\d+)\s*[\/\-]\s*(\d+)$/);
-    return match ? Math.max(0, parseInt(match[2], 10)) : 0;
-  }
-
-  function currentValues() {
-    return Array.prototype.map.call(fields.querySelectorAll("select"), function (el) {
-      return el.value;
-    });
-  }
-
-  function escapeHtml(value) {
-    return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-  }
-
-  function render(nights, values) {
-    if (nights < 1) {
-      fields.innerHTML = '<p class="help-text">No overnight stays for this duration.</p>';
-      return;
-    }
-    var html = "";
-    for (var i = 0; i < nights; i++) {
-      html += '<div class="stay-fields__item"><label for="stay-' + i + '">Night ' + (i + 1) + "</label>";
-      html += '<select class="form-control" id="stay-' + i + '" name="stays[]"><option value="">Select a place</option>';
-      places.forEach(function (place) {
-        var selected = place.slug === values[i] ? " selected" : "";
-        html += '<option value="' + escapeHtml(place.slug) + '"' + selected + ">" + escapeHtml(place.label) + "</option>";
-      });
-      html += "</select></div>";
-    }
-    fields.innerHTML = html;
-  }
-
-  function update() {
-    render(nightsFromDuration(duration.value), currentValues());
-  }
-
-  duration.addEventListener("input", update);
-  duration.addEventListener("change", update);
-})();
-</script>
+  <div class="form-footer">
+    <a class="btn btn--secondary" href="<?= e(url('admin/packages/index.php')) ?>">Cancel</a>
+    <button class="btn btn--primary" type="submit"><?= yn_icon('check') ?>Save Package</button>
+  </div>
+</form>
+<template id="icon-copy"><?= yn_icon('copy') ?></template>
+<template id="icon-trash"><?= yn_icon('trash') ?></template>
+<template id="icon-chevron-down"><?= yn_icon('chevron-down') ?></template>
 <?php
 $adminContent = ob_get_clean();
-$pageTitle = $id ? 'Edit package' : 'Add package';
+$pageTitle = $id ? 'Edit Package' : 'Add Package';
+$pageSubtitle = $id ? 'Update this travel package.' : 'Create and publish a new travel package.';
+$adminScripts = ['admin/assets/package-form.js'];
 $activeNav = 'packages';
 require dirname(__DIR__) . '/_layout.php';

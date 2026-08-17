@@ -63,6 +63,70 @@ function parse_package_duration(string $text): ?array
     return null;
 }
 
+/**
+ * Days and nights come from two number inputs; the older "4D 3N" text field
+ * is still accepted so saved links and scripts keep working.
+ */
+function package_days_nights_from_post(?array $existing = null): array
+{
+    if (post('days') !== '' || post('nights') !== '') {
+        return [
+            'days' => max(1, (int) post('days', '1')),
+            'nights' => max(0, (int) post('nights', '0')),
+        ];
+    }
+    $parsed = parse_package_duration(post('duration'));
+    if ($parsed) {
+        return $parsed;
+    }
+    $days = max(1, (int) ($existing['days'] ?? 1));
+    return ['days' => $days, 'nights' => max(0, (int) ($existing['nights'] ?? max(0, $days - 1)))];
+}
+
+/** Highlights arrive as chips, plus whatever is still sitting in the entry box. */
+function package_highlights_from_post(): array
+{
+    $out = [];
+    if (isset($_POST['highlights']) && is_array($_POST['highlights'])) {
+        foreach ($_POST['highlights'] as $value) {
+            $value = trim((string) $value);
+            if ($value !== '' && !in_array($value, $out, true)) {
+                $out[] = $value;
+            }
+        }
+    } else {
+        $out = lines_to_array(post('highlights'));
+    }
+    foreach (lines_to_array(post('highlights_extra')) as $value) {
+        if (!in_array($value, $out, true)) {
+            $out[] = $value;
+        }
+    }
+    return $out;
+}
+
+/** One itinerary entry per day row; empty rows are dropped. */
+function package_itinerary_from_post(): array
+{
+    if (!isset($_POST['itinerary_title']) || !is_array($_POST['itinerary_title'])) {
+        return textarea_to_itinerary(post('itinerary'));
+    }
+    $titles = array_values($_POST['itinerary_title']);
+    $texts = isset($_POST['itinerary_text']) && is_array($_POST['itinerary_text'])
+        ? array_values($_POST['itinerary_text'])
+        : [];
+    $out = [];
+    foreach ($titles as $i => $title) {
+        $title = trim((string) $title);
+        $text = trim((string) ($texts[$i] ?? ''));
+        if ($title === '' && $text === '') {
+            continue;
+        }
+        $out[] = ['day' => count($out) + 1, 'title' => $title, 'text' => $text];
+    }
+    return $out;
+}
+
 function package_duration_bucket(int $days): string
 {
     if ($days <= 4) {
@@ -252,9 +316,7 @@ function package_form_data_from_post(?array $existing = null): array
     $existingSlug = trim((string) ($existing['slug'] ?? ''));
     $slug = $existingSlug !== '' ? $existingSlug : unique_package_slug(slugify($title), (int) ($existing['id'] ?? 0));
 
-    $duration = parse_package_duration(post('duration'));
-    $days = $duration['days'] ?? max(1, (int) ($existing['days'] ?? 1));
-    $nights = $duration['nights'] ?? max(0, (int) ($existing['nights'] ?? max(0, $days - 1)));
+    ['days' => $days, 'nights' => $nights] = package_days_nights_from_post($existing);
 
     $pickup = post('pickup');
 
@@ -301,8 +363,8 @@ function package_form_data_from_post(?array $existing = null): array
         'title' => $title,
         'overview' => post('overview'),
         'card_text' => post('card_text'),
-        'highlights_json' => json_encode(lines_to_array(post('highlights')), JSON_UNESCAPED_UNICODE),
-        'itinerary_json' => json_encode(textarea_to_itinerary(post('itinerary')), JSON_UNESCAPED_UNICODE),
+        'highlights_json' => json_encode(package_highlights_from_post(), JSON_UNESCAPED_UNICODE),
+        'itinerary_json' => json_encode(package_itinerary_from_post(), JSON_UNESCAPED_UNICODE),
         'image' => (string) ($existing['image'] ?? ''),
         'gallery_json' => json_encode(json_decode_array($existing['gallery_json'] ?? null), JSON_UNESCAPED_UNICODE),
         'itinerary_pdf' => (string) ($existing['itinerary_pdf'] ?? ''),
@@ -315,14 +377,20 @@ function package_form_data_from_post(?array $existing = null): array
     ];
 }
 
-function package_form_validate(array $data, ?array $duration): array
+function package_form_validate(array $data): array
 {
     $errors = [];
     if (($data['title'] ?? '') === '') {
         $errors[] = 'Title is required.';
     }
-    if ($duration === null) {
-        $errors[] = post('duration') === '' ? 'Duration is required.' : 'Duration must look like 4D 3N.';
+    if (trim((string) ($data['overview'] ?? '')) === '') {
+        $errors[] = 'Overview is required.';
+    }
+    if ((int) ($data['days'] ?? 0) < 1) {
+        $errors[] = 'Duration needs at least one day.';
+    }
+    if ((int) ($data['nights'] ?? 0) > (int) ($data['days'] ?? 0)) {
+        $errors[] = 'Nights cannot be more than days.';
     }
     if (trim((string) ($data['pickup'] ?? '')) === '') {
         $errors[] = 'Pickup / drop is required.';
