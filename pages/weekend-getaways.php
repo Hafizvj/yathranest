@@ -62,7 +62,7 @@ require dirname(__DIR__) . '/includes/layout-header.php';
       <?php else: ?>
         <div class="package-grid">
           <?php foreach ($items as $item):
-            $img = strpos($item['image'], 'uploads/') === 0 ? '../' . $item['image'] : '../assets/images/' . ltrim($item['image'] ?: 'forest.jpg', '/');
+            $img = media_src((string) ($item['image'] ?? ''), '../', 'forest.jpg');
             ?>
             <article class="card">
               <div class="card__media">

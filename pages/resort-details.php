@@ -28,10 +28,7 @@ $navActive = 'resorts';
 $whatsapp = preg_replace('/\D/', '', setting('whatsapp', '919876543210'));
 
 $resortImg = static function (string $file): string {
-    if ($file === '') {
-        return '../assets/images/resort.jpg';
-    }
-    return strpos($file, 'uploads/') === 0 ? '../' . $file : '../assets/images/' . ltrim($file, '/');
+    return media_src($file, '../', 'resort.jpg');
 };
 $img = $resortImg((string) ($resort['image'] ?? ''));
 

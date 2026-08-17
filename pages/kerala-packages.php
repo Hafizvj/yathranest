@@ -77,7 +77,7 @@ require dirname(__DIR__) . '/includes/layout-header.php';
 <main id="main">
   <section class="page-head page-head--media">
     <div class="page-head__media" aria-hidden="true">
-      <img src="../assets/images/<?= e($heroImage) ?>" alt="" width="1600" height="900" />
+      <img src="<?= e(media_src($heroImage, '../', 'kerala-backwaters.jpg')) ?>" alt="" width="1600" height="900" />
     </div>
     <div class="container page-head__inner">
       <?= yn_crumbs($crumbTrail, true) ?>
@@ -132,7 +132,7 @@ require dirname(__DIR__) . '/includes/layout-header.php';
         <?php else: ?>
           <div class="destinations-grid">
             <?php foreach ($destinations as $dest):
-              $img = '../assets/images/' . ltrim($dest['image'], '/');
+              $img = media_src((string) $dest['image'], '../', 'beach.jpg');
               $href = 'kerala-packages.php?location=' . rawurlencode($dest['slug']);
               $countLabel = $dest['count'] . ' package' . ($dest['count'] === 1 ? '' : 's');
               ?>

@@ -15,36 +15,48 @@ $recent = db()->query('SELECT * FROM inquiries ORDER BY created_at DESC LIMIT 10
 ob_start();
 ?>
 <div class="admin-cards">
-  <div class="admin-card"><strong><?= $counts['packages'] ?></strong><span>Packages</span></div>
-  <div class="admin-card"><strong><?= $counts['inquiries_new'] ?></strong><span>New inquiries</span></div>
-  <div class="admin-card"><strong><?= $counts['resorts'] ?></strong><span>Resorts</span></div>
-  <div class="admin-card"><strong><?= $counts['places'] ?></strong><span>Places</span></div>
+  <a class="admin-card" href="<?= e(url('admin/packages/index.php')) ?>" style="text-decoration:none">
+    <strong><?= $counts['packages'] ?></strong><span>Packages</span>
+  </a>
+  <a class="admin-card" href="<?= e(url('admin/inquiries/index.php?status=new')) ?>" style="text-decoration:none">
+    <strong><?= $counts['inquiries_new'] ?></strong><span>New inquiries</span>
+  </a>
+  <a class="admin-card" href="<?= e(url('admin/resorts/index.php')) ?>" style="text-decoration:none">
+    <strong><?= $counts['resorts'] ?></strong><span>Resorts</span>
+  </a>
+  <a class="admin-card" href="<?= e(url('admin/places/index.php')) ?>" style="text-decoration:none">
+    <strong><?= $counts['places'] ?></strong><span>Places</span>
+  </a>
 </div>
 
 <div class="admin-panel">
   <div class="admin-toolbar">
-    <h2 style="margin:0;font-size:1.1rem">Recent inquiries</h2>
+    <h2>Recent inquiries</h2>
     <a class="btn btn--secondary btn--sm" href="<?= e(url('admin/inquiries/index.php')) ?>">View all</a>
   </div>
-  <table class="admin-table">
-    <thead>
-      <tr><th>When</th><th>Type</th><th>Name</th><th>Interest</th><th>Status</th><th></th></tr>
-    </thead>
-    <tbody>
-      <?php if (!$recent): ?>
-        <tr><td colspan="6">No inquiries yet.</td></tr>
-      <?php else: foreach ($recent as $row): ?>
-        <tr>
-          <td><?= e($row['created_at']) ?></td>
-          <td><?= e($row['type']) ?></td>
-          <td><?= e($row['name']) ?></td>
-          <td><?= e($row['interest']) ?></td>
-          <td><span class="badge badge--<?= e($row['status']) ?>"><?= e($row['status']) ?></span></td>
-          <td><a class="btn btn--secondary btn--sm" href="<?= e(url('admin/inquiries/view.php?id=' . (int) $row['id'])) ?>">Open</a></td>
-        </tr>
-      <?php endforeach; endif; ?>
-    </tbody>
-  </table>
+  <div class="admin-table-wrap">
+    <table class="admin-table">
+      <thead>
+        <tr><th>When</th><th>Type</th><th>Name</th><th>Interest</th><th>Status</th><th></th></tr>
+      </thead>
+      <tbody>
+        <?php if (!$recent): ?>
+          <tr><td class="admin-empty" colspan="6">No inquiries yet.</td></tr>
+        <?php else: foreach ($recent as $row): ?>
+          <tr>
+            <td><?= e($row['created_at']) ?></td>
+            <td><?= e($row['type']) ?></td>
+            <td><?= e($row['name']) ?></td>
+            <td><?= e($row['interest']) ?></td>
+            <td><span class="badge badge--<?= e($row['status']) ?>"><?= e($row['status']) ?></span></td>
+            <td class="admin-row-actions">
+              <a class="btn btn--secondary btn--sm" href="<?= e(url('admin/inquiries/view.php?id=' . (int) $row['id'])) ?>">Open</a>
+            </td>
+          </tr>
+        <?php endforeach; endif; ?>
+      </tbody>
+    </table>
+  </div>
 </div>
 <?php
 $adminContent = ob_get_clean();

@@ -15,6 +15,10 @@ $phone = setting('phone', '+91 98765 43210');
 $email = setting('email', 'hello@yathranest.com');
 $whatsapp = setting('whatsapp', '919876543210');
 $phoneHref = 'tel:' . preg_replace('/\s+/', '', $phone);
+$logoWordmark = setting('logo_wordmark', 'assets/logo/logo-wordmark.png');
+$logoMark = setting('logo_mark', 'assets/logo/logo-mark.png');
+$favicon = setting('favicon', 'assets/logo/favicon-32.png');
+$appleTouch = setting('apple_touch_icon', 'assets/logo/apple-touch-icon.png');
 
 /** Primary navigation, shared by the Explore menu and the mobile drawer. */
 $navGroups = [
@@ -48,9 +52,9 @@ $navCurrent = static function (string $key) use ($navActive): string {
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="<?= e($metaDescription) ?>" />
   <title><?= e($pageTitle) ?></title>
-  <link rel="icon" type="image/png" sizes="32x32" href="<?= e($assetDepth) ?>assets/logo/favicon-32.png" />
-  <link rel="icon" type="image/png" sizes="150x150" href="<?= e($assetDepth) ?>assets/logo/logo-mark.png" />
-  <link rel="apple-touch-icon" href="<?= e($assetDepth) ?>assets/logo/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="<?= e(media_src($favicon, $assetDepth, 'assets/logo/favicon-32.png', 'assets/')) ?>" />
+  <link rel="icon" type="image/png" sizes="150x150" href="<?= e(media_src($logoMark, $assetDepth, 'assets/logo/logo-mark.png', 'assets/')) ?>" />
+  <link rel="apple-touch-icon" href="<?= e(media_src($appleTouch, $assetDepth, 'assets/logo/apple-touch-icon.png', 'assets/')) ?>" />
   <meta name="theme-color" content="#346356" />
   <link rel="stylesheet" href="<?= e($assetDepth) ?>css/style.css?v=12" />
   <link rel="stylesheet" href="<?= e($assetDepth) ?>css/components.css?v=12" />
@@ -69,7 +73,7 @@ $navCurrent = static function (string $key) use ($navActive): string {
   <header class="site-header site-header--modern">
     <div class="container container--wide site-header__inner">
       <a class="logo" href="<?= e($homeHref) ?>" aria-label="YathraNest home">
-        <img class="logo__img" src="<?= e($assetDepth) ?>assets/logo/logo-wordmark.png" alt="YathraNest" width="293" height="98" />
+        <img class="logo__img" src="<?= e(media_src($logoWordmark, $assetDepth, 'assets/logo/logo-wordmark.png', 'assets/')) ?>" alt="YathraNest" width="293" height="98" />
       </a>
       <div class="header-actions">
         <div class="nav-explore">
@@ -100,7 +104,7 @@ $navCurrent = static function (string $key) use ($navActive): string {
     <div class="nav-drawer__panel" role="dialog" aria-label="Mobile navigation">
       <div class="nav-drawer__head">
         <a class="logo" href="<?= e($homeHref) ?>" aria-label="YathraNest home">
-          <img class="logo__img" src="<?= e($assetDepth) ?>assets/logo/logo-wordmark.png" alt="YathraNest" width="293" height="98" />
+          <img class="logo__img" src="<?= e(media_src($logoWordmark, $assetDepth, 'assets/logo/logo-wordmark.png', 'assets/')) ?>" alt="YathraNest" width="293" height="98" />
         </a>
         <button class="nav-drawer__close" type="button" aria-label="Close menu">&times;</button>
       </div>

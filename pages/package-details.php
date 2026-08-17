@@ -28,10 +28,7 @@ $listLabel = $pageKey === 'south' ? 'South Indian Packages' : ($pageKey === 'dom
 $eyebrow = ($pkg['sheet'] ?? '') === 'TN & KA PLANS' ? 'South Indian Package' : (($pkg['sheet'] ?? '') === 'Domestic' ? 'Domestic Package' : (($pkg['sheet'] ?? '') === 'International' ? 'International Package' : 'Kerala Package'));
 $navActive = $pageKey === 'south' ? 'south' : ($pageKey === 'domestic' ? 'domestic' : ($pageKey === 'international' ? 'international' : 'kerala'));
 
-$heroSrc = '../assets/images/' . ltrim($pkg['image'] ?? 'beach.jpg', '/');
-if ($pkg && strpos($pkg['image'] ?? '', 'uploads/') === 0) {
-    $heroSrc = '../' . $pkg['image'];
-}
+$heroSrc = media_src((string) ($pkg['image'] ?? ''), '../', 'beach.jpg');
 
 $days = (int) ($pkg['days'] ?? 0);
 $nights = (int) ($pkg['nights'] ?? 0);
@@ -40,13 +37,7 @@ $whatsapp = preg_replace('/\D/', '', setting('whatsapp', '919876543210'));
 
 function pkg_img_src(string $file): string
 {
-    if ($file === '') {
-        return '../assets/images/beach.jpg';
-    }
-    if (strpos($file, 'uploads/') === 0) {
-        return '../' . $file;
-    }
-    return '../assets/images/' . ltrim($file, '/');
+    return media_src($file, '../', 'beach.jpg');
 }
 
 require dirname(__DIR__) . '/includes/layout-header.php';

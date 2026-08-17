@@ -17,30 +17,45 @@ $rows = db()->query("SELECT * FROM {$table} ORDER BY sort_order, title")->fetchA
 ob_start();
 ?>
 <div class="admin-toolbar">
-  <p style="margin:0;color:#6b6560"><?= count($rows) ?> items</p>
+  <p class="admin-toolbar__meta"><?= count($rows) ?> items</p>
   <a class="btn btn--primary" href="<?= e(url('admin/' . $cfg['nav'] . '/edit.php')) ?>">Add</a>
 </div>
 <div class="admin-panel">
-  <table class="admin-table">
-    <thead><tr><th>Title</th><th>Slug</th><th>Status</th><th></th></tr></thead>
-    <tbody>
-      <?php foreach ($rows as $row): ?>
-        <tr>
-          <td><?= e($row['title']) ?></td>
-          <td><?= e($row['slug']) ?></td>
-          <td><?= !empty($row['is_published']) ? 'Published' : 'Draft' ?></td>
-          <td>
-            <a class="btn btn--secondary btn--sm" href="<?= e(url('admin/' . $cfg['nav'] . '/edit.php?id=' . (int) $row['id'])) ?>">Edit</a>
-            <form method="post" action="<?= e(url('admin/' . $cfg['nav'] . '/delete.php')) ?>" style="display:inline" onsubmit="return confirm('Delete?');">
-              <?= csrf_field() ?>
-              <input type="hidden" name="id" value="<?= (int) $row['id'] ?>" />
-              <button class="btn btn--danger btn--sm" type="submit">Delete</button>
-            </form>
-          </td>
-        </tr>
-      <?php endforeach; ?>
-    </tbody>
-  </table>
+  <?php if (!$rows): ?>
+    <p class="admin-empty">No items yet.</p>
+  <?php else: ?>
+  <div class="admin-table-wrap">
+    <table class="admin-table">
+      <thead><tr><th></th><th>Title</th><th>Slug</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+        <?php foreach ($rows as $row): ?>
+          <tr>
+            <td>
+              <?php if (!empty($row['image'])): ?>
+                <img class="admin-thumb" src="<?= e(image_url($row['image'])) ?>" alt="" width="48" height="48" loading="lazy" />
+              <?php endif; ?>
+            </td>
+            <td><?= e($row['title']) ?></td>
+            <td><?= e($row['slug']) ?></td>
+            <td>
+              <span class="badge badge--<?= !empty($row['is_published']) ? 'published' : 'draft' ?>">
+                <?= !empty($row['is_published']) ? 'Published' : 'Draft' ?>
+              </span>
+            </td>
+            <td class="admin-row-actions">
+              <a class="btn btn--secondary btn--sm" href="<?= e(url('admin/' . $cfg['nav'] . '/edit.php?id=' . (int) $row['id'])) ?>">Edit</a>
+              <form method="post" action="<?= e(url('admin/' . $cfg['nav'] . '/delete.php')) ?>" data-confirm="Delete this item?">
+                <?= csrf_field() ?>
+                <input type="hidden" name="id" value="<?= (int) $row['id'] ?>" />
+                <button class="btn btn--danger btn--sm" type="submit">Delete</button>
+              </form>
+            </td>
+          </tr>
+        <?php endforeach; ?>
+      </tbody>
+    </table>
+  </div>
+  <?php endif; ?>
 </div>
 <?php
 $adminContent = ob_get_clean();

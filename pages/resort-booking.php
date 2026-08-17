@@ -104,7 +104,7 @@ require dirname(__DIR__) . '/includes/layout-header.php';
         <div class="results-meta"><span data-filter-count></span></div>
         <div class="resort-grid" data-filter-list data-per-page="6">
           <?php foreach ($resorts as $r):
-            $img = strpos($r['image'], 'uploads/') === 0 ? '../' . $r['image'] : '../assets/images/' . ltrim($r['image'], '/');
+            $img = media_src((string) ($r['image'] ?? ''), '../', 'resort.jpg');
             $href = 'resort-details.php?resort=' . rawurlencode($r['slug']);
             ?>
             <article class="card" data-filter-item data-name="<?= e($r['title']) ?>" data-destination="<?= e(slugify($r['location'])) ?>" data-type="<?= e(strtolower((string) $r['category'])) ?>">

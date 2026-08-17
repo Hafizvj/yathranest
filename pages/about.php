@@ -16,6 +16,7 @@ $enquiryInterest = 'About enquiry';
 $enquirySource = 'pages/about.php';
 $navActive = 'about';
 $hero = $sections['hero_image'] ?? 'friends-travel.jpg';
+$heroSrc = media_src($hero, $assetDepth, 'friends-travel.jpg');
 
 $values = [
     ['icon' => 'compass', 'title' => 'Curated, not generic', 'text' => 'Every itinerary is shaped around the destination, pacing and what matters to you.'],
@@ -29,7 +30,7 @@ require dirname(__DIR__) . '/includes/layout-header.php';
 <main id="main">
   <section class="page-head page-head--media">
     <div class="page-head__media" aria-hidden="true">
-      <img src="../assets/images/<?= e($hero) ?>" alt="" width="1600" height="900" />
+      <img src="<?= e($heroSrc) ?>" alt="" width="1600" height="900" />
     </div>
     <div class="container page-head__inner">
       <?= yn_crumbs(['Home' => '../index.php', 'About' => null], true) ?>

@@ -208,14 +208,8 @@ function catalog_by_slug(string $table, string $slug, bool $publishedOnly = true
 
 function package_card_html(array $pkg, string $assetPrefix = '../assets/images/'): string
 {
-    $imgSrc = $pkg['image'] ?? '';
-    if ($imgSrc !== '' && strpos($imgSrc, 'uploads/') !== 0 && strpos($imgSrc, 'http') !== 0) {
-        $imgSrc = rtrim($assetPrefix, '/') . '/' . ltrim($imgSrc, '/');
-    } elseif (strpos($imgSrc, 'uploads/') === 0) {
-        $imgSrc = '../' . $imgSrc;
-    } else {
-        $imgSrc = image_url($pkg['image'] ?? '', ltrim($assetPrefix, './'));
-    }
+    $depth = (strpos($assetPrefix, '../') === 0) ? '../' : '';
+    $imgSrc = media_src((string) ($pkg['image'] ?? ''), $depth, 'beach.jpg');
     $href = 'package-details.php?package=' . rawurlencode($pkg['slug']);
     $destAttr = e(implode(' ', $pkg['destinations'] ?? []));
     $highlights = '';

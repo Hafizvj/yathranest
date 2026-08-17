@@ -5,6 +5,21 @@
 $admin = admin_user();
 $pageTitle = $pageTitle ?? 'Admin';
 $activeNav = $activeNav ?? '';
+$logoMark = setting('logo_mark', 'assets/logo/logo-mark.png');
+$favicon = setting('favicon', 'assets/logo/favicon-32.png');
+$appleTouch = setting('apple_touch_icon', 'assets/logo/apple-touch-icon.png');
+$navItems = [
+    'dashboard' => ['label' => 'Dashboard', 'href' => 'admin/index.php'],
+    'packages' => ['label' => 'Packages', 'href' => 'admin/packages/index.php'],
+    'places' => ['label' => 'Places', 'href' => 'admin/places/index.php'],
+    'resorts' => ['label' => 'Resorts', 'href' => 'admin/resorts/index.php'],
+    'getaways' => ['label' => 'Getaways', 'href' => 'admin/getaways/index.php'],
+    'gift-cards' => ['label' => 'Gift Cards', 'href' => 'admin/gift-cards/index.php'],
+    'investment' => ['label' => 'Investment', 'href' => 'admin/investment/index.php'],
+    'inquiries' => ['label' => 'Inquiries', 'href' => 'admin/inquiries/index.php'],
+    'content' => ['label' => 'Page content', 'href' => 'admin/content/index.php'],
+    'settings' => ['label' => 'Settings', 'href' => 'admin/settings/index.php'],
+];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -12,29 +27,28 @@ $activeNav = $activeNav ?? '';
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title><?= e($pageTitle) ?> | YathraNest Admin</title>
-  <link rel="icon" type="image/png" sizes="32x32" href="<?= e(url('assets/logo/favicon-32.png')) ?>" />
-  <link rel="icon" type="image/png" sizes="150x150" href="<?= e(url('assets/logo/logo-mark.png')) ?>" />
-  <link rel="apple-touch-icon" href="<?= e(url('assets/logo/apple-touch-icon.png')) ?>" />
+  <link rel="icon" type="image/png" sizes="32x32" href="<?= e(image_url($favicon, '')) ?>" />
+  <link rel="icon" type="image/png" sizes="150x150" href="<?= e(image_url($logoMark, '')) ?>" />
+  <link rel="apple-touch-icon" href="<?= e(image_url($appleTouch, '')) ?>" />
   <meta name="theme-color" content="#346356" />
-  <link rel="stylesheet" href="<?= e(url('admin/assets/admin.css')) ?>?v=2" />
+  <link rel="stylesheet" href="<?= e(url('admin/assets/admin.css')) ?>?v=3" />
 </head>
 <body class="admin">
-  <aside class="admin-sidebar">
+  <a class="skip-link" href="#admin-main">Skip to content</a>
+  <div class="admin-backdrop" data-admin-backdrop hidden></div>
+  <aside class="admin-sidebar" id="admin-sidebar">
     <a class="admin-brand" href="<?= e(url('admin/index.php')) ?>">
-      <img src="<?= e(url('assets/logo/logo-mark.png')) ?>" alt="" width="150" height="150" />
+      <img src="<?= e(image_url($logoMark, '')) ?>" alt="" width="150" height="150" />
       <span>YathraNest Admin</span>
     </a>
-    <nav class="admin-nav">
-      <a class="<?= $activeNav === 'dashboard' ? 'is-active' : '' ?>" href="<?= e(url('admin/index.php')) ?>">Dashboard</a>
-      <a class="<?= $activeNav === 'packages' ? 'is-active' : '' ?>" href="<?= e(url('admin/packages/index.php')) ?>">Packages</a>
-      <a class="<?= $activeNav === 'places' ? 'is-active' : '' ?>" href="<?= e(url('admin/places/index.php')) ?>">Places</a>
-      <a class="<?= $activeNav === 'resorts' ? 'is-active' : '' ?>" href="<?= e(url('admin/resorts/index.php')) ?>">Resorts</a>
-      <a class="<?= $activeNav === 'getaways' ? 'is-active' : '' ?>" href="<?= e(url('admin/getaways/index.php')) ?>">Getaways</a>
-      <a class="<?= $activeNav === 'gift-cards' ? 'is-active' : '' ?>" href="<?= e(url('admin/gift-cards/index.php')) ?>">Gift Cards</a>
-      <a class="<?= $activeNav === 'investment' ? 'is-active' : '' ?>" href="<?= e(url('admin/investment/index.php')) ?>">Investment</a>
-      <a class="<?= $activeNav === 'inquiries' ? 'is-active' : '' ?>" href="<?= e(url('admin/inquiries/index.php')) ?>">Inquiries</a>
-      <a class="<?= $activeNav === 'content' ? 'is-active' : '' ?>" href="<?= e(url('admin/content/index.php')) ?>">Page content</a>
-      <a class="<?= $activeNav === 'settings' ? 'is-active' : '' ?>" href="<?= e(url('admin/settings/index.php')) ?>">Settings</a>
+    <nav class="admin-nav" aria-label="Admin">
+      <?php foreach ($navItems as $key => $item): ?>
+        <a
+          class="<?= $activeNav === $key ? 'is-active' : '' ?>"
+          href="<?= e(url($item['href'])) ?>"
+          <?= $activeNav === $key ? 'aria-current="page"' : '' ?>
+        ><?= e($item['label']) ?></a>
+      <?php endforeach; ?>
     </nav>
     <div class="admin-sidebar__foot">
       <a href="<?= e(url('index.php')) ?>" target="_blank" rel="noopener">View site</a>
@@ -43,20 +57,32 @@ $activeNav = $activeNav ?? '';
   </aside>
   <div class="admin-main">
     <header class="admin-top">
-      <h1><?= e($pageTitle) ?></h1>
+      <div class="admin-top__left">
+        <button class="admin-menu-btn" type="button" data-admin-menu aria-controls="admin-sidebar" aria-expanded="false" aria-label="Open menu">
+          <span></span>
+        </button>
+        <h1><?= e($pageTitle) ?></h1>
+      </div>
       <?php if ($admin): ?>
         <p class="admin-user"><?= e($admin['name'] ?? $admin['email']) ?></p>
       <?php endif; ?>
     </header>
     <?php if ($msg = flash_get('success')): ?>
-      <div class="admin-alert admin-alert--ok"><?= e($msg) ?></div>
+      <div class="admin-alert admin-alert--ok" role="status">
+        <span><?= e($msg) ?></span>
+        <button type="button" class="admin-alert__close" data-alert-dismiss aria-label="Dismiss">&times;</button>
+      </div>
     <?php endif; ?>
     <?php if ($msg = flash_get('error')): ?>
-      <div class="admin-alert admin-alert--err"><?= e($msg) ?></div>
+      <div class="admin-alert admin-alert--err" role="alert">
+        <span><?= e($msg) ?></span>
+        <button type="button" class="admin-alert__close" data-alert-dismiss aria-label="Dismiss">&times;</button>
+      </div>
     <?php endif; ?>
-    <div class="admin-content">
+    <div class="admin-content" id="admin-main">
       <?= $adminContent ?? '' ?>
     </div>
   </div>
+  <script src="<?= e(url('admin/assets/admin.js')) ?>?v=3" defer></script>
 </body>
 </html>

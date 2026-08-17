@@ -49,19 +49,55 @@ function asset_url(string $path): string
     return base_url(ltrim($path, '/'));
 }
 
-function image_url(string $path, string $prefix = 'assets/images/'): string
+/**
+ * Normalize a stored media path into a site-relative path.
+ * Accepts uploads/..., assets/..., bare filenames, or absolute http(s) URLs.
+ */
+function media_path(string $path, string $fallback = 'beach.jpg', string $prefix = 'assets/images/'): string
 {
-    $path = ltrim($path, '/');
+    $path = trim($path);
     if ($path === '') {
-        return asset_url($prefix . 'beach.jpg');
+        $fallback = ltrim($fallback, '/');
+        if ($fallback === '') {
+            return rtrim($prefix, '/') . '/beach.jpg';
+        }
+        if (
+            strpos($fallback, 'uploads/') === 0
+            || strpos($fallback, 'assets/') === 0
+            || strpos($fallback, 'http://') === 0
+            || strpos($fallback, 'https://') === 0
+        ) {
+            return $fallback;
+        }
+        return rtrim($prefix, '/') . '/' . $fallback;
     }
     if (strpos($path, 'http://') === 0 || strpos($path, 'https://') === 0) {
         return $path;
     }
-    if (strpos($path, 'uploads/') === 0) {
-        return asset_url($path);
+    $path = ltrim($path, '/');
+    if (strpos($path, 'uploads/') === 0 || strpos($path, 'assets/') === 0) {
+        return $path;
     }
-    return asset_url($prefix . $path);
+    return rtrim($prefix, '/') . '/' . $path;
+}
+
+function image_url(string $path, string $prefix = 'assets/images/'): string
+{
+    $resolved = media_path($path, 'beach.jpg', $prefix === '' ? 'assets/' : $prefix);
+    if (strpos($resolved, 'http://') === 0 || strpos($resolved, 'https://') === 0) {
+        return $resolved;
+    }
+    return asset_url($resolved);
+}
+
+/** Relative URL for public pages that use $assetDepth ('', '../'). */
+function media_src(string $path, string $assetDepth = '', string $fallback = 'beach.jpg', string $prefix = 'assets/images/'): string
+{
+    $resolved = media_path($path, $fallback, $prefix);
+    if (strpos($resolved, 'http://') === 0 || strpos($resolved, 'https://') === 0) {
+        return $resolved;
+    }
+    return $assetDepth . $resolved;
 }
 
 function redirect(string $path): void

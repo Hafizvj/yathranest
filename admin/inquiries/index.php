@@ -24,40 +24,50 @@ ob_start();
 ?>
 <div class="admin-panel">
   <form method="get" class="admin-toolbar">
-    <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
-      <select class="form-control" name="type" style="width:auto">
+    <div class="admin-filters">
+      <label class="sr-only" for="filter-type">Type</label>
+      <select class="form-control" id="filter-type" name="type">
         <option value="">All types</option>
         <?php foreach (['general','contact','taxi','resort','gift','investment'] as $t): ?>
           <option value="<?= $t ?>" <?= $type === $t ? 'selected' : '' ?>><?= $t ?></option>
         <?php endforeach; ?>
       </select>
-      <select class="form-control" name="status" style="width:auto">
+      <label class="sr-only" for="filter-status">Status</label>
+      <select class="form-control" id="filter-status" name="status">
         <option value="">All statuses</option>
         <option value="new" <?= $status === 'new' ? 'selected' : '' ?>>new</option>
         <option value="handled" <?= $status === 'handled' ? 'selected' : '' ?>>handled</option>
       </select>
       <button class="btn btn--secondary" type="submit">Filter</button>
     </div>
+    <p class="admin-toolbar__meta"><?= count($rows) ?> shown</p>
   </form>
-  <table class="admin-table">
-    <thead><tr><th>When</th><th>Type</th><th>Name</th><th>Phone</th><th>Interest</th><th>Travel from</th><th>Status</th><th></th></tr></thead>
-    <tbody>
-      <?php if (!$rows): ?><tr><td colspan="8">No inquiries.</td></tr><?php endif; ?>
-      <?php foreach ($rows as $row): ?>
-        <tr>
-          <td><?= e($row['created_at']) ?></td>
-          <td><?= e($row['type']) ?></td>
-          <td><?= e($row['name']) ?></td>
-          <td><?= e($row['phone']) ?></td>
-          <td><?= e($row['interest']) ?></td>
-          <td><?= e(enquiry_date_label($row['travel_date'] ?? '')) ?></td>
-          <td><span class="badge badge--<?= e($row['status']) ?>"><?= e($row['status']) ?></span></td>
-          <td><a class="btn btn--secondary btn--sm" href="<?= e(url('admin/inquiries/view.php?id=' . (int) $row['id'])) ?>">Open</a></td>
-        </tr>
-      <?php endforeach; ?>
-    </tbody>
-  </table>
+  <div class="admin-table-wrap">
+    <table class="admin-table">
+      <thead><tr><th>When</th><th>Type</th><th>Name</th><th>Phone</th><th>Interest</th><th>Travel from</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+        <?php if (!$rows): ?>
+          <tr><td class="admin-empty" colspan="8">No inquiries.</td></tr>
+        <?php endif; ?>
+        <?php foreach ($rows as $row): ?>
+          <tr>
+            <td><?= e($row['created_at']) ?></td>
+            <td><?= e($row['type']) ?></td>
+            <td><?= e($row['name']) ?></td>
+            <td><?= e($row['phone']) ?></td>
+            <td><?= e($row['interest']) ?></td>
+            <td><?= e(enquiry_date_label($row['travel_date'] ?? '')) ?></td>
+            <td><span class="badge badge--<?= e($row['status']) ?>"><?= e($row['status']) ?></span></td>
+            <td class="admin-row-actions">
+              <a class="btn btn--secondary btn--sm" href="<?= e(url('admin/inquiries/view.php?id=' . (int) $row['id'])) ?>">Open</a>
+            </td>
+          </tr>
+        <?php endforeach; ?>
+      </tbody>
+    </table>
+  </div>
 </div>
+<style>.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}</style>
 <?php
 $adminContent = ob_get_clean();
 $pageTitle = 'Inquiries';
