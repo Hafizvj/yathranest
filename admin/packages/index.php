@@ -3,7 +3,10 @@
 require_once dirname(__DIR__, 2) . '/includes/bootstrap.php';
 require_admin();
 
-$rows = db()->query('SELECT id, slug, title, days, type, image, is_published, pages_json FROM packages ORDER BY sort_order, title')->fetchAll();
+$rows = db()->query(
+    'SELECT id, slug, title, days, nights, type, types_json, image, is_published, is_featured, pages_json
+     FROM packages ORDER BY is_featured DESC, sort_order, title'
+)->fetchAll();
 
 ob_start();
 ?>
@@ -17,7 +20,7 @@ ob_start();
   <?php else: ?>
   <div class="admin-table-wrap">
     <table class="admin-table">
-      <thead><tr><th></th><th>Title</th><th>Days</th><th>Type</th><th>Pages</th><th>Status</th><th></th></tr></thead>
+      <thead><tr><th></th><th>Title</th><th>Duration</th><th>Type</th><th>Pages</th><th>Status</th><th></th></tr></thead>
       <tbody>
         <?php foreach ($rows as $row): ?>
           <tr>
@@ -27,13 +30,17 @@ ob_start();
               <?php endif; ?>
             </td>
             <td><strong><?= e($row['title']) ?></strong><br><small><?= e($row['slug']) ?></small></td>
-            <td><?= (int) $row['days'] ?></td>
-            <td><?= e($row['type']) ?></td>
+            <td><?= (int) $row['days'] ?>D / <?= (int) $row['nights'] ?>N</td>
+            <?php $types = json_decode_array($row['types_json']) ?: array_filter([(string) $row['type']]); ?>
+            <td><?= e(package_types_label(['types' => $types])) ?></td>
             <td><?= e(implode(', ', json_decode_array($row['pages_json']))) ?></td>
             <td>
               <span class="badge badge--<?= (int) $row['is_published'] ? 'published' : 'draft' ?>">
                 <?= (int) $row['is_published'] ? 'Published' : 'Draft' ?>
               </span>
+              <?php if (!empty($row['is_featured'])): ?>
+                <br><small>Featured</small>
+              <?php endif; ?>
             </td>
             <td class="admin-row-actions">
               <a class="btn btn--secondary btn--sm" href="<?= e(url('admin/packages/edit.php?id=' . (int) $row['id'])) ?>">Edit</a>

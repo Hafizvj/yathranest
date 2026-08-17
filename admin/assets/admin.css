@@ -418,6 +418,18 @@ textarea.form-control { min-height: 100px; resize: vertical; }
   margin: 0;
 }
 
+.stay-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 0.7rem;
+}
+.stay-fields__item label {
+  display: block;
+  font-size: 0.85rem;
+  margin-bottom: 0.3rem;
+  color: var(--muted);
+}
+
 .form-actions {
   display: flex;
   flex-wrap: wrap;

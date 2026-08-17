@@ -34,10 +34,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = 'Label is required.';
     }
 
+    $scope = post('catalog_scope');
+    if (!isset(catalog_scope_options()[$scope])) {
+        $scope = place_default_catalog_scope($slug);
+    }
+
     if (!$errors) {
         $payload = [
             $slug,
             post('label'),
+            $scope,
             json_encode($tags, JSON_UNESCAPED_UNICODE),
             post('arrive_text'),
             post('sightseeing_text'),
@@ -46,11 +52,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ];
         if ($id) {
             $payload[] = $id;
-            db()->prepare('UPDATE places SET slug=?, label=?, tags_json=?, arrive_text=?, sightseeing_text=?, images_json=?, sort_order=? WHERE id=?')->execute($payload);
+            db()->prepare('UPDATE places SET slug=?, label=?, catalog_scope=?, tags_json=?, arrive_text=?, sightseeing_text=?, images_json=?, sort_order=? WHERE id=?')->execute($payload);
             admin_remove_missing_uploads($oldImages, $images);
             flash_set('success', 'Place updated.');
         } else {
-            db()->prepare('INSERT INTO places (slug, label, tags_json, arrive_text, sightseeing_text, images_json, sort_order) VALUES (?,?,?,?,?,?,?)')->execute($payload);
+            db()->prepare('INSERT INTO places (slug, label, catalog_scope, tags_json, arrive_text, sightseeing_text, images_json, sort_order) VALUES (?,?,?,?,?,?,?,?)')->execute($payload);
             flash_set('success', 'Place created.');
         }
         redirect('admin/places/index.php');
@@ -59,6 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $row = [
         'slug' => $slug,
         'label' => post('label'),
+        'catalog_scope' => $scope,
         'tags_json' => json_encode($tags, JSON_UNESCAPED_UNICODE),
         'arrive_text' => post('arrive_text'),
         'sightseeing_text' => post('sightseeing_text'),
@@ -91,6 +98,16 @@ ob_start();
         <div class="form-group">
           <label for="slug">Slug</label>
           <input class="form-control" id="slug" name="slug" value="<?= e($row['slug'] ?? '') ?>" />
+        </div>
+        <div class="form-group">
+          <label for="catalog_scope">Listing page</label>
+          <?php $currentScope = (string) ($row['catalog_scope'] ?? place_default_catalog_scope((string) ($row['slug'] ?? ''))); ?>
+          <select class="form-control" id="catalog_scope" name="catalog_scope">
+            <?php foreach (catalog_scope_options() as $value => $label): ?>
+              <option value="<?= e($value) ?>" <?= $currentScope === $value ? 'selected' : '' ?>><?= e($label) ?></option>
+            <?php endforeach; ?>
+          </select>
+          <p class="help-text">Packages visiting this place appear on this listing page.</p>
         </div>
         <div class="form-group full">
           <label for="tags">Tags (comma-separated)</label>

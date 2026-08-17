@@ -42,65 +42,322 @@ function textarea_to_itinerary(string $text): array
     return $out;
 }
 
-function package_form_data_from_post(): array
+function format_package_duration(int $days, int $nights): string
 {
-    $pages = isset($_POST['pages']) && is_array($_POST['pages']) ? array_values($_POST['pages']) : [];
-    $destinations = csv_to_array(post('destinations'));
-    $highlights = lines_to_array(post('highlights'));
-    $gallery = admin_collect_media_paths('gallery_keep', 'gallery_paths');
-    $itinerary = textarea_to_itinerary(post('itinerary'));
-    $slug = post('slug') !== '' ? post('slug') : slugify(post('title'));
-    $days = max(1, (int) post('days', '1'));
-    $nights = max(0, (int) post('nights', (string) max(0, $days - 1)));
-    $duration = post('duration_bucket');
-    if ($duration === '') {
-        if ($days <= 4) {
-            $duration = '2-4';
-        } elseif ($days <= 7) {
-            $duration = '5-7';
-        } else {
-            $duration = '8-10';
+    return $days . 'D ' . $nights . 'N';
+}
+
+/** Reads "4D 3N", "4 Days 3 Nights" or "4/3" into days and nights. */
+function parse_package_duration(string $text): ?array
+{
+    $text = trim($text);
+    if ($text === '') {
+        return null;
+    }
+    if (preg_match('/(\d+)\s*[dD](?:ays?)?[^\d]*(\d+)\s*[nN](?:ights?)?/', $text, $m)) {
+        return ['days' => max(1, (int) $m[1]), 'nights' => max(0, (int) $m[2])];
+    }
+    if (preg_match('/^(\d+)\s*[\/\-]\s*(\d+)$/', $text, $m)) {
+        return ['days' => max(1, (int) $m[1]), 'nights' => max(0, (int) $m[2])];
+    }
+    return null;
+}
+
+function package_duration_bucket(int $days): string
+{
+    if ($days <= 4) {
+        return '2-4';
+    }
+    if ($days <= 7) {
+        return '5-7';
+    }
+    return '8-10';
+}
+
+function unique_package_slug(string $base, int $excludeId = 0): string
+{
+    $slug = $base !== '' ? $base : 'package';
+    $check = db()->prepare('SELECT id FROM packages WHERE slug = ? AND id <> ? LIMIT 1');
+    $candidate = $slug;
+    $i = 2;
+    while (true) {
+        $check->execute([$candidate, $excludeId]);
+        if (!$check->fetch()) {
+            return $candidate;
+        }
+        $candidate = $slug . '-' . $i;
+        $i++;
+    }
+}
+
+function package_selected_types(?array $row = null): array
+{
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $types = isset($_POST['types']) && is_array($_POST['types']) ? array_values($_POST['types']) : [];
+    } elseif ($row) {
+        $types = json_decode_array($row['types_json'] ?? null);
+        if (!$types && !empty($row['type'])) {
+            $types = [(string) $row['type']];
+        }
+    } else {
+        $types = [];
+    }
+    $out = [];
+    foreach ($types as $type) {
+        $type = strtolower(trim((string) $type));
+        if ($type !== '' && !in_array($type, $out, true)) {
+            $out[] = $type;
         }
     }
+    return $out;
+}
+
+function package_selected_destinations(?array $row = null): array
+{
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        return isset($_POST['destinations']) && is_array($_POST['destinations'])
+            ? array_values(array_filter(array_map('strval', $_POST['destinations'])))
+            : [];
+    }
+    return $row ? json_decode_array($row['destinations_json'] ?? null) : [];
+}
+
+/** Expands a legacy "2 wayanad 1 ooty" split into one slug per night. */
+function parse_stay_split_to_nights(string $split, int $nights): array
+{
+    $split = strtolower(trim($split));
+    if ($split === '' || $nights < 1) {
+        return array_fill(0, max(0, $nights), '');
+    }
+    $out = [];
+    if (preg_match_all('/(?:(\d+)\s+)?([a-z][a-z0-9-]*)/', $split, $matches, PREG_SET_ORDER)) {
+        $hasCount = false;
+        foreach ($matches as $m) {
+            if (($m[1] ?? '') !== '') {
+                $hasCount = true;
+                break;
+            }
+        }
+        foreach ($matches as $m) {
+            $count = $hasCount ? (int) ($m[1] !== '' ? $m[1] : 1) : 1;
+            for ($i = 0; $i < $count; $i++) {
+                $out[] = $m[2];
+            }
+        }
+    }
+    if (count($out) < $nights) {
+        $out = array_merge($out, array_fill(0, $nights - count($out), $out[0] ?? ''));
+    }
+    return array_slice($out, 0, $nights);
+}
+
+/**
+ * One stay slug per night, taken from the submitted form, the stored stays,
+ * a legacy stay split, or failing that the package's destinations.
+ */
+function package_stays_from_row(?array $row, int $nights): array
+{
+    if ($nights < 1) {
+        return [];
+    }
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['stays']) && is_array($_POST['stays'])) {
+        $stays = array_values(array_map('strval', $_POST['stays']));
+        if (count($stays) < $nights) {
+            $stays = array_merge($stays, array_fill(0, $nights - count($stays), ''));
+        }
+        return array_slice($stays, 0, $nights);
+    }
+    if ($row) {
+        $stored = json_decode_array($row['stays_json'] ?? null);
+        if ($stored) {
+            if (count($stored) < $nights) {
+                $stored = array_merge($stored, array_fill(0, $nights - count($stored), (string) end($stored)));
+            }
+            return array_slice(array_map('strval', $stored), 0, $nights);
+        }
+        $fromSplit = parse_stay_split_to_nights((string) ($row['stay_split'] ?? ''), $nights);
+        if (array_filter($fromSplit)) {
+            return $fromSplit;
+        }
+        $dests = json_decode_array($row['destinations_json'] ?? null);
+        if ($dests) {
+            $out = [];
+            for ($i = 0; $i < $nights; $i++) {
+                $out[] = (string) ($dests[$i] ?? $dests[count($dests) - 1]);
+            }
+            return $out;
+        }
+    }
+    return array_fill(0, $nights, '');
+}
+
+/** Collapses per-night slugs into the stored "2 wayanad 1 ooty" form. */
+function stays_to_split(array $slugs): string
+{
+    $parts = [];
+    foreach (stays_to_runs($slugs) as [$slug, $count]) {
+        $parts[] = $count . ' ' . $slug;
+    }
+    return implode(' ', $parts);
+}
+
+/** Collapses per-night slugs into "2 nights Wayanad · 1 night Ooty". */
+function stays_to_summary(array $slugs, array $places): string
+{
+    $parts = [];
+    foreach (stays_to_runs($slugs) as [$slug, $count]) {
+        $label = $places[$slug]['label'] ?? $slug;
+        $parts[] = $count . ' night' . ($count === 1 ? '' : 's') . ' ' . $label;
+    }
+    return implode(' · ', $parts);
+}
+
+/**
+ * Groups consecutive nights in the same place.
+ * @return array<int, array{0:string,1:int}>
+ */
+function stays_to_runs(array $slugs): array
+{
+    $runs = [];
+    $current = '';
+    $count = 0;
+    foreach ($slugs as $slug) {
+        $slug = trim((string) $slug);
+        if ($slug === '') {
+            continue;
+        }
+        if ($slug === $current) {
+            $count++;
+            continue;
+        }
+        if ($current !== '') {
+            $runs[] = [$current, $count];
+        }
+        $current = $slug;
+        $count = 1;
+    }
+    if ($current !== '') {
+        $runs[] = [$current, $count];
+    }
+    return $runs;
+}
+
+/**
+ * Builds a full package row from the minimal form. Everything the form no
+ * longer asks for is derived here, or carried over from $existing.
+ */
+function package_form_data_from_post(?array $existing = null): array
+{
+    $title = post('title');
+    $existingSlug = trim((string) ($existing['slug'] ?? ''));
+    $slug = $existingSlug !== '' ? $existingSlug : unique_package_slug(slugify($title), (int) ($existing['id'] ?? 0));
+
+    $duration = parse_package_duration(post('duration'));
+    $days = $duration['days'] ?? max(1, (int) ($existing['days'] ?? 1));
+    $nights = $duration['nights'] ?? max(0, (int) ($existing['nights'] ?? max(0, $days - 1)));
+
+    $pickup = post('pickup');
+
+    $types = package_selected_types($existing);
+    $destSlugs = package_selected_destinations($existing);
+    $places = places_all();
+
+    $destLabels = [];
+    $pages = [];
+    foreach ($destSlugs as $destSlug) {
+        $place = $places[$destSlug] ?? null;
+        $destLabels[] = $place['label'] ?? $destSlug;
+        $scope = $place['catalog_scope'] ?? place_default_catalog_scope((string) $destSlug);
+        if ($scope !== '' && !in_array($scope, $pages, true)) {
+            $pages[] = $scope;
+        }
+    }
+    if (!$pages) {
+        $pages = json_decode_array($existing['pages_json'] ?? null) ?: ['kerala'];
+    }
+
+    $stays = package_stays_from_row($existing, $nights);
+    $staySummary = stays_to_summary($stays, $places);
+
     return [
         'slug' => $slug,
-        'sheet' => post('sheet'),
-        'group_name' => post('group_name'),
-        'pickup' => post('pickup'),
-        'drop_point' => post('drop_point'),
-        'pickup_slug' => post('pickup_slug') !== '' ? post('pickup_slug') : slugify(post('pickup')),
+        'sheet' => (string) ($existing['sheet'] ?? ''),
+        'group_name' => $destLabels[0] ?? (string) ($existing['group_name'] ?? ''),
+        'pickup' => $pickup,
+        'drop_point' => $pickup,
+        'pickup_slug' => $pickup !== '' ? slugify($pickup) : (string) ($existing['pickup_slug'] ?? ''),
         'days' => $days,
         'nights' => $nights,
-        'stay_split' => post('stay_split'),
-        'stay_summary' => post('stay_summary'),
-        'destinations_json' => json_encode($destinations, JSON_UNESCAPED_UNICODE),
-        'dest_line' => post('dest_line'),
+        'stay_split' => stays_to_split($stays),
+        'stay_summary' => $staySummary,
+        'stays_json' => json_encode($stays, JSON_UNESCAPED_UNICODE),
+        'destinations_json' => json_encode($destSlugs, JSON_UNESCAPED_UNICODE),
+        'dest_line' => implode(' · ', $destLabels) ?: (string) ($existing['dest_line'] ?? ''),
         'pages_json' => json_encode($pages, JSON_UNESCAPED_UNICODE),
-        'type' => post('type', 'leisure'),
-        'state' => post('state'),
-        'duration_bucket' => $duration,
-        'title' => post('title'),
+        'type' => $types[0] ?? (string) ($existing['type'] ?? 'family'),
+        'types_json' => json_encode($types, JSON_UNESCAPED_UNICODE),
+        'state' => (string) ($existing['state'] ?? ''),
+        'duration_bucket' => package_duration_bucket($days),
+        'title' => $title,
         'overview' => post('overview'),
         'card_text' => post('card_text'),
-        'highlights_json' => json_encode($highlights, JSON_UNESCAPED_UNICODE),
-        'itinerary_json' => json_encode($itinerary, JSON_UNESCAPED_UNICODE),
-        'image' => post('image'),
-        'gallery_json' => json_encode($gallery, JSON_UNESCAPED_UNICODE),
-        'has_houseboat' => isset($_POST['has_houseboat']) ? 1 : 0,
-        'accommodation' => post('accommodation'),
-        'is_published' => isset($_POST['is_published']) ? 1 : 0,
-        'sort_order' => (int) post('sort_order', '0'),
+        'highlights_json' => json_encode(lines_to_array(post('highlights')), JSON_UNESCAPED_UNICODE),
+        'itinerary_json' => json_encode(textarea_to_itinerary(post('itinerary')), JSON_UNESCAPED_UNICODE),
+        'image' => (string) ($existing['image'] ?? ''),
+        'gallery_json' => json_encode(json_decode_array($existing['gallery_json'] ?? null), JSON_UNESCAPED_UNICODE),
+        'itinerary_pdf' => (string) ($existing['itinerary_pdf'] ?? ''),
+        'price_chart_pdf' => (string) ($existing['price_chart_pdf'] ?? ''),
+        'has_houseboat' => (int) ($existing['has_houseboat'] ?? 0),
+        'accommodation' => $staySummary !== '' ? $staySummary : (string) ($existing['accommodation'] ?? ''),
+        'is_featured' => isset($_POST['is_featured']) ? 1 : 0,
+        'is_published' => $existing ? (int) ($existing['is_published'] ?? 1) : 1,
+        'sort_order' => (int) post('sort_order', (string) ($existing['sort_order'] ?? '0')),
     ];
+}
+
+function package_form_validate(array $data, ?array $duration): array
+{
+    $errors = [];
+    if (($data['title'] ?? '') === '') {
+        $errors[] = 'Title is required.';
+    }
+    if ($duration === null) {
+        $errors[] = post('duration') === '' ? 'Duration is required.' : 'Duration must look like 4D 3N.';
+    }
+    if (trim((string) ($data['pickup'] ?? '')) === '') {
+        $errors[] = 'Pickup / drop is required.';
+    }
+    if (json_decode_array($data['types_json'] ?? null) === []) {
+        $errors[] = 'Select at least one type.';
+    }
+    if (json_decode_array($data['destinations_json'] ?? null) === []) {
+        $errors[] = 'Select at least one destination.';
+    }
+    $nights = (int) ($data['nights'] ?? 0);
+    $stays = json_decode_array($data['stays_json'] ?? null);
+    if ($nights > 0) {
+        if (count($stays) !== $nights) {
+            $errors[] = 'Choose a stay for each night.';
+        } else {
+            foreach ($stays as $i => $stay) {
+                if (trim((string) $stay) === '') {
+                    $errors[] = 'Choose a stay for night ' . ($i + 1) . '.';
+                    break;
+                }
+            }
+        }
+    }
+    return $errors;
 }
 
 function package_fields(): array
 {
     return [
         'slug', 'sheet', 'group_name', 'pickup', 'drop_point', 'pickup_slug',
-        'days', 'nights', 'stay_split', 'stay_summary', 'destinations_json', 'dest_line',
-        'pages_json', 'type', 'state', 'duration_bucket', 'title', 'overview', 'card_text',
-        'highlights_json', 'itinerary_json', 'image', 'gallery_json', 'has_houseboat',
-        'accommodation', 'is_published', 'sort_order',
+        'days', 'nights', 'stay_split', 'stay_summary', 'stays_json', 'destinations_json', 'dest_line',
+        'pages_json', 'type', 'types_json', 'state', 'duration_bucket', 'title', 'overview', 'card_text',
+        'highlights_json', 'itinerary_json', 'image', 'gallery_json', 'itinerary_pdf', 'price_chart_pdf',
+        'has_houseboat', 'accommodation', 'is_featured', 'is_published', 'sort_order',
     ];
 }
 
@@ -283,6 +540,91 @@ function admin_apply_image_upload(array $file, string $subdir, string $currentPa
         return $uploaded;
     }
     return null;
+}
+
+function admin_pdf_max_bytes(): int
+{
+    return 10 * 1024 * 1024;
+}
+
+/**
+ * Store an uploaded PDF under uploads/{subdir}/ and return its relative path,
+ * or null on failure (see admin_upload_last_error()).
+ */
+function admin_store_pdf(array $file, string $subdir): ?string
+{
+    admin_upload_last_error('');
+    $error = (int) ($file['error'] ?? UPLOAD_ERR_NO_FILE);
+    if ($error === UPLOAD_ERR_NO_FILE || ($file['name'] ?? '') === '') {
+        return null;
+    }
+    if ($error !== UPLOAD_ERR_OK) {
+        admin_upload_last_error('PDF upload failed.');
+        return null;
+    }
+
+    $tmp = (string) ($file['tmp_name'] ?? '');
+    if ($tmp === '' || !is_uploaded_file($tmp)) {
+        admin_upload_last_error('Invalid upload.');
+        return null;
+    }
+
+    $size = (int) ($file['size'] ?? 0);
+    if ($size <= 0 || $size > admin_pdf_max_bytes()) {
+        admin_upload_last_error('PDF must be between 1 byte and 10 MB.');
+        return null;
+    }
+
+    if (strtolower(pathinfo((string) ($file['name'] ?? ''), PATHINFO_EXTENSION)) !== 'pdf') {
+        admin_upload_last_error('Only PDF files are allowed here.');
+        return null;
+    }
+
+    $finfo = new finfo(FILEINFO_MIME_TYPE);
+    if ((string) $finfo->file($tmp) !== 'application/pdf') {
+        admin_upload_last_error('File is not a valid PDF.');
+        return null;
+    }
+
+    $subdir = trim(str_replace(['..', '\\'], '', $subdir), '/');
+    $dir = rtrim((string) config('upload_dir'), '/\\') . DIRECTORY_SEPARATOR . $subdir;
+    if (!is_dir($dir) && !mkdir($dir, 0755, true) && !is_dir($dir)) {
+        admin_upload_last_error('Could not create upload folder.');
+        return null;
+    }
+
+    $name = bin2hex(random_bytes(8)) . '.pdf';
+    $dest = $dir . DIRECTORY_SEPARATOR . $name;
+    if (!move_uploaded_file($tmp, $dest)) {
+        admin_upload_last_error('Could not save uploaded PDF.');
+        return null;
+    }
+    @chmod($dest, 0644);
+
+    return 'uploads/' . $subdir . '/' . $name;
+}
+
+/**
+ * Resolve one PDF field: a new upload replaces the stored file, a remove
+ * checkbox clears it, otherwise the current path stays.
+ */
+function admin_apply_pdf_field(string $fileKey, string $removeKey, string $current, string $subdir): string
+{
+    if (!empty($_FILES[$fileKey]['name'])) {
+        $uploaded = admin_store_pdf($_FILES[$fileKey], $subdir);
+        if ($uploaded) {
+            if ($current !== '' && $current !== $uploaded) {
+                admin_delete_upload($current);
+            }
+            return $uploaded;
+        }
+        return $current;
+    }
+    if (!empty($_POST[$removeKey])) {
+        admin_delete_upload($current);
+        return '';
+    }
+    return $current;
 }
 
 /**

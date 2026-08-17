@@ -1,5 +1,39 @@
 <?php
 
+/** Travel types offered on the package form. */
+function package_type_options(): array
+{
+    return [
+        'family' => 'Family',
+        'couple' => 'Couple',
+        'bachelors' => 'Bachelors',
+    ];
+}
+
+/** Listing pages a place can belong to, used to derive a package's pages. */
+function catalog_scope_options(): array
+{
+    return [
+        'kerala' => 'Kerala',
+        'south' => 'South India',
+        'domestic' => 'Domestic',
+        'international' => 'International',
+    ];
+}
+
+function place_default_catalog_scope(string $slug): string
+{
+    static $south = ['mysore', 'ooty', 'coorg', 'chikmagalur', 'valparai', 'kodaikanal'];
+    static $domestic = ['lakshadweep', 'goa', 'andaman'];
+    if (in_array($slug, $south, true)) {
+        return 'south';
+    }
+    if (in_array($slug, $domestic, true)) {
+        return 'domestic';
+    }
+    return 'kerala';
+}
+
 function package_map_row(array $row): array
 {
     $row['pages'] = json_decode_array($row['pages_json'] ?? null);
@@ -7,6 +41,11 @@ function package_map_row(array $row): array
     $row['highlights'] = json_decode_array($row['highlights_json'] ?? null);
     $row['itinerary'] = json_decode_array($row['itinerary_json'] ?? null);
     $row['gallery'] = json_decode_array($row['gallery_json'] ?? null);
+    $row['stays'] = json_decode_array($row['stays_json'] ?? null);
+    $row['types'] = json_decode_array($row['types_json'] ?? null);
+    if (!$row['types'] && !empty($row['type'])) {
+        $row['types'] = [(string) $row['type']];
+    }
     $row['id'] = $row['slug'];
     $row['group'] = $row['group_name'];
     $row['drop'] = $row['drop_point'];
@@ -14,10 +53,26 @@ function package_map_row(array $row): array
     $row['destLine'] = $row['dest_line'];
     $row['cardText'] = $row['card_text'];
     $row['hasHouseboat'] = (bool) $row['has_houseboat'];
+    $row['isFeatured'] = !empty($row['is_featured']);
     $row['staySummary'] = $row['stay_summary'];
     $row['nights'] = (int) $row['nights'];
     $row['days'] = (int) $row['days'];
     return $row;
+}
+
+/** Human label for a package's travel types, e.g. "Family, Couple". */
+function package_types_label(array $pkg): string
+{
+    $options = package_type_options();
+    $labels = [];
+    foreach ($pkg['types'] ?? [] as $type) {
+        $type = strtolower(trim((string) $type));
+        if ($type === '') {
+            continue;
+        }
+        $labels[] = $options[$type] ?? ucwords(str_replace('-', ' ', $type));
+    }
+    return implode(', ', $labels);
 }
 
 function packages_for_page(string $page, bool $publishedOnly = true): array
@@ -26,7 +81,7 @@ function packages_for_page(string $page, bool $publishedOnly = true): array
     if ($publishedOnly) {
         $sql .= ' WHERE is_published = 1';
     }
-    $sql .= ' ORDER BY sort_order ASC, days ASC, title ASC';
+    $sql .= ' ORDER BY is_featured DESC, sort_order ASC, days ASC, title ASC';
     $rows = db()->query($sql)->fetchAll();
     $out = [];
     foreach ($rows as $row) {
@@ -143,6 +198,7 @@ function places_all(): array
         $out[$row['slug']] = [
             'slug' => $row['slug'],
             'label' => $row['label'],
+            'catalog_scope' => $row['catalog_scope'] ?? place_default_catalog_scope((string) $row['slug']),
             'tags' => json_decode_array($row['tags_json'] ?? null),
             'arrive' => $row['arrive_text'],
             'sightseeing' => $row['sightseeing_text'],
@@ -219,7 +275,8 @@ function package_card_html(array $pkg, string $assetPrefix = '../assets/images/'
     $days = (int) ($pkg['days'] ?? 0);
     $nights = (int) ($pkg['nights'] ?? 0);
     $nightsLabel = $nights . ' Night' . ($nights === 1 ? '' : 's');
-    return '<article class="card" data-filter-item data-name="' . e($pkg['title']) . '" data-destination="' . $destAttr . '" data-state="' . e($pkg['state'] ?? '') . '" data-duration="' . e($pkg['duration'] ?? '') . '" data-type="' . e($pkg['type'] ?? '') . '" data-pickup="' . e($pkg['pickup_slug'] ?? '') . '">'
+    $typeAttr = e(implode(' ', $pkg['types'] ?? array_filter([$pkg['type'] ?? ''])));
+    return '<article class="card" data-filter-item data-name="' . e($pkg['title']) . '" data-destination="' . $destAttr . '" data-state="' . e($pkg['state'] ?? '') . '" data-duration="' . e($pkg['duration'] ?? '') . '" data-type="' . $typeAttr . '" data-pickup="' . e($pkg['pickup_slug'] ?? '') . '">'
         . '<div class="card__media"><img src="' . e($imgSrc) . '" alt="' . e($pkg['title']) . '" width="800" height="500" loading="lazy" /></div>'
         . '<div class="card__body">'
         . '<p class="card__meta">' . e($pkg['dest_line'] ?? '') . '</p>'

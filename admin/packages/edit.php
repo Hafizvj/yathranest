@@ -16,47 +16,67 @@ if ($id) {
     }
 }
 
+$places = places_all();
 $errors = [];
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verify_csrf(post('_csrf'))) {
         $errors[] = 'Invalid CSRF token.';
     } else {
         $oldImage = (string) ($row['image'] ?? '');
         $oldGallery = json_decode_array($row['gallery_json'] ?? null);
-        $data = package_form_data_from_post();
 
-        if ($data['title'] === '' || $data['slug'] === '') {
-            $errors[] = 'Title and slug are required.';
+        $data = package_form_data_from_post($row);
+        $duration = parse_package_duration(post('duration'));
+        $errors = array_merge($errors, package_form_validate($data, $duration));
+
+        $takeUploadError = static function () use (&$errors): void {
+            $message = admin_upload_last_error();
+            if ($message) {
+                $errors[] = $message;
+                admin_upload_last_error('');
+            }
+        };
+
+        $newHero = !empty($_FILES['image_file']['name']);
+        $removeHero = !empty($_POST['remove_image']);
+        if (!$newHero && ($removeHero || $oldImage === '')) {
+            $errors[] = 'A cover image is required.';
         }
+
+        // Uploads only run once the rest of the form is valid, so a rejected
+        // save does not leave orphaned files behind.
+        $gallery = $oldGallery;
         if (!$errors) {
-            $check = db()->prepare('SELECT id FROM packages WHERE slug = ? AND id <> ? LIMIT 1');
-            $check->execute([$data['slug'], $id ?: 0]);
-            if ($check->fetch()) {
-                $errors[] = 'Slug already in use.';
-            }
-        }
+            $gallery = admin_collect_media_paths('gallery_keep', '', $_FILES['gallery_files'] ?? null, 'packages');
+            $takeUploadError();
+            $data['gallery_json'] = json_encode($gallery, JSON_UNESCAPED_UNICODE);
 
-        $gallery = admin_collect_media_paths(
-            'gallery_keep',
-            'gallery_paths',
-            $_FILES['gallery_files'] ?? null,
-            'packages'
-        );
-        if (admin_upload_last_error()) {
-            $errors[] = admin_upload_last_error();
-        }
-        $data['gallery_json'] = json_encode($gallery, JSON_UNESCAPED_UNICODE);
-
-        if (!empty($_FILES['image_file']['name'])) {
-            $uploaded = admin_apply_image_upload($_FILES['image_file'], 'packages', $oldImage);
-            if ($uploaded) {
-                $data['image'] = $uploaded;
-            } elseif (admin_upload_last_error()) {
-                $errors[] = admin_upload_last_error();
+            if ($newHero) {
+                $uploaded = admin_apply_image_upload($_FILES['image_file'], 'packages', $oldImage);
+                $takeUploadError();
+                if ($uploaded) {
+                    $data['image'] = $uploaded;
+                }
+            } elseif ($removeHero) {
+                admin_delete_upload($oldImage);
+                $data['image'] = '';
             }
-        } elseif (isset($_POST['remove_image']) && $_POST['remove_image'] === '1') {
-            admin_delete_upload($oldImage);
-            $data['image'] = '';
+
+            $data['itinerary_pdf'] = admin_apply_pdf_field(
+                'itinerary_pdf_file',
+                'remove_itinerary_pdf',
+                (string) ($row['itinerary_pdf'] ?? ''),
+                'packages'
+            );
+            $takeUploadError();
+            $data['price_chart_pdf'] = admin_apply_pdf_field(
+                'price_chart_pdf_file',
+                'remove_price_chart_pdf',
+                (string) ($row['price_chart_pdf'] ?? ''),
+                'packages'
+            );
+            $takeUploadError();
         }
 
         if (!$errors) {
@@ -70,50 +90,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             redirect('admin/packages/index.php');
         }
-        $row = array_merge($row ?: [], [
-            'title' => post('title'),
-            'slug' => post('slug'),
-            'type' => post('type'),
-            'sheet' => post('sheet'),
-            'group_name' => post('group_name'),
-            'pickup' => post('pickup'),
-            'drop_point' => post('drop_point'),
-            'pickup_slug' => post('pickup_slug'),
-            'days' => post('days'),
-            'nights' => post('nights'),
-            'duration_bucket' => post('duration_bucket'),
-            'state' => post('state'),
-            'dest_line' => post('dest_line'),
-            'stay_split' => post('stay_split'),
-            'stay_summary' => post('stay_summary'),
-            'card_text' => post('card_text'),
-            'overview' => post('overview'),
-            'accommodation' => post('accommodation'),
-            'image' => $data['image'],
-            'gallery_json' => $data['gallery_json'],
-            'sort_order' => post('sort_order'),
-            'has_houseboat' => isset($_POST['has_houseboat']) ? 1 : 0,
-            'is_published' => isset($_POST['is_published']) ? 1 : 0,
-            'pages_json' => json_encode(isset($_POST['pages']) && is_array($_POST['pages']) ? $_POST['pages'] : [], JSON_UNESCAPED_UNICODE),
-            'destinations_json' => json_encode(csv_to_array(post('destinations')), JSON_UNESCAPED_UNICODE),
-            'highlights_json' => json_encode(lines_to_array(post('highlights')), JSON_UNESCAPED_UNICODE),
-            'itinerary_json' => json_encode(textarea_to_itinerary(post('itinerary')), JSON_UNESCAPED_UNICODE),
-        ]);
+        $row = array_merge($row ?: [], $data);
     }
 }
 
-$pages = json_decode_array($row['pages_json'] ?? null);
-if (!$pages && isset($_POST['pages'])) {
-    $pages = (array) $_POST['pages'];
+$selectedTypes = package_selected_types($row);
+$typeOptions = package_type_options();
+foreach ($selectedTypes as $type) {
+    if (!isset($typeOptions[$type])) {
+        $typeOptions[$type] = ucwords(str_replace('-', ' ', $type));
+    }
 }
+$selectedDestinations = package_selected_destinations($row);
 $highlights = implode("\n", json_decode_array($row['highlights_json'] ?? null));
 $itineraryText = itinerary_to_textarea(json_decode_array($row['itinerary_json'] ?? null));
 $galleryPaths = json_decode_array($row['gallery_json'] ?? null);
-$destText = implode(', ', json_decode_array($row['destinations_json'] ?? null));
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $destText = post('destinations');
-    $highlights = post('highlights');
-    $itineraryText = post('itinerary');
+
+$durationValue = post('duration') !== ''
+    ? post('duration')
+    : format_package_duration((int) ($row['days'] ?? 4), (int) ($row['nights'] ?? 3));
+$nights = (int) (parse_package_duration($durationValue)['nights'] ?? 0);
+$stays = package_stays_from_row($row, $nights);
+
+$placeOptions = [];
+foreach ($places as $place) {
+    $placeOptions[] = ['slug' => $place['slug'], 'label' => $place['label']];
 }
 
 ob_start();
@@ -127,94 +128,15 @@ ob_start();
 
     <div class="form-grid">
       <section class="form-section">
-        <h2 class="form-section__title">Basics</h2>
+        <h2 class="form-section__title">Package</h2>
         <div class="form-group full">
           <label for="title">Title</label>
-          <input class="form-control" id="title" name="title" required value="<?= e($row['title'] ?? '') ?>" />
+          <input class="form-control" id="title" name="title" required value="<?= e($row['title'] ?? '') ?>" placeholder="Wayanad 4 Days 3 Nights" />
         </div>
-        <div class="form-group">
-          <label for="slug">Slug</label>
-          <input class="form-control" id="slug" name="slug" required value="<?= e($row['slug'] ?? '') ?>" />
-        </div>
-        <div class="form-group">
-          <label for="type">Type</label>
-          <select class="form-control" id="type" name="type">
-            <?php foreach (['leisure','adventure','family','couple','heritage'] as $t): ?>
-              <option value="<?= $t ?>" <?= (($row['type'] ?? '') === $t) ? 'selected' : '' ?>><?= $t ?></option>
-            <?php endforeach; ?>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="sheet">Sheet</label>
-          <input class="form-control" id="sheet" name="sheet" value="<?= e($row['sheet'] ?? '') ?>" />
-        </div>
-        <div class="form-group">
-          <label for="group_name">Group</label>
-          <input class="form-control" id="group_name" name="group_name" value="<?= e($row['group_name'] ?? '') ?>" />
-        </div>
-        <div class="form-group full">
-          <label>Pages</label>
-          <div class="checks">
-            <?php foreach (['kerala','south','domestic','international'] as $p): ?>
-              <label><input type="checkbox" name="pages[]" value="<?= $p ?>" <?= in_array($p, $pages, true) ? 'checked' : '' ?> /> <?= $p ?></label>
-            <?php endforeach; ?>
-          </div>
-        </div>
-      </section>
-
-      <section class="form-section">
-        <h2 class="form-section__title">Trip details</h2>
-        <div class="form-group">
-          <label for="pickup">Pickup</label>
-          <input class="form-control" id="pickup" name="pickup" value="<?= e($row['pickup'] ?? '') ?>" />
-        </div>
-        <div class="form-group">
-          <label for="drop_point">Drop</label>
-          <input class="form-control" id="drop_point" name="drop_point" value="<?= e($row['drop_point'] ?? '') ?>" />
-        </div>
-        <div class="form-group">
-          <label for="pickup_slug">Pickup slug</label>
-          <input class="form-control" id="pickup_slug" name="pickup_slug" value="<?= e($row['pickup_slug'] ?? '') ?>" />
-        </div>
-        <div class="form-group">
-          <label for="state">State</label>
-          <input class="form-control" id="state" name="state" value="<?= e($row['state'] ?? '') ?>" />
-        </div>
-        <div class="form-group">
-          <label for="days">Days</label>
-          <input class="form-control" id="days" type="number" min="1" name="days" value="<?= e((string) ($row['days'] ?? '2')) ?>" />
-        </div>
-        <div class="form-group">
-          <label for="nights">Nights</label>
-          <input class="form-control" id="nights" type="number" min="0" name="nights" value="<?= e((string) ($row['nights'] ?? '1')) ?>" />
-        </div>
-        <div class="form-group">
-          <label for="duration_bucket">Duration bucket</label>
-          <input class="form-control" id="duration_bucket" name="duration_bucket" value="<?= e($row['duration_bucket'] ?? '') ?>" placeholder="2-4 / 5-7 / 8-10" />
-        </div>
-        <div class="form-group">
-          <label for="stay_split">Stay split</label>
-          <input class="form-control" id="stay_split" name="stay_split" value="<?= e($row['stay_split'] ?? '') ?>" />
-        </div>
-        <div class="form-group full">
-          <label for="stay_summary">Stay summary</label>
-          <input class="form-control" id="stay_summary" name="stay_summary" value="<?= e($row['stay_summary'] ?? '') ?>" />
-        </div>
-        <div class="form-group full">
-          <label for="destinations">Destinations (comma-separated slugs)</label>
-          <input class="form-control" id="destinations" name="destinations" value="<?= e($destText) ?>" />
-        </div>
-        <div class="form-group full">
-          <label for="dest_line">Dest line</label>
-          <input class="form-control" id="dest_line" name="dest_line" value="<?= e($row['dest_line'] ?? '') ?>" />
-        </div>
-      </section>
-
-      <section class="form-section">
-        <h2 class="form-section__title">Content</h2>
         <div class="form-group full">
           <label for="card_text">Card text</label>
-          <textarea class="form-control" id="card_text" name="card_text"><?= e($row['card_text'] ?? '') ?></textarea>
+          <textarea class="form-control" id="card_text" name="card_text" rows="3"><?= e($row['card_text'] ?? '') ?></textarea>
+          <p class="help-text">Short line shown on listing cards.</p>
         </div>
         <div class="form-group full">
           <label for="overview">Overview</label>
@@ -222,39 +144,89 @@ ob_start();
         </div>
         <div class="form-group full">
           <label for="highlights">Highlights (one per line)</label>
-          <textarea class="form-control" id="highlights" name="highlights"><?= e($highlights) ?></textarea>
+          <textarea class="form-control" id="highlights" name="highlights" rows="4"><?= e($highlights) ?></textarea>
+        </div>
+        <div class="form-group full">
+          <label>Type</label>
+          <div class="checks">
+            <?php foreach ($typeOptions as $value => $label): ?>
+              <label><input type="checkbox" name="types[]" value="<?= e($value) ?>" <?= in_array($value, $selectedTypes, true) ? 'checked' : '' ?> /> <?= e($label) ?></label>
+            <?php endforeach; ?>
+          </div>
+          <p class="help-text">Pick every group this trip suits.</p>
+        </div>
+        <div class="form-group full">
+          <label>Destinations</label>
+          <?php if (!$places): ?>
+            <p class="help-text">Add places first so they can be selected here.</p>
+          <?php else: ?>
+            <div class="checks">
+              <?php foreach ($places as $place): ?>
+                <label><input type="checkbox" name="destinations[]" value="<?= e($place['slug']) ?>" <?= in_array($place['slug'], $selectedDestinations, true) ? 'checked' : '' ?> /> <?= e($place['label']) ?></label>
+              <?php endforeach; ?>
+            </div>
+            <p class="help-text">Listing pages are set from these places.</p>
+          <?php endif; ?>
+        </div>
+      </section>
+
+      <section class="form-section">
+        <h2 class="form-section__title">Trip</h2>
+        <div class="form-group">
+          <label for="duration">Duration</label>
+          <input class="form-control" id="duration" name="duration" required value="<?= e($durationValue) ?>" placeholder="4D 3N" />
+        </div>
+        <div class="form-group">
+          <label for="pickup">Pickup / Drop</label>
+          <input class="form-control" id="pickup" name="pickup" required value="<?= e($row['pickup'] ?? '') ?>" placeholder="Calicut" />
+          <p class="help-text">Pickup and drop are the same place.</p>
+        </div>
+        <div class="form-group full" id="stays-field" data-places="<?= e(json_encode($placeOptions, JSON_UNESCAPED_UNICODE)) ?>">
+          <label>Stays</label>
+          <div class="stay-fields" data-stay-fields>
+            <?php if ($nights < 1): ?>
+              <p class="help-text">No overnight stays for this duration.</p>
+            <?php else: ?>
+              <?php for ($i = 0; $i < $nights; $i++): ?>
+                <div class="stay-fields__item">
+                  <label for="stay-<?= $i ?>">Night <?= $i + 1 ?></label>
+                  <select class="form-control" id="stay-<?= $i ?>" name="stays[]">
+                    <option value="">Select a place</option>
+                    <?php foreach ($places as $place): ?>
+                      <option value="<?= e($place['slug']) ?>" <?= (($stays[$i] ?? '') === $place['slug']) ? 'selected' : '' ?>><?= e($place['label']) ?></option>
+                    <?php endforeach; ?>
+                  </select>
+                </div>
+              <?php endfor; ?>
+            <?php endif; ?>
+          </div>
+          <p class="help-text">One stay per night, from the duration above.</p>
         </div>
         <div class="form-group full">
           <label for="itinerary">Itinerary (Day N | Title | Text — one day per line)</label>
-          <textarea class="form-control" id="itinerary" name="itinerary" rows="8"><?= e($itineraryText) ?></textarea>
-        </div>
-        <div class="form-group full">
-          <label for="accommodation">Accommodation</label>
-          <textarea class="form-control" id="accommodation" name="accommodation"><?= e($row['accommodation'] ?? '') ?></textarea>
+          <textarea class="form-control" id="itinerary" name="itinerary" rows="8" placeholder="1 | Arrival | Drive to Wayanad and check in"><?= e($itineraryText) ?></textarea>
         </div>
       </section>
 
       <section class="form-section">
         <h2 class="form-section__title">Media</h2>
-        <p class="form-section__hint">Upload JPG, PNG, WEBP or GIF up to 5 MB. Uncheck Keep to remove gallery images.</p>
+        <p class="form-section__hint">Images up to 5 MB (JPG, PNG, WEBP, GIF). Uncheck Keep to remove a gallery image.</p>
         <div class="form-group full media-field">
-          <label>Hero image</label>
+          <label>Cover image</label>
           <?= admin_hero_preview($row['image'] ?? null) ?>
           <div class="media-live-preview" hidden>
             <div class="media-preview">
               <div class="media-preview__item media-preview__item--hero">
-                <img id="package-hero-preview" alt="New hero preview" hidden />
+                <img id="package-hero-preview" alt="New cover preview" hidden />
               </div>
             </div>
           </div>
           <div class="media-drop">
-            <label for="image_file">Upload new hero</label>
-            <input class="form-control" id="image_file" type="file" name="image_file" accept="image/jpeg,image/png,image/webp,image/gif" data-preview-target="#package-hero-preview" />
+            <label for="image_file">Upload cover image</label>
+            <input class="form-control" id="image_file" type="file" name="image_file" accept="image/jpeg,image/png,image/webp,image/gif" data-preview-target="#package-hero-preview" <?= empty($row['image']) ? 'required' : '' ?> />
           </div>
-          <label for="image">Or image path</label>
-          <input class="form-control" id="image" name="image" value="<?= e($row['image'] ?? '') ?>" placeholder="packages/slug.jpg or uploads/packages/..." />
           <?php if (!empty($row['image'])): ?>
-            <label class="checks"><input type="checkbox" name="remove_image" value="1" /> Remove current hero image</label>
+            <label class="checks"><input type="checkbox" name="remove_image" value="1" /> Remove current cover image</label>
           <?php endif; ?>
         </div>
         <div class="form-group full media-field">
@@ -265,23 +237,38 @@ ob_start();
             <input class="form-control" id="gallery_files" type="file" name="gallery_files[]" accept="image/jpeg,image/png,image/webp,image/gif" multiple data-preview-list="#package-gallery-new" />
             <div id="package-gallery-new" class="media-preview" style="margin-top:0.75rem"></div>
           </div>
-          <label for="gallery_paths">Add gallery paths (one per line)</label>
-          <textarea class="form-control" id="gallery_paths" name="gallery_paths" rows="3" placeholder="packages/extra.jpg"></textarea>
         </div>
       </section>
 
       <section class="form-section">
-        <h2 class="form-section__title">Publish</h2>
+        <h2 class="form-section__title">Downloads &amp; publishing</h2>
+        <p class="form-section__hint">PDFs up to 10 MB. Visitors can download whichever you upload.</p>
         <div class="form-group">
-          <label for="sort_order">Sort order</label>
+          <label for="itinerary_pdf_file">Itinerary PDF</label>
+          <?php if (!empty($row['itinerary_pdf'])): ?>
+            <p class="help-text"><a href="<?= e(asset_url((string) $row['itinerary_pdf'])) ?>" target="_blank" rel="noopener">Current itinerary PDF</a></p>
+            <label class="checks"><input type="checkbox" name="remove_itinerary_pdf" value="1" /> Remove</label>
+          <?php endif; ?>
+          <input class="form-control" id="itinerary_pdf_file" type="file" name="itinerary_pdf_file" accept="application/pdf,.pdf" />
+        </div>
+        <div class="form-group">
+          <label for="price_chart_pdf_file">Price chart PDF</label>
+          <?php if (!empty($row['price_chart_pdf'])): ?>
+            <p class="help-text"><a href="<?= e(asset_url((string) $row['price_chart_pdf'])) ?>" target="_blank" rel="noopener">Current price chart PDF</a></p>
+            <label class="checks"><input type="checkbox" name="remove_price_chart_pdf" value="1" /> Remove</label>
+          <?php endif; ?>
+          <input class="form-control" id="price_chart_pdf_file" type="file" name="price_chart_pdf_file" accept="application/pdf,.pdf" />
+        </div>
+        <div class="form-group">
+          <label for="sort_order">Order</label>
           <input class="form-control" id="sort_order" type="number" name="sort_order" value="<?= e((string) ($row['sort_order'] ?? '0')) ?>" />
         </div>
         <div class="form-group">
-          <label>Options</label>
+          <label>Featured</label>
           <div class="checks">
-            <label><input type="checkbox" name="has_houseboat" value="1" <?= !empty($row['has_houseboat']) ? 'checked' : '' ?> /> Houseboat</label>
-            <label><input type="checkbox" name="is_published" value="1" <?= !isset($row['is_published']) || !empty($row['is_published']) ? 'checked' : '' ?> /> Published</label>
+            <label><input type="checkbox" name="is_featured" value="1" <?= !empty($row['is_featured']) ? 'checked' : '' ?> /> Featured</label>
           </div>
+          <p class="help-text">Featured packages rank first in listings and show on the homepage.</p>
         </div>
       </section>
     </div>
@@ -292,6 +279,61 @@ ob_start();
     </div>
   </form>
 </div>
+<script>
+(function () {
+  var duration = document.getElementById("duration");
+  var root = document.getElementById("stays-field");
+  if (!duration || !root) return;
+  var fields = root.querySelector("[data-stay-fields]");
+  var places = [];
+  try {
+    places = JSON.parse(root.getAttribute("data-places") || "[]");
+  } catch (err) {
+    places = [];
+  }
+
+  function nightsFromDuration(value) {
+    var text = String(value || "");
+    var match = text.match(/(\d+)\s*[dD](?:ays?)?[^\d]*(\d+)\s*[nN](?:ights?)?/) || text.match(/^(\d+)\s*[\/\-]\s*(\d+)$/);
+    return match ? Math.max(0, parseInt(match[2], 10)) : 0;
+  }
+
+  function currentValues() {
+    return Array.prototype.map.call(fields.querySelectorAll("select"), function (el) {
+      return el.value;
+    });
+  }
+
+  function escapeHtml(value) {
+    return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+
+  function render(nights, values) {
+    if (nights < 1) {
+      fields.innerHTML = '<p class="help-text">No overnight stays for this duration.</p>';
+      return;
+    }
+    var html = "";
+    for (var i = 0; i < nights; i++) {
+      html += '<div class="stay-fields__item"><label for="stay-' + i + '">Night ' + (i + 1) + "</label>";
+      html += '<select class="form-control" id="stay-' + i + '" name="stays[]"><option value="">Select a place</option>';
+      places.forEach(function (place) {
+        var selected = place.slug === values[i] ? " selected" : "";
+        html += '<option value="' + escapeHtml(place.slug) + '"' + selected + ">" + escapeHtml(place.label) + "</option>";
+      });
+      html += "</select></div>";
+    }
+    fields.innerHTML = html;
+  }
+
+  function update() {
+    render(nightsFromDuration(duration.value), currentValues());
+  }
+
+  duration.addEventListener("input", update);
+  duration.addEventListener("change", update);
+})();
+</script>
 <?php
 $adminContent = ob_get_clean();
 $pageTitle = $id ? 'Edit package' : 'Add package';

@@ -25,7 +25,7 @@ $related = $pkg ? packages_related($pkg, 3) : [];
 $pageKey = ($pkg['pages'][0] ?? 'kerala');
 $listHref = $pageKey === 'south' ? 'south-indian-packages.php' : ($pageKey === 'domestic' ? 'domestic-packages.php' : ($pageKey === 'international' ? 'international-packages.php' : 'kerala-packages.php'));
 $listLabel = $pageKey === 'south' ? 'South Indian Packages' : ($pageKey === 'domestic' ? 'Domestic Packages' : ($pageKey === 'international' ? 'International Packages' : 'Kerala Packages'));
-$eyebrow = ($pkg['sheet'] ?? '') === 'TN & KA PLANS' ? 'South Indian Package' : (($pkg['sheet'] ?? '') === 'Domestic' ? 'Domestic Package' : (($pkg['sheet'] ?? '') === 'International' ? 'International Package' : 'Kerala Package'));
+$eyebrow = $pageKey === 'south' ? 'South Indian Package' : ($pageKey === 'domestic' ? 'Domestic Package' : ($pageKey === 'international' ? 'International Package' : 'Kerala Package'));
 $navActive = $pageKey === 'south' ? 'south' : ($pageKey === 'domestic' ? 'domestic' : ($pageKey === 'international' ? 'international' : 'kerala'));
 
 $heroSrc = media_src((string) ($pkg['image'] ?? ''), '../', 'beach.jpg');
@@ -34,6 +34,13 @@ $days = (int) ($pkg['days'] ?? 0);
 $nights = (int) ($pkg['nights'] ?? 0);
 $nightsLabel = $nights . ' Night' . ($nights === 1 ? '' : 's');
 $whatsapp = preg_replace('/\D/', '', setting('whatsapp', '919876543210'));
+
+$typesLabel = $pkg ? (package_types_label($pkg) ?: 'All travellers') : 'All travellers';
+// An uploaded brochure wins over the generated print view.
+$itineraryHref = !empty($pkg['itinerary_pdf'])
+    ? media_src((string) $pkg['itinerary_pdf'], '../')
+    : 'itinerary-print.php?package=' . rawurlencode((string) ($pkg['slug'] ?? '')) . '&print=1';
+$priceChartHref = !empty($pkg['price_chart_pdf']) ? media_src((string) $pkg['price_chart_pdf'], '../') : '';
 
 function pkg_img_src(string $file): string
 {
@@ -92,21 +99,24 @@ require dirname(__DIR__) . '/includes/layout-header.php';
               <div class="spec">
                 <span class="spec__icon"><?= yn_icon('car') ?></span>
                 <span>
-                  <span class="spec__label">Pickup</span>
+                  <span class="spec__label">Pickup &amp; drop</span>
                   <span class="spec__value"><?= e($pkg['pickup']) ?></span>
                 </span>
               </div>
               <div class="spec">
-                <span class="spec__icon"><?= yn_icon('route') ?></span>
+                <span class="spec__icon"><?= yn_icon('users') ?></span>
                 <span>
-                  <span class="spec__label">Drop</span>
-                  <span class="spec__value"><?= e($pkg['drop_point']) ?></span>
+                  <span class="spec__label">Best for</span>
+                  <span class="spec__value"><?= e($typesLabel) ?></span>
                 </span>
               </div>
             </div>
             <div class="btn-group">
               <a class="btn btn--primary" href="#enquiry" data-open-modal="enquiry-modal" data-package-title="<?= e($pkg['title']) ?>">Request Pricing</a>
-              <a class="btn btn--secondary" href="itinerary-print.php?package=<?= e(rawurlencode($pkg['slug'])) ?>&print=1" target="_blank" rel="noopener">Download Itinerary PDF</a>
+              <a class="btn btn--secondary" href="<?= e($itineraryHref) ?>" target="_blank" rel="noopener">Download Itinerary PDF</a>
+              <?php if ($priceChartHref !== ''): ?>
+                <a class="btn btn--secondary" href="<?= e($priceChartHref) ?>" target="_blank" rel="noopener">Download Price Chart</a>
+              <?php endif; ?>
             </div>
           </div>
         </div>
@@ -226,7 +236,10 @@ require dirname(__DIR__) . '/includes/layout-header.php';
               <div class="btn-group">
                 <a class="btn btn--light" href="#enquiry" data-open-modal="enquiry-modal" data-package-title="<?= e($pkg['title']) ?>">Request Pricing</a>
                 <a class="btn btn--secondary quote-card__ghost" href="https://wa.me/<?= e($whatsapp) ?>" target="_blank" rel="noopener noreferrer">WhatsApp Us</a>
-                <a class="btn btn--secondary quote-card__ghost" href="itinerary-print.php?package=<?= e(rawurlencode($pkg['slug'])) ?>&print=1" target="_blank" rel="noopener">Download Itinerary</a>
+                <a class="btn btn--secondary quote-card__ghost" href="<?= e($itineraryHref) ?>" target="_blank" rel="noopener">Download Itinerary</a>
+                <?php if ($priceChartHref !== ''): ?>
+                  <a class="btn btn--secondary quote-card__ghost" href="<?= e($priceChartHref) ?>" target="_blank" rel="noopener">Download Price Chart</a>
+                <?php endif; ?>
               </div>
               <p class="quote-card__note"><?= yn_icon('shield') ?>Trusted partners · flexible dates</p>
             </div>
@@ -250,7 +263,7 @@ require dirname(__DIR__) . '/includes/layout-header.php';
                   <span class="info-row__icon"><?= yn_icon('users') ?></span>
                   <span>
                     <span class="info-row__label">Best for</span>
-                    <span class="info-row__value"><?= e(ucwords((string) ($pkg['type'] ?? 'All travellers'))) ?></span>
+                    <span class="info-row__value"><?= e($typesLabel) ?></span>
                   </span>
                 </div>
               </div>

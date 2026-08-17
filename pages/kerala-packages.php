@@ -52,10 +52,18 @@ try {
 
 $destOptions = [];
 $pickupOptions = [];
+$typeOptions = [];
+$typeLabels = package_type_options();
 $pickupLabels = ['calicut' => 'Calicut', 'kochi' => 'Kochi', 'coimbatore' => 'Coimbatore', 'mysore' => 'Mysore', 'trivandrum' => 'Trivandrum'];
 foreach ($packages as $pkg) {
     foreach ($pkg['destinations'] as $d) {
         $destOptions[$d] = $places[$d]['label'] ?? $d;
+    }
+    foreach ($pkg['types'] ?? [] as $t) {
+        $t = strtolower((string) $t);
+        if ($t !== '') {
+            $typeOptions[$t] = $typeLabels[$t] ?? ucwords(str_replace('-', ' ', $t));
+        }
     }
     if (!empty($pkg['pickup_slug'])) {
         $pickupOptions[$pkg['pickup_slug']] = $pickupLabels[$pkg['pickup_slug']] ?? $pkg['pickup_slug'];
@@ -63,6 +71,7 @@ foreach ($packages as $pkg) {
 }
 ksort($destOptions);
 ksort($pickupOptions);
+ksort($typeOptions);
 
 $crumbTrail = ['Home' => '../index.php'];
 if ($location !== '') {
@@ -182,11 +191,9 @@ require dirname(__DIR__) . '/includes/layout-header.php';
                 <label for="f-type">Travel type</label>
                 <select class="form-control" id="f-type" data-filter="type">
                   <option value="all">All types</option>
-                  <option value="family">Family</option>
-                  <option value="couple">Couple</option>
-                  <option value="adventure">Adventure</option>
-                  <option value="leisure">Leisure</option>
-                  <option value="heritage">Heritage</option>
+                  <?php foreach ($typeOptions as $val => $label): ?>
+                    <option value="<?= e($val) ?>"><?= e($label) ?></option>
+                  <?php endforeach; ?>
                 </select>
               </div>
               <div class="form-group">

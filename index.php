@@ -6,12 +6,19 @@ $email = 'hello@yathranest.com';
 $whatsapp = '919876543210';
 $home = null;
 $sections = [];
+$featured = [];
 try {
     $phone = setting('phone', $phone);
     $email = setting('email', $email);
     $whatsapp = preg_replace('/\D/', '', setting('whatsapp', $whatsapp));
     $home = page_content('home');
     $sections = $home['sections'] ?? [];
+    foreach (packages_for_page('') as $pkg) {
+        if (!empty($pkg['is_featured'])) {
+            $featured[] = $pkg;
+        }
+    }
+    $featured = array_slice($featured, 0, 3);
 } catch (Throwable $e) {
     // Site can still render without DB for static assets
 }
@@ -256,6 +263,33 @@ $csrf = csrf_token();
         </div>
 
         <div class="package-grid">
+          <?php if ($featured): ?>
+            <?php foreach ($featured as $pkg):
+              $href = 'pages/package-details.php?package=' . rawurlencode((string) $pkg['slug']);
+              $nights = (int) $pkg['nights'];
+              ?>
+              <article class="card">
+                <div class="card__media">
+                  <img src="<?= e(media_src((string) ($pkg['image'] ?? ''), '', 'beach.jpg')) ?>" alt="<?= e($pkg['title']) ?>" width="800" height="500" loading="lazy" />
+                </div>
+                <div class="card__body">
+                  <p class="card__meta"><?= e($pkg['dest_line']) ?></p>
+                  <h3 class="card__title"><a href="<?= e($href) ?>"><?= e($pkg['title']) ?></a></h3>
+                  <p class="meta-row"><span><strong><?= (int) $pkg['days'] ?> Days</strong> / <?= $nights ?> Night<?= $nights === 1 ? '' : 's' ?></span></p>
+                  <p class="card__text"><?= e($pkg['card_text'] ?? '') ?></p>
+                  <ul class="highlight-list">
+                    <?php foreach (array_slice($pkg['highlights'], 0, 3) as $highlight): ?>
+                      <li><?= e($highlight) ?></li>
+                    <?php endforeach; ?>
+                  </ul>
+                  <div class="card__actions">
+                    <a class="btn btn--secondary btn--sm" href="<?= e($href) ?>">View Package</a>
+                    <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal" data-package-title="<?= e($pkg['title']) ?>">Request Pricing</a>
+                  </div>
+                </div>
+              </article>
+            <?php endforeach; ?>
+          <?php else: ?>
           <article class="card">
             <div class="card__media">
               <img src="./assets/images/packages/clt-wayanad-4d.jpg" alt="Wayanad forests and plantations" width="800" height="500" loading="lazy" />
@@ -318,6 +352,7 @@ $csrf = csrf_token();
               </div>
             </div>
           </article>
+          <?php endif; ?>
         </div>
       </div>
     </section>
