@@ -38,6 +38,12 @@ html {
   --transition: 0.2s ease;
 }
 
+iconify-icon {
+  display: inline-block;
+  vertical-align: -0.15em;
+  color: inherit;
+}
+
 *,
 *::before,
 *::after {
@@ -315,11 +321,13 @@ h3 {
   padding: 0.45rem 0.35rem;
 }
 
-.nav-explore__btn svg {
+.nav-explore__btn svg,
+.nav-explore__btn iconify-icon {
   transition: transform var(--transition);
 }
 
-.nav-explore__btn[aria-expanded="true"] svg {
+.nav-explore__btn[aria-expanded="true"] svg,
+.nav-explore__btn[aria-expanded="true"] iconify-icon {
   transform: rotate(180deg);
 }
 
@@ -776,6 +784,23 @@ body.nav-open {
   justify-content: space-between;
   font-size: 0.875rem;
   color: #a8b5ae;
+}
+
+.footer-credit {
+  width: 100%;
+  margin: 0;
+  font-size: 0.75rem;
+  opacity: 0.85;
+}
+
+.footer-credit a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.footer-credit a:hover {
+  color: #fff;
 }
 
 /* Utility */

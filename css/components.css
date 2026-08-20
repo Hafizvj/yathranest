@@ -399,10 +399,11 @@
   flex-shrink: 0;
 }
 
-.hero-card__icon svg {
+.hero-card__icon svg,
+.hero-card__icon iconify-icon {
   width: 18px;
   height: 18px;
-  fill: currentColor;
+  color: inherit;
 }
 
 .hero-card__icon svg[fill="none"] {
@@ -445,7 +446,8 @@
   transition: transform var(--transition);
 }
 
-.hero-card__arrow svg {
+.hero-card__arrow svg,
+.hero-card__arrow iconify-icon {
   width: 14px;
   height: 14px;
 }
@@ -482,7 +484,8 @@
   flex-shrink: 0;
 }
 
-.hero-trust__icon svg {
+.hero-trust__icon svg,
+.hero-trust__icon iconify-icon {
   width: 20px;
   height: 20px;
 }

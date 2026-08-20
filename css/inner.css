@@ -314,7 +314,8 @@
   background: rgba(52, 99, 86, 0.1);
 }
 
-.chip svg {
+.chip svg,
+.chip iconify-icon {
   width: 15px;
   height: 15px;
   flex-shrink: 0;
@@ -670,7 +671,8 @@
   margin-bottom: 0.35rem;
 }
 
-.tile__icon svg {
+.tile__icon svg,
+.tile__icon iconify-icon {
   width: 22px;
   height: 22px;
 }
@@ -737,7 +739,8 @@
   background: var(--teal-wash);
 }
 
-.info-row__icon svg {
+.info-row__icon svg,
+.info-row__icon iconify-icon {
   width: 19px;
   height: 19px;
 }
@@ -861,7 +864,8 @@
   background: var(--teal-wash);
 }
 
-.spec__icon svg {
+.spec__icon svg,
+.spec__icon iconify-icon {
   width: 17px;
   height: 17px;
 }
@@ -987,7 +991,8 @@
   color: var(--ink);
 }
 
-.incl-card h3 svg {
+.incl-card h3 svg,
+.incl-card h3 iconify-icon {
   width: 18px;
   height: 18px;
 }
@@ -1092,7 +1097,8 @@
   color: rgba(255, 255, 255, 0.7);
 }
 
-.quote-card__note svg {
+.quote-card__note svg,
+.quote-card__note iconify-icon {
   width: 16px;
   height: 16px;
   flex-shrink: 0;
@@ -1274,7 +1280,8 @@
   border: 1px solid var(--line);
 }
 
-.form-note svg {
+.form-note svg,
+.form-note iconify-icon {
   width: 16px;
   height: 16px;
   flex-shrink: 0;
@@ -1341,7 +1348,8 @@
   background: var(--teal-wash);
 }
 
-.empty-state__icon svg {
+.empty-state__icon svg,
+.empty-state__icon iconify-icon {
   width: 24px;
   height: 24px;
 }
@@ -1380,7 +1388,8 @@
   color: var(--ink-soft);
 }
 
-.amenity svg {
+.amenity svg,
+.amenity iconify-icon {
   width: 16px;
   height: 16px;
   flex-shrink: 0;

@@ -69,6 +69,7 @@ $handlerPath = ($assetDepth === '' ? '' : '../') . 'handlers/enquiry.php';
       <div class="footer-bottom">
         <p>&copy; <span data-year><?= date('Y') ?></span> YathraNest. All rights reserved.</p>
         <p>Browse · Explore · Enquire — pricing shared personally.</p>
+        <p class="footer-credit">Icons by <a href="https://icon-sets.iconify.design/solar/" rel="noopener noreferrer" target="_blank">Solar / 480 Design</a> via Iconify.</p>
       </div>
     </div>
   </footer>

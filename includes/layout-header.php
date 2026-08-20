@@ -61,6 +61,7 @@ $navCurrent = static function (string $key) use ($navActive): string {
   <link rel="stylesheet" href="<?= e($assetDepth) ?>css/responsive.css?v=12" />
   <link rel="stylesheet" href="<?= e($assetDepth) ?>css/inner.css?v=12" />
   <link rel="stylesheet" href="<?= e($assetDepth) ?>css/motion.css?v=12" />
+  <script src="https://code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js" defer></script>
   <script>
     if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       document.documentElement.classList.add("has-motion");
@@ -79,9 +80,7 @@ $navCurrent = static function (string $key) use ($navActive): string {
         <div class="nav-explore">
           <button class="nav-explore__btn" type="button" aria-expanded="false" aria-controls="explore-menu" id="explore-btn">
             Explore
-            <svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true" focusable="false">
-              <path d="M2.5 4.5L6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+            <?= yn_icon('chevron-down') ?>
           </button>
           <div class="nav-explore__menu" id="explore-menu" hidden>
             <?php foreach ($navGroups as $groupLabel => $links): ?>

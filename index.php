@@ -23,6 +23,90 @@ try {
     // Site can still render without DB for static assets
 }
 $csrf = csrf_token();
+
+$homeHeroVisual = (string) ($sections['hero_visual'] ?? $sections['hero_image'] ?? 'maldives.jpg');
+if ($homeHeroVisual === '') {
+    $homeHeroVisual = 'maldives.jpg';
+}
+$homeHeroVisualSrc = media_src($homeHeroVisual, '', 'maldives.jpg');
+
+$homeHeroCardDefaults = [
+    [
+        'title' => 'Kerala Tour Package',
+        'desc' => 'Experience God’s Own Country.',
+        'href' => 'pages/kerala-packages.php',
+        'image' => 'hills-mist.jpg',
+        'icon' => yn_icon('leaf'),
+    ],
+    [
+        'title' => 'South Indian Packages',
+        'desc' => 'Temples, hills and coastal escapes.',
+        'href' => 'pages/south-indian-packages.php',
+        'image' => 'temple.jpg',
+        'icon' => yn_icon('buildings'),
+    ],
+    [
+        'title' => 'Domestic Packages',
+        'desc' => 'Incredible places across India.',
+        'href' => 'pages/domestic-packages.php',
+        'image' => 'lake.jpg',
+        'icon' => yn_icon('map'),
+    ],
+    [
+        'title' => 'International Package',
+        'desc' => 'Explore the world beyond borders.',
+        'href' => 'pages/international-packages.php',
+        'image' => 'dubai.jpg',
+        'icon' => yn_icon('globe'),
+    ],
+    [
+        'title' => 'Taxi Cab Booking',
+        'desc' => 'Reliable rides, anytime, anywhere.',
+        'href' => 'pages/taxi-booking.php',
+        'image' => 'car-taxi.jpg',
+        'icon' => yn_icon('car'),
+    ],
+    [
+        'title' => 'Resort Stay Booking',
+        'desc' => 'Stay. Relax. Rejuvenate.',
+        'href' => 'pages/resort-booking.php',
+        'image' => 'resort-pool.jpg',
+        'icon' => yn_icon('bed'),
+    ],
+    [
+        'title' => 'Weekend Getaways',
+        'desc' => 'Travel. Connect. Create memories.',
+        'href' => 'pages/weekend-getaways.php',
+        'image' => 'friends-travel.jpg',
+        'icon' => yn_icon('users'),
+    ],
+    [
+        'title' => 'Gift Card',
+        'desc' => 'Give the gift of travel.',
+        'href' => 'pages/gift-cards.php',
+        'image' => 'gift.jpg',
+        'icon' => yn_icon('gift'),
+    ],
+    [
+        'title' => 'Investment Plans',
+        'desc' => 'Grow with YathraNest options.',
+        'href' => 'pages/investment-plans.php',
+        'image' => 'city.jpg',
+        'icon' => yn_icon('chart'),
+    ],
+];
+$homeHeroCards = $homeHeroCardDefaults;
+$savedCards = $sections['hero_cards'] ?? [];
+if (is_array($savedCards)) {
+    foreach ($homeHeroCardDefaults as $i => $defaults) {
+        if (!empty($savedCards[$i]) && is_array($savedCards[$i])) {
+            $homeHeroCards[$i] = array_merge($defaults, $savedCards[$i]);
+            // Keep Solar icons from defaults; admin does not store icon markup.
+            $homeHeroCards[$i]['icon'] = $defaults['icon'];
+        }
+    }
+}
+$arrowSvg = yn_icon('arrow-right');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -39,6 +123,7 @@ $csrf = csrf_token();
   <link rel="stylesheet" href="css/components.css?v=12" />
   <link rel="stylesheet" href="css/responsive.css?v=12" />
   <link rel="stylesheet" href="css/motion.css?v=12" />
+  <script src="https://code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js" defer></script>
   <script>
     if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       document.documentElement.classList.add("has-motion");
@@ -57,9 +142,7 @@ $csrf = csrf_token();
         <div class="nav-explore">
           <button class="nav-explore__btn" type="button" aria-expanded="false" aria-controls="explore-menu" id="explore-btn">
             Explore
-            <svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true" focusable="false">
-              <path d="M2.5 4.5L6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+            <?= yn_icon('chevron-down') ?>
           </button>
           <div class="nav-explore__menu" id="explore-menu" hidden>
             <a href="pages/kerala-packages.php">Kerala Packages</a>
@@ -109,7 +192,7 @@ $csrf = csrf_token();
   <main id="main">
     <section class="hero-v2" aria-labelledby="hero-heading">
       <div class="hero-v2__visual" aria-hidden="true">
-        <img src="./assets/images/maldives.jpg" alt="" width="1400" height="900" />
+        <img src="<?= e($homeHeroVisualSrc) ?>" alt="" width="1400" height="900" />
         <svg class="hero-v2__edge" viewBox="0 0 280 520" preserveAspectRatio="none">
           <path fill="var(--hero-wash)" d="M280 0C210 36 188 78 168 124c-22 50-48 72-42 128 6 58 44 78 22 132-18 44-70 62-108 86-20 12-40 28-40 50V0h280z"/>
         </svg>
@@ -125,103 +208,41 @@ $csrf = csrf_token();
         <div class="hero-v2__copy">
           <p class="hero-v2__eyebrow">Journeys designed for you</p>
           <h1 id="hero-heading">
-            <span class="hero-line"><span>Traveled more.</span></span>
-            <span class="hero-line"><span>Worry less.</span></span>
+            <?php if (!empty($sections['hero_title'])): ?>
+              <span class="hero-line"><span><?= e($sections['hero_title']) ?></span></span>
+            <?php else: ?>
+              <span class="hero-line"><span>Traveled more.</span></span>
+              <span class="hero-line"><span>Worry less.</span></span>
+            <?php endif; ?>
           </h1>
-          <p class="hero-v2__lead">Handpicked experiences, comfortable stays, and seamless journeys — all in one place.</p>
+          <p class="hero-v2__lead"><?= e($sections['hero_text'] ?? 'Handpicked experiences, comfortable stays, and seamless journeys — all in one place.') ?></p>
         </div>
 
         <h2 id="services-heading" class="sr-only">Our services</h2>
         <div class="hero-v2__grid">
-          <a class="hero-card" href="pages/kerala-packages.php" style="--i:0">
-            <img src="./assets/images/hills-mist.jpg" alt="" width="640" height="360" />
-            <span class="hero-card__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><path d="M12 14c-3.2-.8-6-3.4-7-5.6 2.6.2 5.1 1.8 7 5.6 1.9-3.8 4.4-5.4 7-5.6-1 2.2-3.8 4.8-7 5.6z"/><path d="M12 13.6c-1.4-2.8-.9-5.5.3-7.2-2.1 1-3.2 3.8-.3 7.2 2.9-3.4 1.8-6.2-.3-7.2 1.2 1.7 1.7 4.4.3 7.2z"/><path d="M11.4 13.4h1.2v6.2a.9.9 0 0 1-.9.9h.6a.9.9 0 0 1-.9-.9v-6.2z"/></svg>
-            </span>
-            <span class="hero-card__text">
-              <span class="hero-card__title">Kerala Tour Package</span>
-              <span class="hero-card__desc">Experience God’s Own Country.</span>
-            </span>
-            <span class="hero-card__arrow" aria-hidden="true">
-              <svg viewBox="0 0 16 16"><path d="M3 8h9M8.5 4.5L12.5 8l-4 3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </span>
-          </a>
-
-          <a class="hero-card" href="pages/domestic-packages.php" style="--i:1">
-            <img src="./assets/images/lake.jpg" alt="" width="640" height="360" />
-            <span class="hero-card__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><path d="M9.2 3.2 12 4.4l2.2.6 1.4 2.4-.2 1.5 1.7 1.2.3 2.2-1.5 1.3.5 2.3-1.3 1.7.3 2.1-1.7 1.5-1.4-1.1-1.2 1.7-1.8-.9-1.2 1.1-1.6-2.1-1.8.3-1.2-2.1.8-1.7-1.5-1.5.2-2.1 1.5-1.2-.4-2.1 1.4-1.5.2-1.7 1.7-1.2z"/></svg>
-            </span>
-            <span class="hero-card__text">
-              <span class="hero-card__title">Domestic Tour Pack</span>
-              <span class="hero-card__desc">Incredible places across India.</span>
-            </span>
-            <span class="hero-card__arrow" aria-hidden="true">
-              <svg viewBox="0 0 16 16"><path d="M3 8h9M8.5 4.5L12.5 8l-4 3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </span>
-          </a>
-
-          <a class="hero-card" href="pages/international-packages.php" style="--i:2">
-            <img src="./assets/images/dubai.jpg" alt="" width="640" height="360" />
-            <span class="hero-card__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="8"/><path d="M4 12h16M12 4c2.4 2.6 3.6 5.4 3.6 8s-1.2 5.4-3.6 8c-2.4-2.6-3.6-5.4-3.6-8s1.2-5.4 3.6-8z"/></svg>
-            </span>
-            <span class="hero-card__text">
-              <span class="hero-card__title">International</span>
-              <span class="hero-card__desc">Explore the world beyond borders.</span>
-            </span>
-            <span class="hero-card__arrow" aria-hidden="true">
-              <svg viewBox="0 0 16 16"><path d="M3 8h9M8.5 4.5L12.5 8l-4 3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </span>
-          </a>
-
-          <a class="hero-card" href="pages/resort-booking.php" style="--i:3">
-            <img src="./assets/images/resort-pool.jpg" alt="" width="640" height="360" />
-            <span class="hero-card__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18v-5.5A2.5 2.5 0 0 1 6.5 10H18a2 2 0 0 1 2 2v6"/><path d="M4 15h16"/><path d="M7 10V7a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v3"/></svg>
-            </span>
-            <span class="hero-card__text">
-              <span class="hero-card__title">Resort Booking</span>
-              <span class="hero-card__desc">Stay. Relax. Rejuvenate.</span>
-            </span>
-            <span class="hero-card__arrow" aria-hidden="true">
-              <svg viewBox="0 0 16 16"><path d="M3 8h9M8.5 4.5L12.5 8l-4 3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </span>
-          </a>
-
-          <a class="hero-card" href="pages/taxi-booking.php" style="--i:4">
-            <img src="./assets/images/car-taxi.jpg" alt="" width="640" height="360" />
-            <span class="hero-card__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15v2.5A1.5 1.5 0 0 0 5.5 19h.7"/><path d="M17.8 19h.7A1.5 1.5 0 0 0 20 17.5V15"/><path d="M4 15 6.2 9.8A2 2 0 0 1 8 8.5h8a2 2 0 0 1 1.8 1.3L20 15"/><path d="M7 15h10"/><circle cx="7.5" cy="18.5" r="1.5"/><circle cx="16.5" cy="18.5" r="1.5"/></svg>
-            </span>
-            <span class="hero-card__text">
-              <span class="hero-card__title">Taxi Booking</span>
-              <span class="hero-card__desc">Reliable rides, anytime, anywhere.</span>
-            </span>
-            <span class="hero-card__arrow" aria-hidden="true">
-              <svg viewBox="0 0 16 16"><path d="M3 8h9M8.5 4.5L12.5 8l-4 3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </span>
-          </a>
-
-          <a class="hero-card" href="pages/weekend-getaways.php" style="--i:5">
-            <img src="./assets/images/friends-travel.jpg" alt="" width="640" height="360" />
-            <span class="hero-card__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8.2" cy="8" r="2.1"/><circle cx="15.8" cy="8.4" r="2.1"/><circle cx="12" cy="9.2" r="2.2"/><path d="M4.6 18c.4-2.6 2.2-4 4.2-4 1.2 0 2.2.4 3 .1.8.4 1.9.1 3.2.1 2.1 0 3.9 1.4 4.4 4"/></svg>
-            </span>
-            <span class="hero-card__text">
-              <span class="hero-card__title">Weekend Strangers Trip</span>
-              <span class="hero-card__desc">Travel. Connect. Create memories.</span>
-            </span>
-            <span class="hero-card__arrow" aria-hidden="true">
-              <svg viewBox="0 0 16 16"><path d="M3 8h9M8.5 4.5L12.5 8l-4 3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </span>
-          </a>
+          <?php foreach ($homeHeroCards as $i => $card):
+            $cardImg = media_src((string) ($card['image'] ?? ''), '', (string) ($homeHeroCardDefaults[$i]['image'] ?? 'beach.jpg'));
+            ?>
+            <a class="hero-card" href="<?= e($card['href']) ?>" style="--i:<?= (int) $i ?>">
+              <img src="<?= e($cardImg) ?>" alt="" width="640" height="360" />
+              <span class="hero-card__icon" aria-hidden="true">
+                <?= $card['icon'] ?? '' ?>
+              </span>
+              <span class="hero-card__text">
+                <span class="hero-card__title"><?= e($card['title']) ?></span>
+                <span class="hero-card__desc"><?= e($card['desc']) ?></span>
+              </span>
+              <span class="hero-card__arrow" aria-hidden="true">
+                <?= $arrowSvg ?>
+              </span>
+            </a>
+          <?php endforeach; ?>
         </div>
 
         <div class="hero-trust" role="list">
           <div class="hero-trust__item" role="listitem">
             <span class="hero-trust__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 5.5 6.2v5.2c0 4.1 2.8 7.8 6.5 8.9 3.7-1.1 6.5-4.8 6.5-8.9V6.2L12 3.5z"/><path d="m8.8 12.1 2.1 2.1 4.3-4.4"/></svg>
+              <?= yn_icon('shield') ?>
             </span>
             <span>
               <strong>Trusted &amp; Safe</strong>
@@ -230,7 +251,7 @@ $csrf = csrf_token();
           </div>
           <div class="hero-trust__item" role="listitem">
             <span class="hero-trust__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12v-1a7 7 0 0 1 14 0v1"/><path d="M5 12h2a1.5 1.5 0 0 1 1.5 1.5V16A1.5 1.5 0 0 1 7 17.5H5.8A1.8 1.8 0 0 1 4 15.7V13.8A1.8 1.8 0 0 1 5.8 12H5z"/><path d="M19 12h-2a1.5 1.5 0 0 0-1.5 1.5V16a1.5 1.5 0 0 0 1.5 1.5h1.2A1.8 1.8 0 0 0 20 15.7v-1.9A1.8 1.8 0 0 0 18.2 12H19z"/><path d="M12 17.5v1.2a2.3 2.3 0 0 0 2.3 2.3H15"/></svg>
+              <?= yn_icon('headset') ?>
             </span>
             <span>
               <strong>24/7 Support</strong>
@@ -239,7 +260,7 @@ $csrf = csrf_token();
           </div>
           <div class="hero-trust__item" role="listitem">
             <span class="hero-trust__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12.8 4.4 19.6 8v3.2L8.2 20.4 4 16.2 12.8 4.4z"/><path d="M14.2 8.2 16 10"/><circle cx="15.2" cy="9.2" r=".7" fill="currentColor" stroke="none"/></svg>
+              <?= yn_icon('tag') ?>
             </span>
             <span>
               <strong>Best Price Promise</strong>
@@ -567,6 +588,7 @@ $csrf = csrf_token();
       <div class="footer-bottom">
         <p>&copy; <span data-year>2026</span> YathraNest. All rights reserved.</p>
         <p>Browse · Explore · Enquire — pricing shared personally.</p>
+        <p class="footer-credit">Icons by <a href="https://icon-sets.iconify.design/solar/" rel="noopener noreferrer" target="_blank">Solar / 480 Design</a> via Iconify.</p>
       </div>
     </div>
   </footer>
