@@ -74,7 +74,7 @@
       '">View Details</a>' +
       '<a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal" data-package-title="' +
       escapeHtml(pkg.title) +
-      '">Request Pricing</a>' +
+      '">Enquire Now</a>' +
       "</div></div></article>"
     );
   }

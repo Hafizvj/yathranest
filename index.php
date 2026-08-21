@@ -1,6 +1,12 @@
 <?php
 require_once __DIR__ . '/includes/bootstrap.php';
 $assetDepth = '';
+$headerHero = true;
+$pageTitle = 'YathraNest — Your Journey Starts Here';
+$metaDescription = 'YathraNest — curated travel packages, taxi services, resort stays, weekend getaways, gift cards and investment plans. Browse, explore and enquire for personalised pricing.';
+$enquiryType = 'general';
+$enquiryInterest = 'General travel enquiry';
+$enquirySource = 'index.php';
 $phone = '+91 98765 43210';
 $email = 'hello@yathranest.com';
 $whatsapp = '919876543210';
@@ -22,7 +28,6 @@ try {
 } catch (Throwable $e) {
     // Site can still render without DB for static assets
 }
-$csrf = csrf_token();
 
 $homeHeroVisual = (string) ($sections['hero_visual'] ?? $sections['hero_image'] ?? 'maldives.jpg');
 if ($homeHeroVisual === '') {
@@ -107,88 +112,9 @@ if (is_array($savedCards)) {
     }
 }
 $arrowSvg = yn_icon('arrow-right');
+
+require __DIR__ . '/includes/layout-header.php';
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="YathraNest — curated travel packages, taxi services, resort stays, weekend getaways, gift cards and investment plans. Browse, explore and enquire for personalised pricing." />
-  <title>YathraNest — Your Journey Starts Here</title>
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/logo/favicon-32.png" />
-  <link rel="icon" type="image/png" sizes="150x150" href="assets/logo/logo-mark.png" />
-  <link rel="apple-touch-icon" href="assets/logo/apple-touch-icon.png" />
-  <meta name="theme-color" content="#346356" />
-  <link rel="stylesheet" href="css/style.css?v=12" />
-  <link rel="stylesheet" href="css/components.css?v=12" />
-  <link rel="stylesheet" href="css/responsive.css?v=12" />
-  <link rel="stylesheet" href="css/motion.css?v=12" />
-  <script src="https://code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js" defer></script>
-  <script>
-    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      document.documentElement.classList.add("has-motion");
-    }
-  </script>
-</head>
-<body>
-  <a class="skip-link" href="#main">Skip to content</a>
-
-  <header class="site-header site-header--modern site-header--hero">
-    <div class="container container--wide site-header__inner">
-      <a class="logo" href="index.php" aria-label="YathraNest home">
-        <img class="logo__img" src="assets/logo/logo-wordmark.png" alt="YathraNest" width="293" height="98" />
-      </a>
-      <div class="header-actions">
-        <div class="nav-explore">
-          <button class="nav-explore__btn" type="button" aria-expanded="false" aria-controls="explore-menu" id="explore-btn">
-            Explore
-            <?= yn_icon('chevron-down') ?>
-          </button>
-          <div class="nav-explore__menu" id="explore-menu" hidden>
-            <a href="pages/kerala-packages.php">Kerala Packages</a>
-            <a href="pages/domestic-packages.php">Domestic Packages</a>
-            <a href="pages/international-packages.php">International</a>
-            <a href="pages/resort-booking.php">Resort Booking</a>
-            <a href="pages/taxi-booking.php">Taxi Booking</a>
-            <a href="pages/weekend-getaways.php">Weekend Getaways</a>
-            <a href="pages/south-indian-packages.php">South Indian Packages</a>
-            <a href="pages/gift-cards.php">Gift Cards</a>
-            <a href="pages/about.php">About</a>
-            <a href="pages/contact.php">Contact</a>
-          </div>
-        </div>
-        <button class="nav-toggle nav-toggle--circle" type="button" aria-expanded="false" aria-controls="nav-drawer" aria-label="Open menu">
-          <span class="nav-toggle__bars" aria-hidden="true"><span></span><span></span><span></span></span>
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <div class="nav-drawer" id="nav-drawer">
-    <div class="nav-drawer__backdrop"></div>
-    <div class="nav-drawer__panel" role="dialog" aria-label="Mobile navigation">
-      <div class="nav-drawer__head">
-        <a class="logo" href="index.php" aria-label="YathraNest home">
-          <img class="logo__img" src="assets/logo/logo-wordmark.png" alt="YathraNest" width="293" height="98" />
-        </a>
-        <button class="nav-drawer__close" type="button" aria-label="Close menu">&times;</button>
-      </div>
-      <nav class="nav-drawer__links" aria-label="Mobile">
-        <a href="pages/kerala-packages.php">Packages</a>
-        <a href="pages/taxi-booking.php">Taxi</a>
-        <a href="pages/resort-booking.php">Resorts</a>
-        <a href="pages/weekend-getaways.php">Getaways</a>
-        <a href="pages/gift-cards.php">Gift Cards</a>
-        <a href="pages/investment-plans.php">Investment Plans</a>
-        <a href="pages/about.php">About</a>
-        <a href="pages/contact.php">Contact</a>
-      </nav>
-      <div class="nav-drawer__cta">
-        <a class="btn btn--primary btn--block" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
-      </div>
-    </div>
-  </div>
-
   <main id="main">
     <section class="hero-v2" aria-labelledby="hero-heading">
       <div class="hero-v2__visual" aria-hidden="true">
@@ -305,7 +231,7 @@ $arrowSvg = yn_icon('arrow-right');
                   </ul>
                   <div class="card__actions">
                     <a class="btn btn--secondary btn--sm" href="<?= e($href) ?>">View Package</a>
-                    <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal" data-package-title="<?= e($pkg['title']) ?>">Request Pricing</a>
+                    <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal" data-package-title="<?= e($pkg['title']) ?>">Enquire Now</a>
                   </div>
                 </div>
               </article>
@@ -327,7 +253,7 @@ $arrowSvg = yn_icon('arrow-right');
               </ul>
               <div class="card__actions">
                 <a class="btn btn--secondary btn--sm" href="pages/package-details.php?package=clt-wayanad-4d">View Package</a>
-                <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
+                <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">Enquire Now</a>
               </div>
             </div>
           </article>
@@ -348,7 +274,7 @@ $arrowSvg = yn_icon('arrow-right');
               </ul>
               <div class="card__actions">
                 <a class="btn btn--secondary btn--sm" href="pages/package-details.php?package=allk-kochi-mta-5d">View Package</a>
-                <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
+                <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">Enquire Now</a>
               </div>
             </div>
           </article>
@@ -369,7 +295,7 @@ $arrowSvg = yn_icon('arrow-right');
               </ul>
               <div class="card__actions">
                 <a class="btn btn--secondary btn--sm" href="pages/package-details.php?package=tn-ooty-3d">View Package</a>
-                <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
+                <a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal">Enquire Now</a>
               </div>
             </div>
           </article>
@@ -520,7 +446,7 @@ $arrowSvg = yn_icon('arrow-right');
           <p>Tell us where you want to go and we’ll help you plan it. Pricing is shared personally after your enquiry.</p>
           <div class="btn-group">
             <a class="btn btn--teal" href="#enquiry" data-open-modal="enquiry-modal">
-              Request Pricing
+              Enquire Now
               <span class="btn__icon" aria-hidden="true">→</span>
             </a>
             <a class="btn btn--outline" href="pages/contact.php" style="background:transparent;border-color:rgba(255,255,255,.35);color:#fff">Contact Us</a>
@@ -530,133 +456,5 @@ $arrowSvg = yn_icon('arrow-right');
     </section>
   </main>
 
-  <footer class="site-footer">
-    <div class="container">
-      <div class="footer-grid">
-        <div class="footer-brand">
-          <a class="logo" href="index.php" aria-label="YathraNest home">
-            <img class="logo__badge" src="assets/logo/logo-mark.png" alt="" width="150" height="150" />
-            <img class="logo__img logo__img--text" src="assets/logo/logo-text-light.png" alt="YathraNest" width="207" height="98" />
-          </a>
-          <p>Curated travel packages, stays, taxi services and unique experiences across India and beyond.</p>
-          <div class="footer-contact">
-            <a href="tel:<?= e(preg_replace('/[^\d+]/', '', $phone)) ?>"><?= e($phone) ?></a>
-            <a href="mailto:<?= e($email) ?>"><?= e($email) ?></a>
-            <a href="https://wa.me/<?= e($whatsapp) ?>" rel="noopener noreferrer" target="_blank">WhatsApp</a>
-          </div>
-          <div class="social-links" aria-label="Social media">
-            <a href="#" aria-label="Instagram">IG</a>
-            <a href="#" aria-label="Facebook">FB</a>
-            <a href="#" aria-label="YouTube">YT</a>
-          </div>
-        </div>
-        <div class="footer-col">
-          <h4>Explore</h4>
-          <ul>
-            <li><a href="pages/kerala-packages.php">Kerala Packages</a></li>
-            <li><a href="pages/south-indian-packages.php">South Indian Packages</a></li>
-            <li><a href="pages/domestic-packages.php">Domestic Packages</a></li>
-            <li><a href="pages/international-packages.php">International Packages</a></li>
-            <li><a href="pages/weekend-getaways.php">Weekend Getaways</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4>Services</h4>
-          <ul>
-            <li><a href="pages/taxi-booking.php">Taxi Booking</a></li>
-            <li><a href="pages/resort-booking.php">Resort Stays</a></li>
-            <li><a href="pages/gift-cards.php">Gift Cards</a></li>
-            <li><a href="pages/investment-plans.php">Investment Plans</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4>Company</h4>
-          <ul>
-            <li><a href="pages/about.php">About Us</a></li>
-            <li><a href="pages/contact.php">Contact</a></li>
-            <li><a href="pages/faq.php">FAQ</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4>Legal</h4>
-          <ul>
-            <li><a href="pages/terms.php">Terms &amp; Conditions</a></li>
-            <li><a href="pages/privacy.php">Privacy Policy</a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <p>&copy; <span data-year>2026</span> YathraNest. All rights reserved.</p>
-        <p>Browse · Explore · Enquire — pricing shared personally.</p>
-        <p class="footer-credit">Icons by <a href="https://icon-sets.iconify.design/solar/" rel="noopener noreferrer" target="_blank">Solar / 480 Design</a> via Iconify.</p>
-      </div>
-    </div>
-  </footer>
-
-  <!-- Enquiry Modal -->
-  <div class="modal" id="enquiry-modal" role="dialog" aria-modal="true" aria-labelledby="enquiry-title">
-    <div class="modal__backdrop"></div>
-    <div class="modal__dialog modal__dialog--lg">
-      <button class="modal__close" type="button" data-close-modal aria-label="Close">&times;</button>
-      <h2 id="enquiry-title">Request Pricing</h2>
-      <p>Share a few details and we’ll continue the conversation on WhatsApp with a personalised quote — no online payment required.</p>
-      <form data-enquiry-form data-success-modal="success-modal" novalidate action="handlers/enquiry.php" method="post">
-        <input type="hidden" name="_csrf" value="<?= e($csrf) ?>" />
-        <input type="hidden" name="type" value="general" />
-        <input type="hidden" name="source_page" value="index.php" />
-        <div class="form-grid form-grid--2">
-          <div class="form-group">
-            <label for="enq-name">Full name</label>
-            <input class="form-control" id="enq-name" name="name" type="text" required autocomplete="name" />
-            <span class="field-error"></span>
-          </div>
-          <div class="form-group">
-            <label for="enq-phone">Phone</label>
-            <input class="form-control" id="enq-phone" name="phone" type="tel" required data-validate="phone" autocomplete="tel" />
-            <span class="field-error"></span>
-          </div>
-          <div class="form-group">
-            <label for="enq-email">Email</label>
-            <input class="form-control" id="enq-email" name="email" type="email" required autocomplete="email" />
-            <span class="field-error"></span>
-          </div>
-          <div class="form-group">
-            <label for="enq-date">Travel from</label>
-            <input class="form-control" id="enq-date" name="travel_date" type="date" required min="<?= e(date('Y-m-d')) ?>" />
-            <span class="field-error"></span>
-          </div>
-          <div class="form-group" style="grid-column:1/-1">
-            <label for="enq-interest">Interest</label>
-            <input class="form-control" id="enq-interest" name="interest" type="text" value="General travel enquiry" data-prefill="interest" />
-          </div>
-        </div>
-        <div class="btn-group">
-          <button class="btn btn--primary" type="submit">Continue on WhatsApp</button>
-          <button class="btn btn--secondary" type="button" data-close-modal>Cancel</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <div class="modal" id="success-modal" role="dialog" aria-modal="true" aria-labelledby="success-title">
-    <div class="modal__backdrop"></div>
-    <div class="modal__dialog">
-      <button class="modal__close" type="button" data-close-modal aria-label="Close">&times;</button>
-      <div class="modal__icon" aria-hidden="true">✓</div>
-      <h2 id="success-title">Thank you!</h2>
-      <p data-success-note>Your enquiry has been submitted. Our team will contact you shortly with availability and pricing.</p>
-      <div class="btn-group">
-        <a class="btn btn--primary" data-whatsapp-link href="#" target="_blank" rel="noopener" hidden>Open WhatsApp</a>
-        <button class="btn btn--secondary" type="button" data-close-modal>Close</button>
-      </div>
-    </div>
-  </div>
-
-  <script src="js/navigation.js?v=11" defer></script>
-  <script src="js/filters.js?v=11" defer></script>
-  <script src="js/forms.js?v=11" defer></script>
-  <script src="js/gallery.js?v=11" defer></script>
-  <script src="js/main.js?v=11" defer></script>
-  <script src="js/motion.js?v=11" defer></script>
-</body>
-</html>
+<?php
+require __DIR__ . '/includes/layout-footer.php';

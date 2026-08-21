@@ -167,7 +167,7 @@
     });
   }
 
-  document.querySelectorAll(".nav-toggle--circle, .nav-explore__btn, .logo").forEach(function (el) {
+  document.querySelectorAll(".nav-toggle--circle").forEach(function (el) {
     magnetic(el, 0.28);
   });
 

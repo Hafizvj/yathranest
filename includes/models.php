@@ -318,6 +318,6 @@ function package_card_html(array $pkg, string $assetPrefix = '../assets/images/'
         . '<ul class="highlight-list">' . $highlights . '</ul>'
         . '<div class="card__actions">'
         . '<a class="btn btn--secondary btn--sm" href="' . e($href) . '">View Details</a>'
-        . '<a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal" data-package-title="' . e($pkg['title']) . '">Request Pricing</a>'
+        . '<a class="btn btn--primary btn--sm" href="#enquiry" data-open-modal="enquiry-modal" data-package-title="' . e($pkg['title']) . '">Enquire Now</a>'
         . '</div></div></article>';
 }

@@ -11,7 +11,7 @@ $location = strtolower(trim(get_query('location')));
 $packagePage = 'kerala';
 
 $pageHeading = 'Kerala Packages';
-$pageLead = 'Curated journeys through backwaters, tea hills, wildlife sanctuaries and coastal towns — request pricing for your dates.';
+$pageLead = 'Curated journeys through backwaters, tea hills, wildlife sanctuaries and coastal towns — enquire for your dates.';
 $heroImage = 'kerala-backwaters.jpg';
 $pageTitle = 'Kerala Packages | YathraNest';
 $metaDescription = $pageLead;
@@ -35,7 +35,7 @@ try {
         $activePlace = place_by_slug($location);
         if ($activePlace) {
             $pageHeading = $activePlace['label'] . ' Packages';
-            $pageLead = 'Packages that include ' . $activePlace['label'] . ' — request pricing for your dates.';
+            $pageLead = 'Packages that include ' . $activePlace['label'] . ' — enquire for your dates.';
             $pageTitle = $activePlace['label'] . ' Packages | YathraNest';
             $enquiryInterest = $activePlace['label'] . ' Packages';
             $imgs = $activePlace['images'] ?? [];
@@ -117,7 +117,7 @@ require dirname(__DIR__) . '/includes/layout-header.php';
           <h2>Catalog temporarily unavailable</h2>
           <p>Please try again shortly, or send us an enquiry and we'll share options directly.</p>
           <div class="btn-group" style="justify-content:center">
-            <a class="btn btn--primary" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
+            <a class="btn btn--primary" href="#enquiry" data-open-modal="enquiry-modal">Enquire Now</a>
           </div>
         </div>
 
@@ -135,7 +135,7 @@ require dirname(__DIR__) . '/includes/layout-header.php';
             <h2>No Kerala locations yet</h2>
             <p>Our catalogue is being updated. Tell us where you'd like to go and we'll plan it.</p>
             <div class="btn-group" style="justify-content:center">
-              <a class="btn btn--primary" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
+              <a class="btn btn--primary" href="#enquiry" data-open-modal="enquiry-modal">Enquire Now</a>
             </div>
           </div>
         <?php else: ?>
@@ -230,7 +230,7 @@ require dirname(__DIR__) . '/includes/layout-header.php';
         <p>Share your dates and preferences — we'll craft a plan and send pricing personally.</p>
         <div class="btn-group">
           <a class="btn btn--teal" href="#enquiry" data-open-modal="enquiry-modal">
-            Request Pricing
+            Enquire Now
             <span class="btn__icon" aria-hidden="true">→</span>
           </a>
           <a class="btn btn--outline" href="contact.php" style="background:transparent;border-color:rgba(255,255,255,.35);color:#fff">Contact Us</a>

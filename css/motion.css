@@ -284,8 +284,8 @@ html.has-motion.is-ready .hero-trust {
   box-shadow: 0 8px 24px rgba(21, 45, 39, 0.28);
 }
 
-.nav-explore__menu {
-  transform-origin: top right;
+.nav-item__menu {
+  transform-origin: top center;
   animation: menu-in 0.35s var(--ease-out);
 }
 
@@ -452,15 +452,6 @@ html.has-motion .benefit-item.is-in:hover {
   transform: scale(1.06);
 }
 
-.logo__img,
-.logo__badge {
-  transition: transform 0.5s var(--ease-out);
-}
-
-.logo:hover .logo__img,
-.logo:hover .logo__badge {
-  transform: scale(1.04);
-}
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {

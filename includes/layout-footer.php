@@ -78,7 +78,7 @@ $handlerPath = ($assetDepth === '' ? '' : '../') . 'handlers/enquiry.php';
     <div class="modal__backdrop"></div>
     <div class="modal__dialog modal__dialog--lg">
       <button class="modal__close" type="button" data-close-modal aria-label="Close">&times;</button>
-      <h2 id="enquiry-title">Request Pricing</h2>
+      <h2 id="enquiry-title">Enquire Now</h2>
       <p>Share a few details and we'll continue the conversation on WhatsApp with a personalised quote — no online payment required.</p>
       <form data-enquiry-form data-success-modal="success-modal" action="<?= e($handlerPath) ?>" method="post" novalidate>
         <?= csrf_field() ?>
@@ -130,12 +130,12 @@ $handlerPath = ($assetDepth === '' ? '' : '../') . 'handlers/enquiry.php';
       </div>
     </div>
   </div>
-  <script src="<?= e($assetDepth) ?>js/navigation.js?v=11" defer></script>
+  <script src="<?= e($assetDepth) ?>js/navigation.js?v=14" defer></script>
   <script src="<?= e($assetDepth) ?>js/filters.js?v=11" defer></script>
   <script src="<?= e($assetDepth) ?>js/forms.js?v=11" defer></script>
   <script src="<?= e($assetDepth) ?>js/gallery.js?v=11" defer></script>
   <script src="<?= e($assetDepth) ?>js/main.js?v=11" defer></script>
-  <script src="<?= e($assetDepth) ?>js/motion.js?v=11" defer></script>
+  <script src="<?= e($assetDepth) ?>js/motion.js?v=14" defer></script>
   <?php if (!empty($extraScripts)) echo $extraScripts; ?>
 </body>
 </html>

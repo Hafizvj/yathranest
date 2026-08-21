@@ -14,7 +14,7 @@ try {
 }
 
 $pageTitle = $pkg ? ($pkg['title'] . ' — Package Details | YathraNest') : 'Package Details | YathraNest';
-$metaDescription = $pkg['overview'] ?? 'Package details — itinerary, inclusions and request pricing with YathraNest.';
+$metaDescription = $pkg['overview'] ?? 'Package details — itinerary, inclusions and enquire with YathraNest.';
 $bodyAttrs = 'data-package-details="true" data-asset-prefix="../assets/images/"';
 $enquiryType = 'general';
 $enquiryInterest = $pkg['title'] ?? 'Package enquiry';
@@ -33,14 +33,15 @@ $heroSrc = media_src((string) ($pkg['image'] ?? ''), '../', 'beach.jpg');
 $days = (int) ($pkg['days'] ?? 0);
 $nights = (int) ($pkg['nights'] ?? 0);
 $nightsLabel = $nights . ' Night' . ($nights === 1 ? '' : 's');
-$whatsapp = preg_replace('/\D/', '', setting('whatsapp', '919876543210'));
 
 $typesLabel = $pkg ? (package_types_label($pkg) ?: 'All travellers') : 'All travellers';
 // An uploaded brochure wins over the generated print view.
-$itineraryHref = !empty($pkg['itinerary_pdf'])
+$hasItineraryPdf = !empty($pkg['itinerary_pdf']);
+$itineraryHref = $hasItineraryPdf
     ? media_src((string) $pkg['itinerary_pdf'], '../')
     : 'itinerary-print.php?package=' . rawurlencode((string) ($pkg['slug'] ?? '')) . '&print=1';
-$priceChartHref = !empty($pkg['price_chart_pdf']) ? media_src((string) $pkg['price_chart_pdf'], '../') : '';
+$hasPriceSheet = !empty($pkg['price_chart_pdf']);
+$priceSheetHref = $hasPriceSheet ? media_src((string) $pkg['price_chart_pdf'], '../') : '';
 
 function pkg_img_src(string $file): string
 {
@@ -112,10 +113,12 @@ require dirname(__DIR__) . '/includes/layout-header.php';
               </div>
             </div>
             <div class="btn-group">
-              <a class="btn btn--primary" href="#enquiry" data-open-modal="enquiry-modal" data-package-title="<?= e($pkg['title']) ?>">Request Pricing</a>
-              <a class="btn btn--secondary" href="<?= e($itineraryHref) ?>" target="_blank" rel="noopener">Download Itinerary PDF</a>
-              <?php if ($priceChartHref !== ''): ?>
-                <a class="btn btn--secondary" href="<?= e($priceChartHref) ?>" target="_blank" rel="noopener">Download Price Chart</a>
+              <a class="btn btn--primary" href="#enquiry" data-open-modal="enquiry-modal" data-package-title="<?= e($pkg['title']) ?>">Enquire Now</a>
+              <a class="btn btn--secondary" href="<?= e($itineraryHref) ?>" target="_blank" rel="noopener">Download Itinerary</a>
+              <?php if ($hasPriceSheet): ?>
+                <a class="btn btn--secondary" href="<?= e($priceSheetHref) ?>" target="_blank" rel="noopener">View Price Sheet</a>
+              <?php else: ?>
+                <a class="btn btn--secondary" href="#enquiry" data-open-modal="enquiry-modal" data-package-title="<?= e($pkg['title'] . ' — Price sheet') ?>">View Price Sheet</a>
               <?php endif; ?>
             </div>
           </div>
@@ -222,7 +225,7 @@ require dirname(__DIR__) . '/includes/layout-header.php';
                 </div>
                 <div class="accordion__item">
                   <button class="accordion__trigger" type="button" aria-expanded="false"><span>Can we add a houseboat or extra night?</span><span class="accordion__icon" aria-hidden="true">+</span></button>
-                  <div class="accordion__panel"><p>Yes. Houseboat nights, extra stays and activity add-ons can be discussed when you request pricing.</p></div>
+                  <div class="accordion__panel"><p>Yes. Houseboat nights, extra stays and activity add-ons can be discussed when you enquire.</p></div>
                 </div>
               </div>
             </div>
@@ -230,18 +233,17 @@ require dirname(__DIR__) . '/includes/layout-header.php';
 
           <aside class="detail-aside">
             <div class="quote-card">
-              <p class="quote-card__eyebrow">No online payment</p>
-              <h3>Request pricing</h3>
-              <p>Share your preferred dates and traveller count. Our team responds with availability and a personalised quote.</p>
+              <h3><?= e($pkg['title']) ?></h3>
               <div class="btn-group">
-                <a class="btn btn--light" href="#enquiry" data-open-modal="enquiry-modal" data-package-title="<?= e($pkg['title']) ?>">Request Pricing</a>
-                <a class="btn btn--secondary quote-card__ghost" href="https://wa.me/<?= e($whatsapp) ?>" target="_blank" rel="noopener noreferrer">WhatsApp Us</a>
+                <a class="btn btn--light" href="#enquiry" data-open-modal="enquiry-modal" data-package-title="<?= e($pkg['title']) ?>">Enquire Now</a>
                 <a class="btn btn--secondary quote-card__ghost" href="<?= e($itineraryHref) ?>" target="_blank" rel="noopener">Download Itinerary</a>
-                <?php if ($priceChartHref !== ''): ?>
-                  <a class="btn btn--secondary quote-card__ghost" href="<?= e($priceChartHref) ?>" target="_blank" rel="noopener">Download Price Chart</a>
+                <?php if ($hasPriceSheet): ?>
+                  <a class="btn btn--secondary quote-card__ghost" href="<?= e($priceSheetHref) ?>" target="_blank" rel="noopener">View Price Sheet</a>
+                <?php else: ?>
+                  <a class="btn btn--secondary quote-card__ghost" href="#enquiry" data-open-modal="enquiry-modal" data-package-title="<?= e($pkg['title'] . ' — Price sheet') ?>">View Price Sheet</a>
                 <?php endif; ?>
               </div>
-              <p class="quote-card__note"><?= yn_icon('shield') ?>Trusted partners · flexible dates</p>
+              <p class="quote-card__note"><?= yn_icon('shield') ?>Trusted partners</p>
             </div>
             <div class="panel">
               <div class="info-list">

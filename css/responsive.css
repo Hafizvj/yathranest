@@ -18,6 +18,14 @@
   }
 }
 
+/* Desktop-only header CTA — hidden on mobile (Enquire lives in the drawer) */
+.header-actions .btn--header-cta {
+  display: none;
+  min-height: 42px;
+  padding: 0.55rem 1.15rem;
+  font-size: 0.875rem;
+}
+
 @media (min-width: 768px) {
   .container {
     padding-inline: 1.75rem;
@@ -27,16 +35,16 @@
     padding-block: 4.5rem;
   }
 
-  .header-actions .btn--primary {
+  .nav-desktop {
+    display: flex;
+  }
+
+  .header-actions .btn--header-cta {
     display: inline-flex;
   }
 
-  .nav-toggle:not(.nav-menu-trigger):not(.nav-toggle--circle) {
+  .nav-toggle--circle {
     display: none;
-  }
-
-  .nav-desktop {
-    display: flex;
   }
 
   .footer-grid {
@@ -215,20 +223,6 @@
   :root {
     --container: 1200px;
     --container-wide: 1360px;
-  }
-}
-
-/* Hide header CTA on very small; show from tablet */
-.header-actions .btn--header-cta {
-  display: none;
-  min-height: 42px;
-  padding: 0.55rem 1.15rem;
-  font-size: 0.875rem;
-}
-
-@media (min-width: 640px) {
-  .header-actions .btn--header-cta {
-    display: inline-flex;
   }
 }
 

@@ -106,7 +106,7 @@ require dirname(__DIR__) . '/includes/layout-header.php';
           <h2>Catalog temporarily unavailable</h2>
           <p>Please try again shortly, or send us an enquiry and we'll share options directly.</p>
           <div class="btn-group" style="justify-content:center">
-            <a class="btn btn--primary" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
+            <a class="btn btn--primary" href="#enquiry" data-open-modal="enquiry-modal">Enquire Now</a>
             <a class="btn btn--secondary" href="contact.php">Contact Us</a>
           </div>
         </div>
@@ -187,7 +187,7 @@ require dirname(__DIR__) . '/includes/layout-header.php';
         <p>Share your dates, group size and preferences — we'll craft a plan and send pricing personally.</p>
         <div class="btn-group">
           <a class="btn btn--teal" href="#enquiry" data-open-modal="enquiry-modal">
-            Request Pricing
+            Enquire Now
             <span class="btn__icon" aria-hidden="true">→</span>
           </a>
           <a class="btn btn--outline" href="contact.php" style="background:transparent;border-color:rgba(255,255,255,.35);color:#fff">Contact Us</a>

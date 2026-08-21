@@ -128,7 +128,7 @@ require dirname(__DIR__) . '/includes/layout-header.php';
             <h3>Get a call back</h3>
             <p>Send an enquiry with your number and a good time — we'll call you.</p>
             <div class="btn-group">
-              <a class="btn btn--light" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
+              <a class="btn btn--light" href="#enquiry" data-open-modal="enquiry-modal">Enquire Now</a>
             </div>
             <p class="quote-card__note"><?= yn_icon('shield') ?>Your details stay private</p>
           </div>

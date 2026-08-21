@@ -83,7 +83,7 @@ require dirname(__DIR__) . '/includes/layout-header.php';
             <h3>Tell us your plan</h3>
             <p>Share where you'd like to go and when — we'll design the trip and share pricing.</p>
             <div class="btn-group">
-              <a class="btn btn--light" href="#enquiry" data-open-modal="enquiry-modal">Request Pricing</a>
+              <a class="btn btn--light" href="#enquiry" data-open-modal="enquiry-modal">Enquire Now</a>
               <a class="btn btn--secondary quote-card__ghost" href="contact.php">Contact Us</a>
             </div>
             <p class="quote-card__note"><?= yn_icon('shield') ?>Trusted &amp; safe travel</p>

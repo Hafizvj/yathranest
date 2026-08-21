@@ -14,7 +14,7 @@ try {
 }
 
 $pageTitle = $pkg ? ($pkg['title'] . ' — Package Details | YathraNest') : 'Package Details | YathraNest';
-$metaDescription = $pkg['overview'] ?? 'Package details — itinerary, inclusions and request pricing with YathraNest.';
+$metaDescription = $pkg['overview'] ?? 'Package details — itinerary, inclusions and Enquire Now with YathraNest.';
 $bodyAttrs = 'data-package-details="true" data-asset-prefix="../assets/images/"';
 $enquiryType = 'general';
 $enquiryInterest = $pkg['title'] ?? 'Package enquiry';
@@ -87,7 +87,7 @@ require dirname(__DIR__) . '/includes/layout-header.php';
             <p class="meta-row"><span>Pickup <?= e($pkg['pickup']) ?> · Drop <?= e($pkg['drop_point']) ?></span></p>
             <p class="text-muted"><?= e($pkg['overview']) ?></p>
             <div class="btn-group">
-              <a class="btn btn--primary" href="#enquiry" data-open-modal="enquiry-modal" data-package-title="<?= e($pkg['title']) ?>">Request Pricing</a>
+              <a class="btn btn--primary" href="#enquiry" data-open-modal="enquiry-modal" data-package-title="<?= e($pkg['title']) ?>">Enquire Now</a>
               <a class="btn btn--secondary" href="contact.php">Enquire Now</a>
             </div>
           </div>
@@ -183,7 +183,7 @@ require dirname(__DIR__) . '/includes/layout-header.php';
                 </div>
                 <div class="accordion__item">
                   <button class="accordion__trigger" type="button" aria-expanded="false"><span>Can we add a houseboat or extra night?</span><span class="accordion__icon" aria-hidden="true">+</span></button>
-                  <div class="accordion__panel"><p>Yes. Houseboat nights, extra stays and activity add-ons can be discussed when you request pricing.</p></div>
+                  <div class="accordion__panel"><p>Yes. Houseboat nights, extra stays and activity add-ons can be discussed when you Enquire Now.</p></div>
                 </div>
               </div>
             </div>
@@ -191,9 +191,9 @@ require dirname(__DIR__) . '/includes/layout-header.php';
 
           <aside class="detail-aside">
             <div class="aside-card">
-              <h3>Request Pricing</h3>
+              <h3>Enquire Now</h3>
               <p>Share your preferred dates and traveller count. Our team will respond with availability and a personalised quote.</p>
-              <a class="btn btn--primary btn--block" href="#enquiry" data-open-modal="enquiry-modal" data-package-title="<?= e($pkg['title']) ?>">Request Pricing</a>
+              <a class="btn btn--primary btn--block" href="#enquiry" data-open-modal="enquiry-modal" data-package-title="<?= e($pkg['title']) ?>">Enquire Now</a>
               <a class="btn btn--secondary btn--block mt-1" href="https://wa.me/<?= e($whatsapp) ?>" target="_blank" rel="noopener noreferrer">WhatsApp Us</a>
             </div>
           </aside>
