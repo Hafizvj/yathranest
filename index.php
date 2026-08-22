@@ -137,7 +137,7 @@ require __DIR__ . '/includes/layout-header.php';
             <?php if (!empty($sections['hero_title'])): ?>
               <span class="hero-line"><span><?= e($sections['hero_title']) ?></span></span>
             <?php else: ?>
-              <span class="hero-line"><span>Traveled more.</span></span>
+              <span class="hero-line"><span>Travel more.</span></span>
               <span class="hero-line"><span>Worry less.</span></span>
             <?php endif; ?>
           </h1>
