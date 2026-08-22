@@ -170,7 +170,7 @@ const page_content = {
     title: 'About YathraNest',
     sections: {
       intro: 'YathraNest crafts thoughtful journeys across Kerala, South India and beyond.',
-      body: '<p>We plan packages, stays, taxi services and experiences with a simple rule: browse and enquire — pricing is shared personally for your dates.</p>',
+      body: '<h2>Our approach</h2><p>YathraNest brings together travel packages, taxi services, resort stays, weekend getaways, gift cards and investment conversations under one thoughtful brand experience.</p><p>We believe travel planning should feel clear and human. Explore options on the website, then enquire — our team responds with availability and pricing tailored to your dates.</p><h2>What we offer</h2><ul><li>Kerala, South Indian, domestic and international packages</li><li>Taxi quotes for airport, local and outstation trips</li><li>Resort discovery and availability checks</li><li>Weekend getaways and stranger trips</li><li>Travel gift cards and investment information requests</li></ul>',
       hero_image: 'friends-travel.jpg',
     },
   },

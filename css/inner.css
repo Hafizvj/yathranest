@@ -325,6 +325,29 @@
   backdrop-filter: blur(6px);
 }
 
+/* About page — trust strip below media hero */
+.hero-trust--inner {
+  margin-top: -1.25rem;
+  margin-bottom: 0.5rem;
+  position: relative;
+  z-index: 2;
+}
+
+.about-quote-wrap {
+  margin-top: 2.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+.section-head--center {
+  text-align: center;
+  justify-content: center;
+}
+
+.section-head--center p {
+  margin-inline: auto;
+}
+
 /* ------------------------------------------------------------------
    Section shells
 ------------------------------------------------------------------ */
@@ -1489,5 +1512,13 @@ html.has-motion .section-head.is-in {
 
   .tile-grid--3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .about-quote-wrap {
+    justify-content: flex-end;
+  }
+
+  .about-quote-wrap .quote-card {
+    max-width: 22rem;
   }
 }
