@@ -1,4 +1,4 @@
-name: Deploy to HostMaria (UAT)
+name: Deploy to HostMaria (Production)
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
 
 concurrency:
-  group: deploy-uat
+  group: deploy-production
   cancel-in-progress: true
 
 jobs:
@@ -30,7 +30,7 @@ jobs:
           protocol: ftps
           security: loose
           timeout: 120000
-          # FTP account already opens in public_html/uat-yathranest
+          # FTP account must open in public_html/yathranest_v3 (yathranest.com)
           server-dir: ./
           log-level: standard
           exclude: |
