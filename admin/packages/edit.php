@@ -38,8 +38,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         };
 
         $newHero = !empty($_FILES['image_file']['name']);
-        $removeHero = !empty($_POST['remove_image']);
-        if (!$newHero && ($removeHero || $oldImage === '')) {
+        $libraryCover = trim(post('library_image'));
+        $removeHero = post('remove_image') === '1';
+        $hasCover = $newHero || ($libraryCover !== '' && !$removeHero) || (!$removeHero && $oldImage !== '');
+        if (!$hasCover) {
             $errors[] = 'A cover image is required.';
         }
 
@@ -49,6 +51,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!$errors) {
             $gallery = admin_collect_media_paths('gallery_keep', '', $_FILES['gallery_files'] ?? null, 'packages');
             $takeUploadError();
+            if (count($gallery) > 10) {
+                $gallery = array_slice($gallery, 0, 10);
+            }
             $data['gallery_json'] = json_encode($gallery, JSON_UNESCAPED_UNICODE);
 
             if ($newHero) {
@@ -57,8 +62,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($uploaded) {
                     $data['image'] = $uploaded;
                 }
+            } elseif ($libraryCover !== '' && !$removeHero) {
+                $data['image'] = ltrim($libraryCover, '/');
+                media_ensure_row($data['image']);
             } elseif ($removeHero) {
-                admin_delete_upload($oldImage);
                 $data['image'] = '';
             }
 
@@ -299,48 +306,122 @@ ob_start();
         <p class="form-card__hint">Upload images to showcase your package.</p>
       </div>
     </div>
-    <div class="form-card__body">
-      <div class="field media-field">
-        <span class="field__label">Cover Image <span class="field__req">*</span></span>
-        <p class="field__hint">This will be shown as the main image on package cards.</p>
-        <?php if (!empty($row['image'])): ?>
-          <?= admin_hero_preview($row['image']) ?>
-        <?php endif; ?>
-        <div class="media-live-preview" hidden>
-          <div class="media-preview">
-            <div class="media-preview__item media-preview__item--hero">
-              <img id="package-hero-preview" alt="New cover preview" hidden />
+    <div class="form-card__body form-card__body--media">
+      <?php
+        $coverPath = (string) ($row['image'] ?? '');
+        $coverName = $coverPath !== '' ? basename(str_replace('\\', '/', $coverPath)) : '';
+        $coverSrc = $coverPath !== '' ? image_url($coverPath) : '';
+        $galleryCount = count(array_filter($galleryPaths));
+      ?>
+      <div class="media-split" data-package-media data-gallery-max="10">
+        <div class="media-col media-col--cover">
+          <span class="field__label">Cover Image <span class="field__req">*</span></span>
+          <p class="field__hint">This will be shown as the main image on package cards.</p>
+
+          <input type="hidden" name="remove_image" value="0" data-cover-remove />
+          <input type="hidden" name="library_image" value="<?= e($coverPath) ?>" data-cover-library />
+          <input
+            id="image_file"
+            class="media-file-input"
+            type="file"
+            name="image_file"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            data-cover-input
+            <?= $coverPath === '' ? 'data-cover-required' : '' ?>
+          />
+
+          <div class="media-drop media-drop--cover" data-dropzone data-cover-empty<?= $coverPath !== '' ? ' hidden' : '' ?>>
+            <span class="media-drop__icon" aria-hidden="true"><?= yn_icon('upload') ?></span>
+            <span class="media-drop__title">Upload cover image</span>
+            <span class="media-drop__hint">JPG, PNG, WEBP up to 5MB</span>
+            <span class="media-drop__divider"><span>or</span></span>
+            <button class="media-drop__browse" type="button" data-cover-library>
+              <?= yn_icon('image') ?>
+              Choose from library
+            </button>
+          </div>
+
+          <div class="media-cover-card" data-cover-filled<?= $coverPath === '' ? ' hidden' : '' ?>>
+            <div class="media-cover-card__preview">
+              <img src="<?= e($coverSrc) ?>" alt="Cover preview" data-cover-img<?= $coverSrc === '' ? ' hidden' : '' ?> />
+              <button class="media-thumb__remove" type="button" data-cover-clear aria-label="Remove cover image"><?= yn_icon('trash') ?></button>
             </div>
+            <div class="media-cover-card__meta">
+              <span class="media-file-meta">
+                <span class="media-file-meta__check" aria-hidden="true"><?= yn_icon('check') ?></span>
+                <span data-cover-name><?= e($coverName !== '' ? $coverName : 'cover-image.jpg') ?></span>
+              </span>
+              <span class="media-file-meta__size" data-cover-size><?= $coverPath !== '' ? 'Saved' : '' ?></span>
+            </div>
+            <button class="btn btn--secondary media-cover-card__replace" type="button" data-cover-replace>
+              <?= yn_icon('upload') ?>
+              Replace image
+            </button>
+          </div>
+
+          <p class="field__error" data-cover-error hidden>Choose a cover image before saving.</p>
+        </div>
+
+        <div class="media-col media-col--gallery">
+          <span class="field__label">Gallery Images</span>
+          <p class="field__hint">Add multiple images to showcase this package.</p>
+
+          <input
+            id="gallery_files"
+            class="media-file-input"
+            type="file"
+            name="gallery_files[]"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            multiple
+            data-gallery-input
+          />
+
+          <div class="media-drop media-drop--gallery" data-dropzone data-gallery-empty<?= $galleryCount > 0 ? ' hidden' : '' ?>>
+            <span class="media-drop__icon" aria-hidden="true"><?= yn_icon('upload') ?></span>
+            <span class="media-drop__title">Upload gallery images</span>
+            <span class="media-drop__hint">Up to 10 images (5MB each)</span>
+            <span class="media-drop__divider"><span>or</span></span>
+            <button class="media-drop__browse" type="button" data-gallery-library>
+              <?= yn_icon('image') ?>
+              Choose from library
+            </button>
+            <p class="media-drop__note"><?= yn_icon('info') ?> You can upload up to 10 images</p>
+          </div>
+
+          <div class="media-gallery-panel" data-gallery-panel<?= $galleryCount === 0 ? ' hidden' : '' ?>>
+            <div class="media-gallery-grid" data-gallery-grid>
+              <?php foreach ($galleryPaths as $gPath):
+                $gPath = (string) $gPath;
+                if ($gPath === '') {
+                    continue;
+                }
+                $gName = basename(str_replace('\\', '/', $gPath));
+                ?>
+                <div class="media-thumb" data-gallery-item data-existing="1">
+                  <div class="media-thumb__frame">
+                    <img src="<?= e(image_url($gPath)) ?>" alt="" />
+                    <button class="media-thumb__remove" type="button" data-gallery-remove aria-label="Remove image"><?= yn_icon('trash') ?></button>
+                  </div>
+                  <p class="media-thumb__name">
+                    <span class="media-file-meta__check" aria-hidden="true"><?= yn_icon('check') ?></span>
+                    <span><?= e($gName) ?></span>
+                  </p>
+                  <input type="hidden" name="gallery_keep[]" value="<?= e($gPath) ?>" />
+                </div>
+              <?php endforeach; ?>
+              <button class="media-thumb media-thumb--add" type="button" data-gallery-add<?= $galleryCount >= 10 ? ' hidden' : '' ?>>
+                <span class="media-thumb__add-icon" aria-hidden="true"><?= yn_icon('plus') ?></span>
+                <span class="media-thumb__add-title">Add more images</span>
+                <span class="media-thumb__add-hint">Up to 10 images</span>
+              </button>
+            </div>
+            <div class="media-gallery-foot">
+              <span data-gallery-count>Selected Images (<?= (int) $galleryCount ?>/10)</span>
+              <span data-gallery-status><?= $galleryCount > 0 ? 'Saved images' : 'No images selected' ?></span>
+            </div>
+            <p class="media-gallery-note"><?= yn_icon('info') ?> You can upload up to 10 images. Each image up to 5MB.</p>
           </div>
         </div>
-        <label class="dropzone" data-dropzone>
-          <span class="dropzone__icon"><?= yn_icon('upload') ?></span>
-          <span class="dropzone__body">
-            <span class="dropzone__text">Upload cover image</span>
-            <span class="dropzone__hint">JPG, PNG, WEBP up to 5MB</span>
-          </span>
-          <input id="image_file" type="file" name="image_file" accept="image/jpeg,image/png,image/webp,image/gif" data-preview-target="#package-hero-preview" <?= empty($row['image']) ? 'data-cover-required' : '' ?> />
-        </label>
-        <span class="file-pick__name" data-file-name-for="image_file"><?= empty($row['image']) ? 'No file chosen' : 'Keeping current image' ?></span>
-        <p class="field__error" data-cover-error hidden>Choose a cover image before saving.</p>
-        <?php if (!empty($row['image'])): ?>
-          <label class="checks"><input type="checkbox" name="remove_image" value="1" /> Remove current cover image</label>
-        <?php endif; ?>
-      </div>
-      <div class="field media-field">
-        <span class="field__label">Gallery Images</span>
-        <p class="field__hint">Add multiple images to showcase this package.</p>
-        <?= admin_media_preview_items($galleryPaths, 'gallery_keep') ?>
-        <label class="dropzone" data-dropzone>
-          <span class="dropzone__icon"><?= yn_icon('upload') ?></span>
-          <span class="dropzone__body">
-            <span class="dropzone__text">Upload gallery images</span>
-            <span class="dropzone__hint">Up to 10 images (5MB each)</span>
-          </span>
-          <input id="gallery_files" type="file" name="gallery_files[]" accept="image/jpeg,image/png,image/webp,image/gif" multiple data-preview-list="#package-gallery-new" />
-        </label>
-        <span class="file-pick__name" data-file-name-for="gallery_files">No files chosen</span>
-        <div id="package-gallery-new" class="media-preview"></div>
       </div>
     </div>
   </section>

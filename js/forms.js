@@ -266,6 +266,12 @@
 
   prefillEnquiry();
 
+  if (document.body.getAttribute("data-auto-enquiry") === "1") {
+    window.setTimeout(function () {
+      openModal("enquiry-modal");
+    }, 200);
+  }
+
   // Choice cards selection styling
   document.querySelectorAll(".choice-card input").forEach(function (input) {
     function sync() {

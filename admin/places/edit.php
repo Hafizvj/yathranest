@@ -205,6 +205,10 @@ ob_start();
           </span>
           <input id="image_files" type="file" name="image_files[]" accept="image/jpeg,image/png,image/webp,image/gif" multiple data-preview-list="#place-images-new" />
         </label>
+        <button class="btn btn--secondary btn--sm media-library-browse" type="button" data-open-media-picker data-media-mode="multiple" data-media-max="20" data-media-event="yn:place-images">
+          <?= yn_icon('image') ?> Choose from library
+        </button>
+        <div id="place-library-keep"></div>
         <span class="file-pick__name" data-file-name-for="image_files">No files chosen</span>
         <div id="place-images-new" class="media-preview"></div>
       </div>
@@ -228,6 +232,6 @@ ob_start();
 $adminContent = ob_get_clean();
 $pageTitle = $id ? 'Edit Place' : 'Add Place';
 $pageSubtitle = $id ? 'Update this destination.' : 'Create a destination used by packages.';
-$adminScripts = ['admin/assets/admin-form.js'];
+$adminScripts = ['admin/assets/admin-form.js', 'admin/assets/admin-place-media.js'];
 $activeNav = 'places';
 require dirname(__DIR__) . '/_layout.php';

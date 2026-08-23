@@ -118,7 +118,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $errors[] = admin_upload_last_error();
         }
     } elseif (isset($_POST['remove_hero_image']) && $_POST['remove_hero_image'] === '1') {
-        admin_delete_upload($oldHero);
         $heroImage = '';
     }
 
@@ -157,7 +156,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $errors[] = admin_upload_last_error();
             }
         } elseif (isset($_POST['remove_hero_visual']) && $_POST['remove_hero_visual'] === '1') {
-            admin_delete_upload($oldVisual);
             $heroVisual = '';
         }
         $newSections['hero_visual'] = $heroVisual !== '' ? $heroVisual : 'maldives.jpg';
@@ -194,7 +192,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $errors[] = 'Hero card ' . ($i + 1) . ': ' . admin_upload_last_error();
                 }
             } elseif (isset($_POST['remove_hero_card'][$i]) && $_POST['remove_hero_card'][$i] === '1') {
-                admin_delete_upload($oldImage);
                 $image = $defaults['image'];
             }
             $heroCards[] = [
@@ -349,6 +346,9 @@ ob_start();
               <label for="hero_visual_file">Upload new image</label>
               <input class="form-control" id="hero_visual_file" type="file" name="hero_visual_file" accept="image/jpeg,image/png,image/webp,image/gif" data-preview-target="#home-visual-preview" />
             </div>
+            <button class="btn btn--secondary btn--sm media-library-browse" type="button" data-open-media-picker data-media-mode="single" data-media-target="#hero_visual" data-media-preview="#home-visual-preview">
+              <?= yn_icon('image') ?> Choose from library
+            </button>
             <details class="content-advanced">
               <summary>Advanced path</summary>
               <label for="hero_visual">Stored path</label>
@@ -390,6 +390,9 @@ ob_start();
                     <label for="hero_card_file_<?= $i ?>">Replace image</label>
                     <input class="form-control" id="hero_card_file_<?= $i ?>" type="file" name="hero_card_file[<?= $i ?>]" accept="image/jpeg,image/png,image/webp,image/gif" data-preview-target="#home-card-preview-<?= $i ?>" />
                   </div>
+                  <button class="btn btn--secondary btn--sm media-library-browse" type="button" data-open-media-picker data-media-mode="single" data-media-target="#hero_card_image_<?= $i ?>" data-media-preview="#home-card-preview-<?= $i ?>">
+                    <?= yn_icon('image') ?> Choose from library
+                  </button>
                   <?php if (!empty($card['image']) && $card['image'] !== ($homeHeroCardDefaults[$i]['image'] ?? '')): ?>
                     <label class="checks"><input type="checkbox" name="remove_hero_card[<?= $i ?>]" value="1" /> Reset image</label>
                   <?php endif; ?>
@@ -442,6 +445,9 @@ ob_start();
               <label for="hero_image_file">Upload hero image</label>
               <input class="form-control" id="hero_image_file" type="file" name="hero_image_file" accept="image/jpeg,image/png,image/webp,image/gif" data-preview-target="#content-hero-preview" />
             </div>
+            <button class="btn btn--secondary btn--sm media-library-browse" type="button" data-open-media-picker data-media-mode="single" data-media-target="#hero_image" data-media-preview="#content-hero-preview">
+              <?= yn_icon('image') ?> Choose from library
+            </button>
             <details class="content-advanced">
               <summary>Advanced path</summary>
               <label for="hero_image">Stored path</label>

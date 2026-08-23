@@ -624,7 +624,8 @@ function admin_store_upload(array $file, string $subdir): ?string
 }
 
 /**
- * Apply a single file upload onto a stored path, optionally deleting the previous upload.
+ * Apply a single file upload onto a stored path.
+ * Does not delete the previous file (shared media library). Registers the new path in media.
  */
 function admin_apply_image_upload(array $file, string $subdir, string $currentPath = ''): ?string
 {
@@ -633,8 +634,8 @@ function admin_apply_image_upload(array $file, string $subdir, string $currentPa
     }
     $uploaded = admin_store_upload($file, $subdir);
     if ($uploaded) {
-        if ($currentPath !== '' && $currentPath !== $uploaded) {
-            admin_delete_upload($currentPath);
+        if (function_exists('media_register_stored_path')) {
+            media_register_stored_path($uploaded, (string) ($file['name'] ?? ''));
         }
         return $uploaded;
     }
@@ -769,6 +770,9 @@ function admin_store_uploads_many(array $files, string $subdir): array
         if (!empty($files['name'])) {
             $one = admin_store_upload($files, $subdir);
             if ($one) {
+                if (function_exists('media_register_stored_path')) {
+                    media_register_stored_path($one, (string) ($files['name'] ?? ''));
+                }
                 $out[] = $one;
             }
         }
@@ -789,19 +793,22 @@ function admin_store_uploads_many(array $files, string $subdir): array
         }
         $path = admin_store_upload($file, $subdir);
         if ($path) {
+            if (function_exists('media_register_stored_path')) {
+                media_register_stored_path($path, (string) $file['name']);
+            }
             $out[] = $path;
         }
     }
     return $out;
 }
 
+/**
+ * Previously deleted files dropped from galleries. With the shared media library,
+ * entity forms only update path lists — physical deletes happen from Media admin.
+ */
 function admin_remove_missing_uploads(array $before, array $after): void
 {
-    foreach ($before as $path) {
-        if (!in_array($path, $after, true)) {
-            admin_delete_upload((string) $path);
-        }
-    }
+    // Intentionally no-op: reused images must not be unlinked when one entity drops them.
 }
 
 function admin_media_preview_items(array $paths, string $keepName = 'gallery_keep', string $prefix = 'assets/images/'): string
@@ -837,3 +844,7 @@ function admin_hero_preview(?string $path, string $prefix = 'assets/images/'): s
         . '<img src="' . e(image_url($path, $prefix)) . '" alt="Current image" />'
         . '</div></div>';
 }
+
+// Media library helpers (media_register_*, media_list, …)
+require_once dirname(__DIR__) . '/_media.php';
+

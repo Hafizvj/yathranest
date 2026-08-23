@@ -18,13 +18,19 @@ $enquiryType = 'general';
 $enquiryInterest = $pageHeading;
 $enquirySource = 'pages/' . basename($_SERVER['SCRIPT_NAME'] ?? '');
 $navActive = $packagePage;
+$packagesOn = feature_enabled('packages');
+if (!$packagesOn) {
+    $bodyAttrs .= ' data-auto-enquiry="1"';
+}
 
 $packages = [];
 $places = [];
 $dbOk = true;
 try {
-    $packages = packages_for_page($packagePage);
-    $places = places_all();
+    if ($packagesOn) {
+        $packages = packages_for_page($packagePage);
+        $places = places_all();
+    }
 } catch (Throwable $e) {
     $dbOk = false;
 }
@@ -107,6 +113,16 @@ require dirname(__DIR__) . '/includes/layout-header.php';
           <p>Please try again shortly, or send us an enquiry and we'll share options directly.</p>
           <div class="btn-group" style="justify-content:center">
             <a class="btn btn--primary" href="#enquiry" data-open-modal="enquiry-modal">Enquire Now</a>
+            <a class="btn btn--secondary" href="contact.php">Contact Us</a>
+          </div>
+        </div>
+      <?php elseif (!$packagesOn): ?>
+        <div class="empty-state">
+          <div class="empty-state__icon"><?= yn_icon('chat') ?></div>
+          <h2>Enquire for packages</h2>
+          <p>Listings are currently shared on request. Tell us your dates and preferences and we'll send tailored options.</p>
+          <div class="btn-group" style="justify-content:center">
+            <a class="btn btn--primary" href="#enquiry" data-open-modal="enquiry-modal" data-package-title="<?= e($pageHeading) ?>">Enquire Now</a>
             <a class="btn btn--secondary" href="contact.php">Contact Us</a>
           </div>
         </div>

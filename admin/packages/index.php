@@ -1,7 +1,10 @@
 <?php
 
 require_once dirname(__DIR__, 2) . '/includes/bootstrap.php';
+require_once dirname(__DIR__) . '/_feature_toggle.php';
 require_admin();
+
+feature_toggle_handle_post('packages', 'admin/packages/index.php');
 
 $rows = db()->query(
     'SELECT id, slug, title, days, nights, type, types_json, image, is_published, is_featured, pages_json
@@ -12,7 +15,10 @@ ob_start();
 ?>
 <div class="admin-toolbar">
   <p class="admin-toolbar__meta"><?= count($rows) ?> packages</p>
-  <a class="btn btn--primary" href="<?= e(url('admin/packages/edit.php')) ?>">Add package</a>
+  <div class="admin-toolbar__actions">
+    <?= feature_toggle_html('packages') ?>
+    <a class="btn btn--primary" href="<?= e(url('admin/packages/edit.php')) ?>">Add package</a>
+  </div>
 </div>
 <div class="admin-panel">
   <?php if (!$rows): ?>

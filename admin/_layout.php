@@ -18,6 +18,7 @@ $navItems = [
     'getaways' => ['label' => 'Getaways', 'href' => 'admin/getaways/index.php'],
     'gift-cards' => ['label' => 'Gift Cards', 'href' => 'admin/gift-cards/index.php'],
     'investment' => ['label' => 'Investment', 'href' => 'admin/investment/index.php'],
+    'media' => ['label' => 'Media', 'href' => 'admin/media/index.php'],
     'inquiries' => ['label' => 'Inquiries', 'href' => 'admin/inquiries/index.php'],
     'content' => ['label' => 'Page content', 'href' => 'admin/content/index.php'],
     'settings' => ['label' => 'Settings', 'href' => 'admin/settings/index.php'],
@@ -33,7 +34,7 @@ $navItems = [
   <link rel="icon" type="image/png" sizes="150x150" href="<?= e(image_url($logoMark, '')) ?>" />
   <link rel="apple-touch-icon" href="<?= e(image_url($appleTouch, '')) ?>" />
   <meta name="theme-color" content="#346356" />
-  <link rel="stylesheet" href="<?= e(url('admin/assets/admin.css')) ?>?v=5" />
+  <link rel="stylesheet" href="<?= e(url('admin/assets/admin.css')) ?>?v=8" />
   <script src="https://code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js" defer></script>
 </head>
 <body class="admin">
@@ -95,9 +96,11 @@ $navItems = [
       <?= $adminContent ?? '' ?>
     </div>
   </div>
-  <script src="<?= e(url('admin/assets/admin.js')) ?>?v=4" defer></script>
+  <?php require __DIR__ . '/_media_picker.php'; ?>
+  <script src="<?= e(url('admin/assets/admin.js')) ?>?v=5" defer></script>
+  <script src="<?= e(url('admin/assets/admin-media.js')) ?>?v=1" defer></script>
   <?php foreach ($adminScripts as $script): ?>
-    <script src="<?= e(url($script)) ?>?v=4" defer></script>
+    <script src="<?= e(url($script)) ?>?v=5" defer></script>
   <?php endforeach; ?>
 </body>
 </html>

@@ -46,7 +46,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $errors[] = admin_upload_last_error();
         }
     } elseif (isset($_POST['remove_image']) && $_POST['remove_image'] === '1') {
-        admin_delete_upload($oldImage);
         $data['image'] = '';
     }
 
@@ -201,6 +200,9 @@ ob_start();
             <label for="image_file">Upload image</label>
             <input class="form-control" id="image_file" type="file" name="image_file" accept="image/jpeg,image/png,image/webp,image/gif" data-preview-target="#catalog-hero-preview" />
           </div>
+          <button class="btn btn--secondary btn--sm media-library-browse" type="button" data-open-media-picker data-media-mode="single" data-media-target="#image" data-media-preview="#catalog-hero-preview">
+            <?= yn_icon('image') ?> Choose from library
+          </button>
           <label for="image">Or image path</label>
           <input class="form-control" id="image" name="image" value="<?= e($row['image'] ?? '') ?>" />
           <?php if (!empty($row['image'])): ?>
@@ -216,6 +218,9 @@ ob_start();
               <input class="form-control" id="gallery_files" type="file" name="gallery_files[]" accept="image/jpeg,image/png,image/webp,image/gif" multiple data-preview-list="#catalog-gallery-new" />
               <div id="catalog-gallery-new" class="media-preview" style="margin-top:0.75rem"></div>
             </div>
+            <button class="btn btn--secondary btn--sm media-library-browse" type="button" data-open-media-picker data-media-mode="multiple" data-media-max="12" data-media-event="yn:catalog-gallery">
+              <?= yn_icon('image') ?> Choose from library
+            </button>
             <label for="gallery_paths">Add gallery paths (one per line)</label>
             <textarea class="form-control" id="gallery_paths" name="gallery_paths" rows="3"></textarea>
           </div>
@@ -243,4 +248,5 @@ ob_start();
 $adminContent = ob_get_clean();
 $pageTitle = ($id ? 'Edit ' : 'Add ') . $cfg['label'];
 $activeNav = $cfg['nav'];
+$adminScripts = ['admin/assets/admin-catalog-media.js'];
 require __DIR__ . '/_layout.php';

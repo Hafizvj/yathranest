@@ -41,6 +41,14 @@ function settings_save(array $pairs): void
     settings_all(true);
 }
 
+/**
+ * Site-wide catalog visibility. Defaults ON when unset.
+ */
+function feature_enabled(string $key): bool
+{
+    return setting('feature_' . $key, '1') === '1';
+}
+
 function page_content(string $key): ?array
 {
     $stmt = db()->prepare('SELECT * FROM page_content WHERE page_key = ? LIMIT 1');

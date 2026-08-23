@@ -9,10 +9,14 @@ $enquiryType = 'general';
 $enquiryInterest = 'Weekend getaway';
 $enquirySource = 'pages/weekend-getaways.php';
 $navActive = 'getaways';
+$getawaysOn = feature_enabled('getaways');
+$bodyAttrs = $getawaysOn ? '' : 'data-auto-enquiry="1"';
 
 $items = [];
 try {
-    $items = catalog_list('getaways');
+    if ($getawaysOn) {
+        $items = catalog_list('getaways');
+    }
 } catch (Throwable $e) {
 }
 
@@ -30,7 +34,11 @@ require dirname(__DIR__) . '/includes/layout-header.php';
         <h1>Weekend Getaways</h1>
         <p class="page-head__lead">Two to four day escapes and stranger trips — planned for comfort, connection and zero logistics on your side.</p>
         <div class="page-head__chips">
-          <?= yn_chip('calendar', count($items) . ' upcoming trip' . (count($items) === 1 ? '' : 's')) ?>
+          <?php if ($getawaysOn): ?>
+            <?= yn_chip('calendar', count($items) . ' upcoming trip' . (count($items) === 1 ? '' : 's')) ?>
+          <?php else: ?>
+            <?= yn_chip('chat', 'Enquire for dates') ?>
+          <?php endif; ?>
           <?= yn_chip('users', 'Solo & group friendly') ?>
           <?= yn_chip('route', 'Transport included') ?>
         </div>
@@ -50,7 +58,16 @@ require dirname(__DIR__) . '/includes/layout-header.php';
         </div>
       </div>
 
-      <?php if (!$items): ?>
+      <?php if (!$getawaysOn): ?>
+        <div class="empty-state">
+          <div class="empty-state__icon"><?= yn_icon('chat') ?></div>
+          <h2>Enquire for a getaway</h2>
+          <p>Upcoming trips are currently shared on request. Tell us the kind of weekend you're after and we'll send options.</p>
+          <div class="btn-group" style="justify-content:center">
+            <a class="btn btn--primary" href="#enquiry" data-open-modal="enquiry-modal">I'm Interested</a>
+          </div>
+        </div>
+      <?php elseif (!$items): ?>
         <div class="empty-state">
           <div class="empty-state__icon"><?= yn_icon('calendar') ?></div>
           <h2>New trips are being planned</h2>

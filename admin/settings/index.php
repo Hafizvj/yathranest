@@ -41,7 +41,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $errors[] = admin_upload_last_error();
             }
         } elseif (isset($_POST['remove_' . $meta['key']]) && $_POST['remove_' . $meta['key']] === '1') {
-            admin_delete_upload($current);
             $payload[$meta['key']] = '';
         }
     }
@@ -117,6 +116,9 @@ ob_start();
           <div class="media-live-preview" hidden>
             <div class="media-preview"><div class="media-preview__item media-preview__item--hero"><img id="logo-wordmark-preview" alt="" hidden /></div></div>
           </div>
+          <button class="btn btn--secondary btn--sm media-library-browse" type="button" data-open-media-picker data-media-mode="single" data-media-target="#logo_wordmark" data-media-preview="#logo-wordmark-preview">
+            <?= yn_icon('image') ?> Choose from library
+          </button>
           <label for="logo_wordmark">Or path</label>
           <input class="form-control" id="logo_wordmark" name="logo_wordmark" value="<?= e($logoWordmark) ?>" />
           <?php if ($logoWordmark !== '' && $logoWordmark !== 'assets/logo/logo-wordmark.png'): ?>
@@ -129,8 +131,14 @@ ob_start();
           <?= admin_hero_preview($logoMark, '') ?>
           <div class="media-drop">
             <label for="logo_mark_file">Upload mark</label>
-            <input class="form-control" id="logo_mark_file" type="file" name="logo_mark_file" accept="image/jpeg,image/png,image/webp,image/gif" />
+            <input class="form-control" id="logo_mark_file" type="file" name="logo_mark_file" accept="image/jpeg,image/png,image/webp,image/gif" data-preview-target="#logo-mark-preview" />
           </div>
+          <div class="media-live-preview" hidden>
+            <div class="media-preview"><div class="media-preview__item media-preview__item--hero"><img id="logo-mark-preview" alt="" hidden /></div></div>
+          </div>
+          <button class="btn btn--secondary btn--sm media-library-browse" type="button" data-open-media-picker data-media-mode="single" data-media-target="#logo_mark" data-media-preview="#logo-mark-preview">
+            <?= yn_icon('image') ?> Choose from library
+          </button>
           <label for="logo_mark">Or path</label>
           <input class="form-control" id="logo_mark" name="logo_mark" value="<?= e($logoMark) ?>" />
           <?php if ($logoMark !== '' && $logoMark !== 'assets/logo/logo-mark.png'): ?>
@@ -143,8 +151,14 @@ ob_start();
           <?= admin_hero_preview($favicon, '') ?>
           <div class="media-drop">
             <label for="favicon_file">Upload favicon</label>
-            <input class="form-control" id="favicon_file" type="file" name="favicon_file" accept="image/jpeg,image/png,image/webp,image/gif" />
+            <input class="form-control" id="favicon_file" type="file" name="favicon_file" accept="image/jpeg,image/png,image/webp,image/gif" data-preview-target="#favicon-preview" />
           </div>
+          <div class="media-live-preview" hidden>
+            <div class="media-preview"><div class="media-preview__item media-preview__item--hero"><img id="favicon-preview" alt="" hidden /></div></div>
+          </div>
+          <button class="btn btn--secondary btn--sm media-library-browse" type="button" data-open-media-picker data-media-mode="single" data-media-target="#favicon" data-media-preview="#favicon-preview">
+            <?= yn_icon('image') ?> Choose from library
+          </button>
           <label for="favicon">Or path</label>
           <input class="form-control" id="favicon" name="favicon" value="<?= e($favicon) ?>" />
           <?php if ($favicon !== '' && $favicon !== 'assets/logo/favicon-32.png'): ?>
@@ -157,8 +171,14 @@ ob_start();
           <?= admin_hero_preview($appleTouch, '') ?>
           <div class="media-drop">
             <label for="apple_touch_icon_file">Upload apple touch icon</label>
-            <input class="form-control" id="apple_touch_icon_file" type="file" name="apple_touch_icon_file" accept="image/jpeg,image/png,image/webp,image/gif" />
+            <input class="form-control" id="apple_touch_icon_file" type="file" name="apple_touch_icon_file" accept="image/jpeg,image/png,image/webp,image/gif" data-preview-target="#apple-touch-preview" />
           </div>
+          <div class="media-live-preview" hidden>
+            <div class="media-preview"><div class="media-preview__item media-preview__item--hero"><img id="apple-touch-preview" alt="" hidden /></div></div>
+          </div>
+          <button class="btn btn--secondary btn--sm media-library-browse" type="button" data-open-media-picker data-media-mode="single" data-media-target="#apple_touch_icon" data-media-preview="#apple-touch-preview">
+            <?= yn_icon('image') ?> Choose from library
+          </button>
           <label for="apple_touch_icon">Or path</label>
           <input class="form-control" id="apple_touch_icon" name="apple_touch_icon" value="<?= e($appleTouch) ?>" />
           <?php if ($appleTouch !== '' && $appleTouch !== 'assets/logo/apple-touch-icon.png'): ?>

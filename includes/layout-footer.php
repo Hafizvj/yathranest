@@ -132,7 +132,7 @@ $handlerPath = ($assetDepth === '' ? '' : '../') . 'handlers/enquiry.php';
   </div>
   <script src="<?= e($assetDepth) ?>js/navigation.js?v=14" defer></script>
   <script src="<?= e($assetDepth) ?>js/filters.js?v=11" defer></script>
-  <script src="<?= e($assetDepth) ?>js/forms.js?v=11" defer></script>
+  <script src="<?= e($assetDepth) ?>js/forms.js?v=12" defer></script>
   <script src="<?= e($assetDepth) ?>js/gallery.js?v=11" defer></script>
   <script src="<?= e($assetDepth) ?>js/main.js?v=11" defer></script>
   <script src="<?= e($assetDepth) ?>js/motion.js?v=14" defer></script>

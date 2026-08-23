@@ -9,10 +9,14 @@ $enquiryType = 'investment';
 $enquiryInterest = 'Investment plans';
 $enquirySource = 'pages/investment-plans.php';
 $navActive = 'investment';
+$investmentsOn = feature_enabled('investments');
+$bodyAttrs = $investmentsOn ? '' : 'data-auto-enquiry="1"';
 
 $plans = [];
 try {
-    $plans = catalog_list('investment_plans');
+    if ($investmentsOn) {
+        $plans = catalog_list('investment_plans');
+    }
 } catch (Throwable $e) {
 }
 
@@ -47,7 +51,16 @@ require dirname(__DIR__) . '/includes/layout-header.php';
             </div>
           </div>
 
-          <?php if (!$plans): ?>
+          <?php if (!$investmentsOn): ?>
+            <div class="empty-state">
+              <div class="empty-state__icon"><?= yn_icon('chat') ?></div>
+              <h2>Programme details on request</h2>
+              <p>Tell us a little about your interest and our team will share the current options.</p>
+              <div class="btn-group" style="justify-content:center">
+                <a class="btn btn--primary" href="#enquiry" data-open-modal="enquiry-modal">Request Information</a>
+              </div>
+            </div>
+          <?php elseif (!$plans): ?>
             <div class="empty-state">
               <div class="empty-state__icon"><?= yn_icon('wallet') ?></div>
               <h2>Programme details on request</h2>

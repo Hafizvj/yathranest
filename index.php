@@ -13,18 +13,22 @@ $whatsapp = '919876543210';
 $home = null;
 $sections = [];
 $featured = [];
+$packagesOn = true;
 try {
     $phone = setting('phone', $phone);
     $email = setting('email', $email);
     $whatsapp = preg_replace('/\D/', '', setting('whatsapp', $whatsapp));
+    $packagesOn = feature_enabled('packages');
     $home = page_content('home');
     $sections = $home['sections'] ?? [];
-    foreach (packages_for_page('') as $pkg) {
-        if (!empty($pkg['is_featured'])) {
-            $featured[] = $pkg;
+    if ($packagesOn) {
+        foreach (packages_for_page('') as $pkg) {
+            if (!empty($pkg['is_featured'])) {
+                $featured[] = $pkg;
+            }
         }
+        $featured = array_slice($featured, 0, 3);
     }
-    $featured = array_slice($featured, 0, 3);
 } catch (Throwable $e) {
     // Site can still render without DB for static assets
 }
@@ -197,6 +201,7 @@ require __DIR__ . '/includes/layout-header.php';
       </div>
     </section>
 
+    <?php if ($packagesOn): ?>
     <!-- Featured Packages -->
     <section class="section section--alt" aria-labelledby="featured-heading">
       <div class="container">
@@ -303,6 +308,7 @@ require __DIR__ . '/includes/layout-header.php';
         </div>
       </div>
     </section>
+    <?php endif; ?>
 
     <!-- Popular Destinations -->
     <section class="section" aria-labelledby="destinations-heading">

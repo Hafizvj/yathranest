@@ -19,6 +19,10 @@ $bodyAttrs = 'data-package-details="true" data-asset-prefix="../assets/images/"'
 $enquiryType = 'general';
 $enquiryInterest = $pkg['title'] ?? 'Package enquiry';
 $enquirySource = 'pages/package-details.php?package=' . rawurlencode($slug);
+$packagesOn = feature_enabled('packages');
+if (!$packagesOn) {
+    $bodyAttrs .= ' data-auto-enquiry="1"';
+}
 
 $related = $pkg ? packages_related($pkg, 3) : [];
 
@@ -71,6 +75,16 @@ require dirname(__DIR__) . '/includes/layout-header.php';
           <div class="btn-group" style="justify-content:center">
             <a class="btn btn--primary" href="kerala-packages.php">Kerala Packages</a>
             <a class="btn btn--secondary" href="south-indian-packages.php">South Indian Packages</a>
+          </div>
+        </div>
+      <?php elseif (!$packagesOn): ?>
+        <div class="empty-state">
+          <div class="empty-state__icon"><?= yn_icon('chat') ?></div>
+          <h2><?= e($pkg['title']) ?></h2>
+          <p>Full itinerary details are shared on enquiry. Tell us your dates and we'll send the plan and pricing personally.</p>
+          <div class="btn-group" style="justify-content:center">
+            <a class="btn btn--primary" href="#enquiry" data-open-modal="enquiry-modal" data-package-title="<?= e($pkg['title']) ?>">Enquire Now</a>
+            <a class="btn btn--secondary" href="<?= e($listHref) ?>"><?= e($listLabel) ?></a>
           </div>
         </div>
       <?php else: ?>

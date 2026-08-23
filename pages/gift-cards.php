@@ -9,10 +9,14 @@ $enquiryType = 'gift';
 $enquiryInterest = 'Gift card';
 $enquirySource = 'pages/gift-cards.php';
 $navActive = 'gift';
+$giftsOn = feature_enabled('gift_cards');
+$bodyAttrs = $giftsOn ? '' : 'data-auto-enquiry="1"';
 
 $cards = [];
 try {
-    $cards = catalog_list('gift_cards');
+    if ($giftsOn) {
+        $cards = catalog_list('gift_cards');
+    }
 } catch (Throwable $e) {
 }
 
@@ -48,7 +52,16 @@ require dirname(__DIR__) . '/includes/layout-header.php';
         </div>
       </div>
 
-      <?php if (!$cards): ?>
+      <?php if (!$giftsOn): ?>
+        <div class="empty-state">
+          <div class="empty-state__icon"><?= yn_icon('chat') ?></div>
+          <h2>Gift cards on request</h2>
+          <p>Tell us the occasion and who it's for — we'll put together the right gift.</p>
+          <div class="btn-group" style="justify-content:center">
+            <a class="btn btn--primary" href="#enquiry" data-open-modal="enquiry-modal">Request Information</a>
+          </div>
+        </div>
+      <?php elseif (!$cards): ?>
         <div class="empty-state">
           <div class="empty-state__icon"><?= yn_icon('gift') ?></div>
           <h2>Gift cards on request</h2>

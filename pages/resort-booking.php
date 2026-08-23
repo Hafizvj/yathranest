@@ -9,10 +9,14 @@ $enquiryType = 'resort';
 $enquiryInterest = 'Resort stay';
 $enquirySource = 'pages/resort-booking.php';
 $navActive = 'resorts';
+$resortsOn = feature_enabled('resorts');
+$bodyAttrs = $resortsOn ? '' : 'data-auto-enquiry="1"';
 
 $resorts = [];
 try {
-    $resorts = catalog_list('resorts');
+    if ($resortsOn) {
+        $resorts = catalog_list('resorts');
+    }
 } catch (Throwable $e) {
 }
 
@@ -43,7 +47,11 @@ require dirname(__DIR__) . '/includes/layout-header.php';
         <h1>Resort Stays</h1>
         <p class="page-head__lead">Hill, backwater and coastal properties we know personally — enquire for availability and personalised pricing.</p>
         <div class="page-head__chips">
-          <?= yn_chip('bed', count($resorts) . ' propert' . (count($resorts) === 1 ? 'y' : 'ies')) ?>
+          <?php if ($resortsOn): ?>
+            <?= yn_chip('bed', count($resorts) . ' propert' . (count($resorts) === 1 ? 'y' : 'ies')) ?>
+          <?php else: ?>
+            <?= yn_chip('chat', 'Enquire for stays') ?>
+          <?php endif; ?>
           <?= yn_chip('shield', 'Verified partners') ?>
           <?= yn_chip('tag', 'Rates on enquiry') ?>
         </div>
@@ -61,7 +69,16 @@ require dirname(__DIR__) . '/includes/layout-header.php';
         </div>
       </div>
 
-      <?php if (!$resorts): ?>
+      <?php if (!$resortsOn): ?>
+        <div class="empty-state">
+          <div class="empty-state__icon"><?= yn_icon('chat') ?></div>
+          <h2>Request a stay</h2>
+          <p>Resort listings are currently by enquiry. Tell us the destination and dates you have in mind and we'll share options that fit.</p>
+          <div class="btn-group" style="justify-content:center">
+            <a class="btn btn--primary" href="#enquiry" data-open-modal="enquiry-modal">Request a stay</a>
+          </div>
+        </div>
+      <?php elseif (!$resorts): ?>
         <div class="empty-state">
           <div class="empty-state__icon"><?= yn_icon('bed') ?></div>
           <h2>Stays are being updated</h2>

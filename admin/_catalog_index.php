@@ -2,6 +2,7 @@
 
 require_once dirname(__DIR__) . '/includes/bootstrap.php';
 require_once __DIR__ . '/_catalog.php';
+require_once __DIR__ . '/_feature_toggle.php';
 require_admin();
 
 $cfg = catalog_config($catalogKey ?? '');
@@ -11,6 +12,11 @@ if (!$cfg) {
     exit;
 }
 
+$featureKey = (string) ($cfg['feature_key'] ?? '');
+if ($featureKey !== '') {
+    feature_toggle_handle_post($featureKey, 'admin/' . $cfg['nav'] . '/index.php');
+}
+
 $table = $cfg['table'];
 $rows = db()->query("SELECT * FROM {$table} ORDER BY sort_order, title")->fetchAll();
 
@@ -18,7 +24,12 @@ ob_start();
 ?>
 <div class="admin-toolbar">
   <p class="admin-toolbar__meta"><?= count($rows) ?> items</p>
-  <a class="btn btn--primary" href="<?= e(url('admin/' . $cfg['nav'] . '/edit.php')) ?>">Add</a>
+  <div class="admin-toolbar__actions">
+    <?php if ($featureKey !== ''): ?>
+      <?= feature_toggle_html($featureKey) ?>
+    <?php endif; ?>
+    <a class="btn btn--primary" href="<?= e(url('admin/' . $cfg['nav'] . '/edit.php')) ?>">Add</a>
+  </div>
 </div>
 <div class="admin-panel">
   <?php if (!$rows): ?>

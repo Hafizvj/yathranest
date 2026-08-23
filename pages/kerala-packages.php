@@ -20,6 +20,10 @@ $enquiryType = 'general';
 $enquiryInterest = 'Kerala Packages';
 $enquirySource = 'pages/kerala-packages.php' . ($location !== '' ? '?location=' . rawurlencode($location) : '');
 $navActive = 'kerala';
+$packagesOn = feature_enabled('packages');
+if (!$packagesOn && $location !== '') {
+    $bodyAttrs .= ' data-auto-enquiry="1"';
+}
 
 $places = [];
 $destinations = [];
@@ -31,7 +35,6 @@ try {
     $places = places_all();
     $destinations = destinations_for_page('kerala');
     if ($location !== '') {
-        $packages = packages_for_destination('kerala', $location);
         $activePlace = place_by_slug($location);
         if ($activePlace) {
             $pageHeading = $activePlace['label'] . ' Packages';
@@ -42,7 +45,13 @@ try {
             if (!empty($imgs[0])) {
                 $heroImage = $imgs[0];
             }
-        } elseif (!$packages) {
+        }
+        if ($packagesOn) {
+            $packages = packages_for_destination('kerala', $location);
+            if (!$activePlace && !$packages) {
+                $location = '';
+            }
+        } elseif (!$activePlace) {
             $location = '';
         }
     }
@@ -97,8 +106,10 @@ require dirname(__DIR__) . '/includes/layout-header.php';
         <div class="page-head__chips">
           <?php if ($location === ''): ?>
             <?= yn_chip('pin', count($destinations) . ' destinations') ?>
-          <?php else: ?>
+          <?php elseif ($packagesOn): ?>
             <?= yn_chip('compass', count($packages) . ' itinerar' . (count($packages) === 1 ? 'y' : 'ies')) ?>
+          <?php else: ?>
+            <?= yn_chip('chat', 'Enquire for options') ?>
           <?php endif; ?>
           <?= yn_chip('leaf', 'Backwaters & hills') ?>
           <?= yn_chip('tag', 'Pricing on enquiry') ?>
@@ -126,7 +137,9 @@ require dirname(__DIR__) . '/includes/layout-header.php';
           <div>
             <p class="section-head__eyebrow">Step 1</p>
             <h2>Choose a location</h2>
-            <p>Pick a destination to see the Kerala packages that include that place.</p>
+            <p><?= $packagesOn
+              ? 'Pick a destination to see the Kerala packages that include that place.'
+              : 'Pick a destination and tell us your dates — we\'ll share suitable Kerala options personally.' ?></p>
           </div>
         </div>
         <?php if (!$destinations): ?>
@@ -142,10 +155,16 @@ require dirname(__DIR__) . '/includes/layout-header.php';
           <div class="destinations-grid">
             <?php foreach ($destinations as $dest):
               $img = media_src((string) $dest['image'], '../', 'beach.jpg');
-              $href = 'kerala-packages.php?location=' . rawurlencode($dest['slug']);
-              $countLabel = $dest['count'] . ' package' . ($dest['count'] === 1 ? '' : 's');
+              $countLabel = $packagesOn
+                ? ($dest['count'] . ' package' . ($dest['count'] === 1 ? '' : 's'))
+                : 'Enquire now';
+              if ($packagesOn) {
+                  $href = 'kerala-packages.php?location=' . rawurlencode($dest['slug']);
+              } else {
+                  $href = '#enquiry';
+              }
               ?>
-              <a class="destination-card" href="<?= e($href) ?>">
+              <a class="destination-card" href="<?= e($href) ?>"<?= $packagesOn ? '' : ' data-open-modal="enquiry-modal" data-package-title="' . e($dest['label']) . '"' ?>>
                 <img src="<?= e($img) ?>" alt="<?= e($dest['label']) ?>" loading="lazy" />
                 <div class="destination-card__overlay">
                   <h3><?= e($dest['label']) ?></h3>
@@ -155,6 +174,24 @@ require dirname(__DIR__) . '/includes/layout-header.php';
             <?php endforeach; ?>
           </div>
         <?php endif; ?>
+
+      <?php elseif (!$packagesOn): ?>
+        <div class="section-head">
+          <div>
+            <p class="section-head__eyebrow">Enquire</p>
+            <h2><?= e($activePlace['label'] ?? 'Packages') ?></h2>
+            <p>Share your dates and preferences — we'll send options for this location personally.</p>
+          </div>
+          <a class="btn btn--secondary btn--sm" href="kerala-packages.php">All Kerala locations</a>
+        </div>
+        <div class="empty-state">
+          <div class="empty-state__icon"><?= yn_icon('chat') ?></div>
+          <h2>Request a custom plan</h2>
+          <p>Package listings are currently by enquiry. Tell us when you'd like to travel and we'll share the best fit.</p>
+          <div class="btn-group" style="justify-content:center">
+            <a class="btn btn--primary" href="#enquiry" data-open-modal="enquiry-modal" data-package-title="<?= e($enquiryInterest) ?>">Enquire Now</a>
+          </div>
+        </div>
 
       <?php else: ?>
         <div data-filter-root>

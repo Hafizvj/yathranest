@@ -26,6 +26,8 @@ $enquiryInterest = $resort['title'] ?? 'Resort stay';
 $enquirySource = 'pages/resort-details.php?resort=' . rawurlencode($slug);
 $navActive = 'resorts';
 $whatsapp = preg_replace('/\D/', '', setting('whatsapp', '919876543210'));
+$resortsOn = feature_enabled('resorts');
+$bodyAttrs = $resortsOn ? '' : 'data-auto-enquiry="1"';
 
 $resortImg = static function (string $file): string {
     return media_src($file, '../', 'resort.jpg');
@@ -55,6 +57,16 @@ require dirname(__DIR__) . '/includes/layout-header.php';
           <div class="btn-group" style="justify-content:center">
             <a class="btn btn--primary" href="resort-booking.php">Browse resorts</a>
             <a class="btn btn--secondary" href="#enquiry" data-open-modal="enquiry-modal">Request a stay</a>
+          </div>
+        </div>
+      <?php elseif (!$resortsOn): ?>
+        <div class="empty-state">
+          <div class="empty-state__icon"><?= yn_icon('chat') ?></div>
+          <h2><?= e($resort['title']) ?></h2>
+          <p>Stay details are shared on enquiry. Tell us your dates and we'll check availability and rates.</p>
+          <div class="btn-group" style="justify-content:center">
+            <a class="btn btn--primary" href="#enquiry" data-open-modal="enquiry-modal" data-package-title="<?= e($resort['title']) ?>">Request a stay</a>
+            <a class="btn btn--secondary" href="resort-booking.php">Resort Stays</a>
           </div>
         </div>
       <?php else: ?>
