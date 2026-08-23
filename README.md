@@ -2,7 +2,7 @@
 
 Travel site for **YathraNest** with a plain PHP admin panel and MySQL database (HostMaria-ready — no Laravel).
 
-## Stack
+## Stacks
 
 - Public site: PHP templates + existing CSS/JS
 - Admin: `/admin` (session login, CSRF)
