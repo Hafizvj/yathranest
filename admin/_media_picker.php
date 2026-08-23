@@ -22,6 +22,9 @@ $mediaPickerApi = url('admin/media/api.php');
     <div class="media-picker__body">
       <p class="media-picker__empty" data-media-picker-empty hidden>No images found.</p>
       <div class="media-picker__grid" data-media-picker-grid></div>
+      <div class="media-picker__more-wrap">
+        <button class="btn btn--secondary btn--sm" type="button" data-media-picker-more hidden>Load more images</button>
+      </div>
     </div>
     <footer class="media-picker__foot">
       <span data-media-picker-status></span>

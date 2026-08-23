@@ -245,6 +245,8 @@
     return best;
   }
 
+  var GALLERY_MAX = 10;
+
   function pickGallery(dests, type, hero, id) {
     var affinity = {};
     dests.forEach(function (d) {
@@ -271,7 +273,7 @@
         return ((salt + a.charCodeAt(0)) % 50) - ((salt + b.charCodeAt(0)) % 50);
       })
       .forEach(function (img) {
-        if (gallery.length < 4) gallery.push(img);
+        if (gallery.length < GALLERY_MAX) gallery.push(img);
       });
     return gallery;
   }
@@ -661,7 +663,7 @@
     var gallery = [image].concat(
       pickGallery(dests, raw.type, "", raw.id).filter(function (img) {
         return img && img.indexOf("packages/") !== 0;
-      }).slice(0, 3)
+      }).slice(0, GALLERY_MAX - 1)
     );
 
     var staySummary = overnight
@@ -689,7 +691,7 @@
       state: stateFor(raw, dests),
       duration: durationBucket(raw.days),
       image: image,
-      gallery: gallery.slice(0, 4),
+      gallery: gallery.slice(0, GALLERY_MAX),
       overview: overview,
       cardText: cardText,
       highlights: highlights,

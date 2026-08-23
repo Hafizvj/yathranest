@@ -100,6 +100,21 @@ function media_src(string $path, string $assetDepth = '', string $fallback = 'be
     return $assetDepth . $resolved;
 }
 
+/** Whether a stored media path resolves to a readable local file or remote URL. */
+function media_exists(string $path): bool
+{
+    $path = trim($path);
+    if ($path === '') {
+        return false;
+    }
+    $resolved = media_path($path, '', 'assets/images/');
+    if (strpos($resolved, 'http://') === 0 || strpos($resolved, 'https://') === 0) {
+        return true;
+    }
+    $full = dirname(__DIR__) . '/' . str_replace('/', DIRECTORY_SEPARATOR, ltrim($resolved, '/'));
+    return is_file($full);
+}
+
 function redirect(string $path): void
 {
     if (preg_match('#^https?://#i', $path)) {

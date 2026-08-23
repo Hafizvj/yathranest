@@ -254,10 +254,12 @@
             escapeHtml(src) +
             '" alt="' +
             escapeHtml(pkg.title) +
-            '" /></button>'
+            '" loading="lazy" /></button>'
           );
         })
         .join("");
+      delete gallery.dataset.galleryBound;
+      document.dispatchEvent(new CustomEvent("yn:gallery-updated"));
     }
 
     var related = document.querySelector("[data-bind='related']");

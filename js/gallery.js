@@ -59,8 +59,15 @@
   }
 
   function open(galleryImages, startIndex) {
-    images = galleryImages;
-    show(startIndex || 0);
+    images = galleryImages.filter(function (item) {
+      return item && item.src;
+    });
+    if (!images.length) return;
+    var start = startIndex || 0;
+    if (start >= images.length) {
+      start = 0;
+    }
+    show(start);
     lightbox.classList.add("is-open");
     document.body.classList.add("modal-open");
     closeBtn.focus();
@@ -93,20 +100,46 @@
     if (e.key === "ArrowRight") show(index + 1);
   });
 
-  document.querySelectorAll("[data-gallery]").forEach(function (gallery) {
-    const buttons = Array.from(gallery.querySelectorAll("[data-gallery-item]"));
-    const galleryImages = buttons.map(function (btn) {
-      const img = btn.querySelector("img");
-      return {
-        src: btn.getAttribute("data-full") || (img && img.src) || "",
-        alt: (img && img.alt) || "",
-      };
-    });
+  function bindGalleries(scope) {
+    (scope || document).querySelectorAll("[data-gallery]").forEach(function (gallery) {
+      if (gallery.dataset.galleryBound === "1") {
+        return;
+      }
+      gallery.dataset.galleryBound = "1";
 
-    buttons.forEach(function (btn, i) {
-      btn.addEventListener("click", function () {
-        open(galleryImages, i);
+      const buttons = Array.from(gallery.querySelectorAll("[data-gallery-item]"));
+      const galleryImages = buttons
+        .map(function (btn) {
+          const img = btn.querySelector("img");
+          return {
+            src: btn.getAttribute("data-full") || (img && img.getAttribute("src")) || "",
+            alt: (img && img.alt) || "",
+          };
+        })
+        .filter(function (item) {
+          return item.src;
+        });
+
+      buttons.forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          const src = btn.getAttribute("data-full") || "";
+          const img = btn.querySelector("img");
+          const resolved = src || (img && img.getAttribute("src")) || "";
+          const startIndex = galleryImages.findIndex(function (item) {
+            return item.src === resolved;
+          });
+          open(galleryImages, startIndex >= 0 ? startIndex : 0);
+        });
       });
     });
+  }
+
+  bindGalleries();
+  document.addEventListener("yn:gallery-updated", function () {
+    bindGalleries();
   });
+
+  window.YNGallery = {
+    bind: bindGalleries,
+  };
 })();
