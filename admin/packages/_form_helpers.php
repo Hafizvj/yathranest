@@ -215,6 +215,58 @@ function package_selected_destinations(?array $row = null): array
     return $row ? json_decode_array($row['destinations_json'] ?? null) : [];
 }
 
+/** Unique highlight strings from all packages, for reuse suggestions. */
+function package_highlight_suggestions(): array
+{
+    $out = [];
+    try {
+        $rows = db()->query('SELECT highlights_json FROM packages WHERE highlights_json IS NOT NULL')->fetchAll();
+    } catch (Throwable $e) {
+        return [];
+    }
+    foreach ($rows as $row) {
+        foreach (json_decode_array($row['highlights_json'] ?? null) as $item) {
+            $item = trim((string) $item);
+            if ($item === '') {
+                continue;
+            }
+            $key = mb_strtolower($item);
+            if (!isset($out[$key])) {
+                $out[$key] = $item;
+            }
+        }
+    }
+    $list = array_values($out);
+    natcasesort($list);
+    return array_values($list);
+}
+
+/** Unique pickup labels from all packages, for reuse suggestions. */
+function package_pickup_suggestions(): array
+{
+    $out = [];
+    try {
+        $rows = db()->query(
+            "SELECT DISTINCT pickup FROM packages WHERE pickup IS NOT NULL AND pickup <> '' ORDER BY pickup ASC"
+        )->fetchAll();
+    } catch (Throwable $e) {
+        return [];
+    }
+    foreach ($rows as $row) {
+        $pickup = trim((string) ($row['pickup'] ?? ''));
+        if ($pickup === '') {
+            continue;
+        }
+        $key = mb_strtolower($pickup);
+        if (!isset($out[$key])) {
+            $out[$key] = $pickup;
+        }
+    }
+    $list = array_values($out);
+    natcasesort($list);
+    return array_values($list);
+}
+
 /** Expands a legacy "2 wayanad 1 ooty" split into one slug per night. */
 function parse_stay_split_to_nights(string $split, int $nights): array
 {

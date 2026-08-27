@@ -116,13 +116,36 @@
     var entry = root.querySelector('[data-chips-entry]');
     var addBtn = root.querySelector('[data-chips-add]');
     var fieldName = root.getAttribute('data-chips');
+    var suggestList = root.querySelector('[data-suggest-list]');
+    var suggestions = [];
+    var activeIndex = -1;
+    var suppressBlurCommit = false;
     if (!list || !entry || !fieldName) {
       return;
+    }
+    try {
+      suggestions = JSON.parse(root.getAttribute('data-suggest') || '[]');
+      if (!Array.isArray(suggestions)) {
+        suggestions = [];
+      }
+    } catch (err) {
+      suggestions = [];
+    }
+
+    function existingValues() {
+      return Array.prototype.map
+        .call(list.querySelectorAll('input[type="hidden"]'), function (input) {
+          return String(input.value || '').trim().toLowerCase();
+        })
+        .filter(Boolean);
     }
 
     function addChip(value) {
       value = value.trim();
       if (value === '') {
+        return;
+      }
+      if (existingValues().indexOf(value.toLowerCase()) !== -1) {
         return;
       }
       var chip = document.createElement('span');
@@ -148,6 +171,68 @@
       list.insertBefore(chip, entry);
     }
 
+    function hideSuggest() {
+      if (!suggestList) {
+        return;
+      }
+      suggestList.hidden = true;
+      suggestList.innerHTML = '';
+      activeIndex = -1;
+    }
+
+    function filteredSuggestions(query) {
+      var q = String(query || '').trim().toLowerCase();
+      var taken = existingValues();
+      return suggestions.filter(function (item) {
+        var text = String(item || '').trim();
+        if (!text || taken.indexOf(text.toLowerCase()) !== -1) {
+          return false;
+        }
+        return !q || text.toLowerCase().indexOf(q) !== -1;
+      }).slice(0, 8);
+    }
+
+    function renderSuggest(query, forceOpen) {
+      if (!suggestList || !suggestions.length) {
+        return;
+      }
+      var matches = filteredSuggestions(query);
+      if (!matches.length && !forceOpen) {
+        hideSuggest();
+        return;
+      }
+      suggestList.innerHTML = '';
+      if (!matches.length) {
+        var empty = document.createElement('li');
+        empty.className = 'suggest__empty';
+        empty.textContent = 'No matches';
+        suggestList.appendChild(empty);
+      } else {
+        matches.forEach(function (item, index) {
+          var li = document.createElement('li');
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'suggest__option';
+          btn.textContent = item;
+          if (index === activeIndex) {
+            btn.classList.add('is-active');
+          }
+          btn.addEventListener('mousedown', function (event) {
+            event.preventDefault();
+            suppressBlurCommit = true;
+            entry.value = '';
+            addChip(item);
+            hideSuggest();
+            entry.focus();
+            suppressBlurCommit = false;
+          });
+          li.appendChild(btn);
+          suggestList.appendChild(li);
+        });
+      }
+      suggestList.hidden = false;
+    }
+
     list.querySelectorAll('[data-chip-remove]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         var chip = btn.closest('.chip');
@@ -162,28 +247,193 @@
       var value = entry.value;
       entry.value = '';
       addChip(value);
+      hideSuggest();
       if (keepFocus) {
         entry.focus();
       }
     }
 
+    entry.addEventListener('input', function () {
+      activeIndex = -1;
+      renderSuggest(entry.value, false);
+    });
+    entry.addEventListener('focus', function () {
+      renderSuggest(entry.value, true);
+    });
     entry.addEventListener('keydown', function (event) {
+      var options = suggestList ? suggestList.querySelectorAll('.suggest__option') : [];
+      if (event.key === 'ArrowDown' && options.length) {
+        event.preventDefault();
+        activeIndex = Math.min(options.length - 1, activeIndex + 1);
+        renderSuggest(entry.value, true);
+        return;
+      }
+      if (event.key === 'ArrowUp' && options.length) {
+        event.preventDefault();
+        activeIndex = Math.max(0, activeIndex - 1);
+        renderSuggest(entry.value, true);
+        return;
+      }
+      if (event.key === 'Escape') {
+        hideSuggest();
+        return;
+      }
       if (event.key === 'Enter' || event.key === ',') {
         event.preventDefault();
+        if (event.key === 'Enter' && activeIndex >= 0 && options[activeIndex]) {
+          options[activeIndex].dispatchEvent(new Event('mousedown'));
+          return;
+        }
         commit(true);
       }
     });
     entry.addEventListener('blur', function () {
-      commit(false);
+      window.setTimeout(function () {
+        if (suppressBlurCommit) {
+          return;
+        }
+        commit(false);
+      }, 120);
     });
     if (addBtn) {
       addBtn.addEventListener('click', function () {
         commit(true);
       });
     }
+    document.addEventListener('click', function (event) {
+      if (!root.contains(event.target)) {
+        hideSuggest();
+      }
+    });
   });
 
-  /* ---------- stays: one select per night ---------- */
+  /* ---------- reusable text suggestions (pickup) ---------- */
+
+  form.querySelectorAll('[data-suggest-input]').forEach(function (root) {
+    var field = root.querySelector('[data-suggest-field]');
+    var toggle = root.querySelector('[data-suggest-toggle]');
+    var suggestList = root.querySelector('[data-suggest-list]');
+    var suggestions = [];
+    var activeIndex = -1;
+    if (!field || !suggestList) {
+      return;
+    }
+    try {
+      suggestions = JSON.parse(root.getAttribute('data-suggest') || '[]');
+      if (!Array.isArray(suggestions)) {
+        suggestions = [];
+      }
+    } catch (err) {
+      suggestions = [];
+    }
+
+    function hideSuggest() {
+      suggestList.hidden = true;
+      suggestList.innerHTML = '';
+      activeIndex = -1;
+      if (toggle) {
+        toggle.setAttribute('aria-expanded', 'false');
+      }
+    }
+
+    function filtered(query, showAll) {
+      var q = String(query || '').trim().toLowerCase();
+      return suggestions.filter(function (item) {
+        var text = String(item || '').trim();
+        if (!text) {
+          return false;
+        }
+        return showAll || !q || text.toLowerCase().indexOf(q) !== -1;
+      }).slice(0, 12);
+    }
+
+    function render(query, showAll) {
+      if (!suggestions.length) {
+        hideSuggest();
+        return;
+      }
+      var matches = filtered(query, !!showAll);
+      suggestList.innerHTML = '';
+      if (!matches.length) {
+        var empty = document.createElement('li');
+        empty.className = 'suggest__empty';
+        empty.textContent = 'No matches';
+        suggestList.appendChild(empty);
+      } else {
+        matches.forEach(function (item, index) {
+          var li = document.createElement('li');
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'suggest__option';
+          btn.textContent = item;
+          if (index === activeIndex) {
+            btn.classList.add('is-active');
+          }
+          btn.addEventListener('mousedown', function (event) {
+            event.preventDefault();
+            field.value = item;
+            hideSuggest();
+            field.focus();
+          });
+          li.appendChild(btn);
+          suggestList.appendChild(li);
+        });
+      }
+      suggestList.hidden = false;
+      if (toggle) {
+        toggle.setAttribute('aria-expanded', 'true');
+      }
+    }
+
+    field.addEventListener('input', function () {
+      activeIndex = -1;
+      render(field.value, false);
+    });
+    field.addEventListener('focus', function () {
+      render(field.value, !String(field.value || '').trim());
+    });
+    field.addEventListener('keydown', function (event) {
+      var options = suggestList.querySelectorAll('.suggest__option');
+      if (event.key === 'ArrowDown' && options.length) {
+        event.preventDefault();
+        activeIndex = Math.min(options.length - 1, activeIndex + 1);
+        render(field.value, !String(field.value || '').trim());
+        return;
+      }
+      if (event.key === 'ArrowUp' && options.length) {
+        event.preventDefault();
+        activeIndex = Math.max(0, activeIndex - 1);
+        render(field.value, !String(field.value || '').trim());
+        return;
+      }
+      if (event.key === 'Enter' && activeIndex >= 0 && options[activeIndex]) {
+        event.preventDefault();
+        options[activeIndex].dispatchEvent(new Event('mousedown'));
+        return;
+      }
+      if (event.key === 'Escape') {
+        hideSuggest();
+      }
+    });
+    if (toggle) {
+      toggle.addEventListener('click', function () {
+        if (!suggestList.hidden) {
+          hideSuggest();
+          return;
+        }
+        activeIndex = -1;
+        render(field.value, true);
+        field.focus();
+      });
+    }
+    document.addEventListener('click', function (event) {
+      if (!root.contains(event.target)) {
+        hideSuggest();
+      }
+    });
+  });
+
+  /* ---------- stays: one select per night, filtered by destinations ---------- */
 
   (function () {
     var root = form.querySelector('[data-stays]');
@@ -205,9 +455,38 @@
       });
     }
 
+    function selectedDestinations() {
+      return Array.prototype.map
+        .call(form.querySelectorAll('input[name="destinations[]"]:checked'), function (el) {
+          return el.value;
+        })
+        .filter(Boolean);
+    }
+
+    function allowedPlaces() {
+      var dests = selectedDestinations();
+      if (!dests.length) {
+        return [];
+      }
+      var allowed = [];
+      dests.forEach(function (slug) {
+        places.forEach(function (place) {
+          if (place.slug === slug) {
+            allowed.push(place);
+          }
+        });
+      });
+      return allowed;
+    }
+
     function render(nights, selected) {
       if (nights < 1) {
         grid.innerHTML = '<p class="field__hint">No overnight stays for this duration.</p>';
+        return;
+      }
+      var options = allowedPlaces();
+      if (!options.length) {
+        grid.innerHTML = '<p class="field__hint">Select destinations first.</p>';
         return;
       }
       grid.innerHTML = '';
@@ -225,18 +504,31 @@
         select.id = 'stay-' + i;
         select.name = 'stays[]';
         select.appendChild(new Option('Select a place', ''));
-        places.forEach(function (place) {
+        options.forEach(function (place) {
           select.appendChild(new Option(place.label, place.slug));
         });
-        select.value = selected[i] || '';
+        var keep = selected[i] || '';
+        if (keep && options.some(function (place) { return place.slug === keep; })) {
+          select.value = keep;
+        } else {
+          select.value = '';
+        }
         item.appendChild(select);
 
         grid.appendChild(item);
       }
     }
 
-    nightsInput.addEventListener('input', function () {
+    function refresh() {
       render(Math.max(0, parseInt(nightsInput.value, 10) || 0), values());
+    }
+
+    nightsInput.addEventListener('input', refresh);
+    form.addEventListener('change', function (event) {
+      var target = event.target;
+      if (target && target.name === 'destinations[]') {
+        refresh();
+      }
     });
   })();
 

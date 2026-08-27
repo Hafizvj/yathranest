@@ -110,6 +110,8 @@ foreach ($selectedTypes as $type) {
 $selectedDestinations = package_selected_destinations($row);
 $highlights = json_decode_array($row['highlights_json'] ?? null);
 $galleryPaths = json_decode_array($row['gallery_json'] ?? null);
+$highlightSuggestions = package_highlight_suggestions();
+$pickupSuggestions = package_pickup_suggestions();
 
 $days = max(1, (int) ($row['days'] ?? 4));
 $nights = max(0, (int) ($row['nights'] ?? 3));
@@ -123,6 +125,12 @@ if (!$itinerary) {
 $placeOptions = [];
 foreach ($places as $place) {
     $placeOptions[] = ['slug' => $place['slug'], 'label' => $place['label']];
+}
+$stayPlaces = [];
+foreach ($selectedDestinations as $slug) {
+    if (isset($places[$slug])) {
+        $stayPlaces[] = $places[$slug];
+    }
 }
 
 ob_start();
@@ -156,17 +164,20 @@ ob_start();
         <textarea class="form-control" id="overview" name="overview" rows="5" maxlength="500" required placeholder="Describe this package in brief..."><?= e($row['overview'] ?? '') ?></textarea>
         <span class="field__counter" data-counter-for="overview"></span>
       </div>
-      <div class="field" data-chips="highlights">
+      <div class="field" data-chips="highlights" data-suggest="<?= e(json_encode($highlightSuggestions, JSON_UNESCAPED_UNICODE)) ?>">
         <label for="highlight-entry">Highlights</label>
-        <div class="chips-input" data-chips-list>
-          <?php foreach ($highlights as $highlight): ?>
-            <span class="chip">
-              <?= e((string) $highlight) ?>
-              <input type="hidden" name="highlights[]" value="<?= e((string) $highlight) ?>" />
-              <button class="chip__remove" type="button" data-chip-remove aria-label="Remove <?= e((string) $highlight) ?>">&times;</button>
-            </span>
-          <?php endforeach; ?>
-          <input class="chips-input__entry" id="highlight-entry" type="text" name="highlights_extra" data-chips-entry placeholder="Add a highlight and press Enter" />
+        <div class="chips-suggest">
+          <div class="chips-input" data-chips-list>
+            <?php foreach ($highlights as $highlight): ?>
+              <span class="chip">
+                <?= e((string) $highlight) ?>
+                <input type="hidden" name="highlights[]" value="<?= e((string) $highlight) ?>" />
+                <button class="chip__remove" type="button" data-chip-remove aria-label="Remove <?= e((string) $highlight) ?>">&times;</button>
+              </span>
+            <?php endforeach; ?>
+            <input class="chips-input__entry" id="highlight-entry" type="text" name="highlights_extra" data-chips-entry placeholder="Add a highlight and press Enter" autocomplete="off" />
+          </div>
+          <ul class="suggest__list" data-suggest-list hidden></ul>
         </div>
         <button class="chips-add" type="button" data-chips-add><?= yn_icon('plus') ?>Add highlight</button>
       </div>
@@ -221,9 +232,13 @@ ob_start();
           <p class="field__hint">Listing pages are set from these places.</p>
         <?php endif; ?>
       </div>
-      <div class="field">
+      <div class="field" data-suggest-input data-suggest="<?= e(json_encode($pickupSuggestions, JSON_UNESCAPED_UNICODE)) ?>">
         <label for="pickup">Pickup / Drop <span class="field__req">*</span></label>
-        <input class="form-control" id="pickup" name="pickup" required value="<?= e($row['pickup'] ?? '') ?>" placeholder="Calicut" />
+        <div class="suggest">
+          <input class="form-control" id="pickup" name="pickup" required value="<?= e($row['pickup'] ?? '') ?>" placeholder="Calicut" autocomplete="off" data-suggest-field />
+          <button class="suggest__toggle" type="button" data-suggest-toggle aria-label="Show pickup suggestions" aria-expanded="false"><?= yn_icon('chevron-down') ?></button>
+          <ul class="suggest__list" data-suggest-list hidden></ul>
+        </div>
         <p class="field__hint">Pickup and drop are the same place.</p>
       </div>
       <div class="field full">
@@ -246,13 +261,15 @@ ob_start();
         <div class="stay-grid" data-stay-grid>
           <?php if ($nights < 1): ?>
             <p class="field__hint">No overnight stays for this duration.</p>
+          <?php elseif (!$stayPlaces): ?>
+            <p class="field__hint">Select destinations first.</p>
           <?php else: ?>
             <?php for ($i = 0; $i < $nights; $i++): ?>
               <div class="stay-grid__item">
                 <label for="stay-<?= $i ?>">Night <?= $i + 1 ?></label>
                 <select class="form-control" id="stay-<?= $i ?>" name="stays[]">
                   <option value="">Select a place</option>
-                  <?php foreach ($places as $place): ?>
+                  <?php foreach ($stayPlaces as $place): ?>
                     <option value="<?= e($place['slug']) ?>" <?= (($stays[$i] ?? '') === $place['slug']) ? 'selected' : '' ?>><?= e($place['label']) ?></option>
                   <?php endforeach; ?>
                 </select>
