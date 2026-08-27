@@ -15,6 +15,8 @@
     3: form.querySelector('[data-ai-panel="3"]'),
   };
   var indicators = document.querySelectorAll('[data-ai-step-indicator]');
+  var wizard = document.querySelector('[data-ai-wizard]');
+  var progress = document.querySelector('[data-ai-progress]');
   var errorBox = form.querySelector('[data-ai-error]');
   var errorText = errorBox ? errorBox.querySelector('span') : null;
   var statusEl = form.querySelector('[data-ai-status]');
@@ -289,6 +291,14 @@
       el.classList.toggle('is-done', n < step);
     });
 
+    if (wizard) {
+      wizard.setAttribute('data-step', String(step));
+    }
+    if (progress) {
+      var fill = step <= 1 ? 0 : step === 2 ? 50 : 100;
+      progress.style.width = fill + '%';
+    }
+
     if (btnBack) {
       btnBack.hidden = step === 1;
     }
@@ -297,7 +307,7 @@
     }
     if (btnNext) {
       btnNext.hidden = step === 3;
-      btnNext.textContent = step === 1 ? 'Continue' : 'Continue';
+      btnNext.textContent = 'Continue';
     }
     if (btnSave) {
       btnSave.hidden = step !== 3;

@@ -105,27 +105,36 @@ $hasAiKey = trim((string) config('gemini_api_key', '')) !== '';
 
 ob_start();
 ?>
-<nav class="ai-steps" data-ai-steps aria-label="Create package steps">
-  <ol class="ai-steps__list">
-    <li class="ai-steps__item is-active" data-ai-step-indicator="1"><span class="ai-steps__num">1</span><span class="ai-steps__label">Trip facts</span></li>
-    <li class="ai-steps__item" data-ai-step-indicator="2"><span class="ai-steps__num">2</span><span class="ai-steps__label">AI content</span></li>
-    <li class="ai-steps__item" data-ai-step-indicator="3"><span class="ai-steps__num">3</span><span class="ai-steps__label">Media</span></li>
-  </ol>
-</nav>
-
-<p class="field__hint" style="margin:0 0 1rem">
-  Prefer the full manual form?
-  <a href="<?= e(url('admin/packages/edit.php')) ?>">Add package without AI</a>
-</p>
+<div class="ai-wizard" data-ai-wizard data-step="<?= (int) $startStep ?>">
+  <div class="ai-wizard__top">
+    <nav class="ai-steps" data-ai-steps aria-label="Create package steps">
+      <ol class="ai-steps__list">
+        <li class="ai-steps__item is-active" data-ai-step-indicator="1">
+          <span class="ai-steps__num">1</span>
+          <span class="ai-steps__label">Facts</span>
+        </li>
+        <li class="ai-steps__item" data-ai-step-indicator="2">
+          <span class="ai-steps__num">2</span>
+          <span class="ai-steps__label">Content</span>
+        </li>
+        <li class="ai-steps__item" data-ai-step-indicator="3">
+          <span class="ai-steps__num">3</span>
+          <span class="ai-steps__label">Media</span>
+        </li>
+      </ol>
+      <span class="ai-steps__fill" data-ai-progress hidden></span>
+    </nav>
+    <a class="ai-wizard__manual" href="<?= e(url('admin/packages/edit.php')) ?>">Manual form</a>
+  </div>
 
 <?php if (!$hasAiKey): ?>
   <div class="admin-alert admin-alert--err" role="status">
-    <span>Add your Gemini API key as <code>gemini_api_key</code> in <code>config/config.php</code> to enable generation. You can still fill Step 2 manually.</span>
+    <span>Add <code>gemini_api_key</code> in <code>config/config.php</code> to enable AI. Step 2 can still be filled manually.</span>
   </div>
 <?php endif; ?>
 
 <form
-  class="form-cards"
+  class="form-cards ai-wizard__form"
   method="post"
   enctype="multipart/form-data"
   data-rich-form
@@ -140,12 +149,10 @@ ob_start();
   <div class="admin-alert admin-alert--err" role="alert" data-ai-error hidden><span></span></div>
 
   <div data-ai-panel="1">
-    <section class="form-card">
+    <section class="form-card ai-panel-card">
       <div class="form-card__head">
-        <span class="form-card__icon"><?= yn_icon('compass') ?></span>
         <div class="form-card__titles">
           <h2 class="form-card__title">Trip facts</h2>
-          <p class="form-card__hint">Destinations, type, duration, stays and highlights — AI uses these next.</p>
         </div>
       </div>
       <div class="form-card__body">
@@ -169,7 +176,7 @@ ob_start();
         <div class="field">
           <span class="field__label">Destinations <span class="field__req">*</span></span>
           <?php if (!$places): ?>
-            <p class="field__hint">Add places first so they can be selected here.</p>
+            <p class="field__hint">Add places first.</p>
           <?php else: ?>
             <div class="picker" data-picker>
               <div class="picker__control" data-picker-control>
@@ -185,15 +192,13 @@ ob_start();
                 <?php endforeach; ?>
               </div>
             </div>
-            <p class="field__hint">Listing pages are set from these places.</p>
           <?php endif; ?>
         </div>
         <div class="field">
           <label for="pickup">Pickup / Drop <span class="field__req">*</span></label>
           <input class="form-control" id="pickup" name="pickup" value="<?= e($row['pickup'] ?? '') ?>" placeholder="Calicut" />
-          <p class="field__hint">Pickup and drop are the same place. Not used in the package title.</p>
         </div>
-        <div class="field full">
+        <div class="field">
           <label for="days">Duration <span class="field__req">*</span></label>
           <div class="duration-grid">
             <span class="input-icon">
@@ -212,7 +217,7 @@ ob_start();
           <span class="field__label">Stays <span class="field__req">*</span></span>
           <div class="stay-grid" data-stay-grid>
             <?php if ($nights < 1): ?>
-              <p class="field__hint">No overnight stays for this duration.</p>
+              <p class="field__hint">No overnight stays.</p>
             <?php else: ?>
               <?php for ($i = 0; $i < $nights; $i++): ?>
                 <div class="stay-grid__item">
@@ -227,9 +232,8 @@ ob_start();
               <?php endfor; ?>
             <?php endif; ?>
           </div>
-          <p class="field__hint">Where guests sleep each night — this becomes the stay summary.</p>
         </div>
-        <div class="field" data-chips="highlights">
+        <div class="field full" data-chips="highlights">
           <label for="highlight-entry">Highlights</label>
           <div class="chips-input" data-chips-list>
             <?php foreach ($highlights as $highlight): ?>
@@ -239,53 +243,49 @@ ob_start();
                 <button class="chip__remove" type="button" data-chip-remove aria-label="Remove <?= e((string) $highlight) ?>">&times;</button>
               </span>
             <?php endforeach; ?>
-            <input class="chips-input__entry" id="highlight-entry" type="text" name="highlights_extra" data-chips-entry placeholder="Add a highlight and press Enter" />
+            <input class="chips-input__entry" id="highlight-entry" type="text" name="highlights_extra" data-chips-entry placeholder="Add highlight + Enter" />
           </div>
-          <button class="chips-add" type="button" data-chips-add><?= yn_icon('plus') ?>Add highlight</button>
+          <button class="chips-add" type="button" data-chips-add><?= yn_icon('plus') ?>Add</button>
         </div>
       </div>
     </section>
   </div>
 
   <div data-ai-panel="2" hidden>
-    <section class="form-card">
+    <section class="form-card ai-panel-card">
       <div class="form-card__head">
-        <span class="form-card__icon"><?= yn_icon('file-text') ?></span>
         <div class="form-card__titles">
-          <h2 class="form-card__title">AI content</h2>
-          <p class="form-card__hint">SEO-focused title, card text, overview and itinerary — edit anything before continuing.</p>
+          <h2 class="form-card__title">Content</h2>
         </div>
         <button class="btn btn--secondary btn--sm" type="button" data-ai-generate>
-          <?= yn_icon('sparkle') ?>Generate with AI
+          <?= yn_icon('sparkle') ?>Generate
         </button>
       </div>
       <div class="form-card__body">
-        <p class="field__hint" data-ai-status hidden></p>
-        <div class="field">
+        <div class="ai-status" data-ai-status hidden></div>
+        <div class="field full">
           <label for="title">Title <span class="field__req">*</span></label>
           <input class="form-control" id="title" name="title" value="<?= e($row['title'] ?? '') ?>" placeholder="e.g., Munnar Alleppey 4 Days Package" />
         </div>
-        <div class="field">
-          <label for="card_text">Card Text (one line)</label>
-          <input class="form-control" id="card_text" name="card_text" maxlength="90" value="<?= e($row['card_text'] ?? '') ?>" placeholder="Short text shown on package card" />
+        <div class="field full">
+          <label for="card_text">Card text</label>
+          <input class="form-control" id="card_text" name="card_text" maxlength="90" value="<?= e($row['card_text'] ?? '') ?>" placeholder="One line for package cards" />
           <span class="field__counter" data-counter-for="card_text"></span>
         </div>
-        <div class="field">
+        <div class="field full">
           <label for="overview">Overview <span class="field__req">*</span></label>
-          <textarea class="form-control" id="overview" name="overview" rows="5" maxlength="500" placeholder="Describe this package in brief..."><?= e($row['overview'] ?? '') ?></textarea>
+          <textarea class="form-control" id="overview" name="overview" rows="4" maxlength="500" placeholder="Brief package description"><?= e($row['overview'] ?? '') ?></textarea>
           <span class="field__counter" data-counter-for="overview"></span>
         </div>
       </div>
     </section>
 
-    <section class="form-card" data-days>
+    <section class="form-card ai-panel-card" data-days>
       <div class="form-card__head">
-        <span class="form-card__icon"><?= yn_icon('list') ?></span>
         <div class="form-card__titles">
           <h2 class="form-card__title">Itinerary</h2>
-          <p class="form-card__hint">Review or edit the day-by-day plan.</p>
         </div>
-        <button class="btn btn--primary btn--sm" type="button" data-day-add><?= yn_icon('plus') ?>Add Day</button>
+        <button class="btn btn--secondary btn--sm" type="button" data-day-add><?= yn_icon('plus') ?>Day</button>
       </div>
       <div class="form-card__body">
         <div class="day-list full" data-day-list>
@@ -313,12 +313,10 @@ ob_start();
   </div>
 
   <div data-ai-panel="3" hidden>
-    <section class="form-card">
+    <section class="form-card ai-panel-card">
       <div class="form-card__head">
-        <span class="form-card__icon"><?= yn_icon('image') ?></span>
         <div class="form-card__titles">
           <h2 class="form-card__title">Media</h2>
-          <p class="form-card__hint">Upload images to showcase your package.</p>
         </div>
       </div>
       <div class="form-card__body form-card__body--media">
@@ -330,8 +328,8 @@ ob_start();
         ?>
         <div class="media-split" data-package-media data-gallery-max="10">
           <div class="media-col media-col--cover">
-            <span class="field__label">Cover Image <span class="field__req">*</span></span>
-            <p class="field__hint">This will be shown as the main image on package cards.</p>
+            <span class="field__label">Cover <span class="field__req">*</span></span>
+            <p class="field__hint">Main card image.</p>
 
             <input type="hidden" name="remove_image" value="0" data-cover-remove />
             <input type="hidden" name="library_image" value="<?= e($coverPath) ?>" data-cover-library />
@@ -378,8 +376,8 @@ ob_start();
           </div>
 
           <div class="media-col media-col--gallery">
-            <span class="field__label">Gallery Images</span>
-            <p class="field__hint">Add multiple images to showcase this package.</p>
+            <span class="field__label">Gallery</span>
+            <p class="field__hint">Up to 10 images.</p>
 
             <input
               id="gallery_files"
@@ -441,46 +439,37 @@ ob_start();
       </div>
     </section>
 
-    <section class="form-card">
+    <section class="form-card ai-panel-card">
       <div class="form-card__head">
-        <span class="form-card__icon"><?= yn_icon('download') ?></span>
         <div class="form-card__titles">
-          <h2 class="form-card__title">Downloads &amp; Publishing</h2>
-          <p class="form-card__hint">Upload documents and set listing preferences.</p>
+          <h2 class="form-card__title">Files &amp; listing</h2>
         </div>
       </div>
       <div class="form-card__body">
         <div class="field">
           <span class="field__label">Itinerary PDF</span>
-          <p class="field__hint">Visitors can download this file.</p>
           <div class="file-pick">
-            <label class="file-pick__btn"><?= yn_icon('upload') ?>Upload PDF
+            <label class="file-pick__btn"><?= yn_icon('upload') ?>Upload
               <input id="itinerary_pdf_file" type="file" name="itinerary_pdf_file" accept="application/pdf,.pdf" />
             </label>
             <span class="file-pick__name" data-file-name-for="itinerary_pdf_file">No file chosen</span>
           </div>
         </div>
         <div class="field">
-          <span class="field__label">Price Chart PDF</span>
-          <p class="field__hint">Upload price chart / rate details.</p>
+          <span class="field__label">Price chart PDF</span>
           <div class="file-pick">
-            <label class="file-pick__btn"><?= yn_icon('upload') ?>Upload PDF
+            <label class="file-pick__btn"><?= yn_icon('upload') ?>Upload
               <input id="price_chart_pdf_file" type="file" name="price_chart_pdf_file" accept="application/pdf,.pdf" />
             </label>
             <span class="file-pick__name" data-file-name-for="price_chart_pdf_file">No file chosen</span>
           </div>
         </div>
         <div class="field">
-          <label for="sort_order">Display Order</label>
-          <p class="field__hint">Set display order in listings.</p>
-          <span class="input-icon">
-            <?= yn_icon('list') ?>
-            <input class="form-control" id="sort_order" type="number" name="sort_order" value="<?= e((string) ($row['sort_order'] ?? '0')) ?>" />
-          </span>
+          <label for="sort_order">Order</label>
+          <input class="form-control" id="sort_order" type="number" name="sort_order" value="<?= e((string) ($row['sort_order'] ?? '0')) ?>" />
         </div>
         <div class="field">
-          <span class="field__label">Featured Package</span>
-          <p class="field__hint">Show on homepage and rank first in listings.</p>
+          <span class="field__label">Featured</span>
           <div class="switch-field">
             <span class="switch">
               <input id="is_featured" type="checkbox" name="is_featured" value="1" aria-label="Featured package" <?= !empty($row['is_featured']) ? 'checked' : '' ?> />
@@ -493,21 +482,26 @@ ob_start();
     </section>
   </div>
 
-  <div class="form-footer" data-ai-footer>
-    <a class="btn btn--secondary" href="<?= e(url('admin/packages/index.php')) ?>" data-ai-cancel>Cancel</a>
-    <button class="btn btn--secondary" type="button" data-ai-back hidden>Back</button>
-    <button class="btn btn--secondary" type="button" data-ai-generate-footer hidden><?= yn_icon('sparkle') ?>Generate with AI</button>
-    <button class="btn btn--primary" type="button" data-ai-next>Continue</button>
-    <button class="btn btn--primary" type="submit" data-ai-save hidden><?= yn_icon('check') ?>Save Package</button>
+  <div class="ai-wizard__footer form-footer" data-ai-footer>
+    <div class="ai-wizard__footer-left">
+      <a class="btn btn--ghost" href="<?= e(url('admin/packages/index.php')) ?>" data-ai-cancel>Cancel</a>
+      <button class="btn btn--ghost" type="button" data-ai-back hidden>Back</button>
+    </div>
+    <div class="ai-wizard__footer-right">
+      <button class="btn btn--secondary" type="button" data-ai-generate-footer hidden><?= yn_icon('sparkle') ?>Regenerate</button>
+      <button class="btn btn--primary" type="button" data-ai-next>Continue</button>
+      <button class="btn btn--primary" type="submit" data-ai-save hidden>Save</button>
+    </div>
   </div>
 </form>
+</div>
 <template id="icon-copy"><?= yn_icon('copy') ?></template>
 <template id="icon-trash"><?= yn_icon('trash') ?></template>
 <template id="icon-chevron-down"><?= yn_icon('chevron-down') ?></template>
 <?php
 $adminContent = ob_get_clean();
 $pageTitle = 'Add Package with AI';
-$pageSubtitle = 'Generate SEO package copy from trip facts, then add media.';
+$pageSubtitle = 'Facts → content → media.';
 $adminScripts = ['admin/assets/admin-form.js', 'admin/assets/admin-ai-package.js'];
 $activeNav = 'packages';
 require dirname(__DIR__) . '/_layout.php';

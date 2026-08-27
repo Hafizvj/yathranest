@@ -34,7 +34,7 @@ $navItems = [
   <link rel="icon" type="image/png" sizes="150x150" href="<?= e(image_url($logoMark, '')) ?>" />
   <link rel="apple-touch-icon" href="<?= e(image_url($appleTouch, '')) ?>" />
   <meta name="theme-color" content="#346356" />
-  <link rel="stylesheet" href="<?= e(url('admin/assets/admin.css')) ?>?v=10" />
+  <link rel="stylesheet" href="<?= e(url('admin/assets/admin.css')) ?>?v=12" />
   <script src="https://code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js" defer></script>
 </head>
 <body class="admin">
@@ -100,7 +100,7 @@ $navItems = [
   <script src="<?= e(url('admin/assets/admin.js')) ?>?v=5" defer></script>
   <script src="<?= e(url('admin/assets/admin-media.js')) ?>?v=2" defer></script>
   <?php foreach ($adminScripts as $script): ?>
-    <script src="<?= e(url($script)) ?>?v=5" defer></script>
+    <script src="<?= e(url($script)) ?>?v=6" defer></script>
   <?php endforeach; ?>
 </body>
 </html>
