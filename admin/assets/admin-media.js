@@ -189,7 +189,23 @@
     updateLoadMore();
     var url = api + '?page=' + (page || 1) + '&q=' + encodeURIComponent(state.query || '');
     return fetch(url, { credentials: 'same-origin' })
-      .then(function (res) { return res.json(); })
+      .then(function (res) {
+        return res.text().then(function (text) {
+          var data = null;
+          try {
+            data = text ? JSON.parse(text) : null;
+          } catch (e) {
+            data = null;
+          }
+          if (!res.ok) {
+            return {
+              ok: false,
+              error: (data && data.error) || ('Could not load library (HTTP ' + res.status + ').')
+            };
+          }
+          return data || { ok: false, error: 'Could not load library.' };
+        });
+      })
       .then(function (data) {
         state.loading = false;
         if (!data || !data.ok) {

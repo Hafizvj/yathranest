@@ -1,6 +1,6 @@
 <?php
 /** Shared media library picker modal — included from admin/_layout.php */
-$mediaPickerApi = url('admin/media/api.php');
+$mediaPickerApi = url('admin/library-api.php');
 ?>
 <div class="media-picker" id="media-picker" hidden data-media-picker data-api="<?= e($mediaPickerApi) ?>">
   <div class="media-picker__backdrop" data-media-picker-close></div>

@@ -18,7 +18,7 @@ $navItems = [
     'getaways' => ['label' => 'Getaways', 'href' => 'admin/getaways/index.php'],
     'gift-cards' => ['label' => 'Gift Cards', 'href' => 'admin/gift-cards/index.php'],
     'investment' => ['label' => 'Investment', 'href' => 'admin/investment/index.php'],
-    'media' => ['label' => 'Media', 'href' => 'admin/media/index.php'],
+    'media' => ['label' => 'Media', 'href' => 'admin/library.php'],
     'inquiries' => ['label' => 'Inquiries', 'href' => 'admin/inquiries/index.php'],
     'content' => ['label' => 'Page content', 'href' => 'admin/content/index.php'],
     'settings' => ['label' => 'Settings', 'href' => 'admin/settings/index.php'],
@@ -98,7 +98,7 @@ $navItems = [
   </div>
   <?php require __DIR__ . '/_media_picker.php'; ?>
   <script src="<?= e(url('admin/assets/admin.js')) ?>?v=5" defer></script>
-  <script src="<?= e(url('admin/assets/admin-media.js')) ?>?v=3" defer></script>
+  <script src="<?= e(url('admin/assets/admin-media.js')) ?>?v=4" defer></script>
   <?php foreach ($adminScripts as $script): ?>
     <script src="<?= e(url($script)) ?>?v=6" defer></script>
   <?php endforeach; ?>
