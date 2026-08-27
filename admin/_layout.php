@@ -34,7 +34,7 @@ $navItems = [
   <link rel="icon" type="image/png" sizes="150x150" href="<?= e(image_url($logoMark, '')) ?>" />
   <link rel="apple-touch-icon" href="<?= e(image_url($appleTouch, '')) ?>" />
   <meta name="theme-color" content="#346356" />
-  <link rel="stylesheet" href="<?= e(url('admin/assets/admin.css')) ?>?v=9" />
+  <link rel="stylesheet" href="<?= e(url('admin/assets/admin.css')) ?>?v=10" />
   <script src="https://code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js" defer></script>
 </head>
 <body class="admin">

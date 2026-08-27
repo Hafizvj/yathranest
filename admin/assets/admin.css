@@ -1916,3 +1916,53 @@ body.media-picker-open { overflow: hidden; }
   gap: 0.35rem;
   margin-top: 0.5rem;
 }
+
+/* AI package wizard stepper */
+.ai-steps {
+  margin: 0 0 1.25rem;
+}
+.ai-steps__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+}
+.ai-steps__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+.ai-steps__num {
+  width: 1.7rem;
+  height: 1.7rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  background: #fff;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+.ai-steps__item.is-active {
+  color: var(--ink);
+  font-weight: 600;
+}
+.ai-steps__item.is-active .ai-steps__num {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.ai-steps__item.is-done .ai-steps__num {
+  background: #e8efe9;
+  border-color: var(--accent);
+  color: var(--accent);
+}
+[data-ai-status].is-busy {
+  color: var(--accent);
+  font-weight: 500;
+}

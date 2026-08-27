@@ -24,4 +24,7 @@ return [
     'upload_url' => 'uploads',
     'session_name' => 'yn_admin',
     'timezone' => 'Asia/Kolkata',
+    // Google AI Studio free key — https://aistudio.google.com/apikey
+    'gemini_api_key' => '',
+    'gemini_model' => 'gemini-3.6-flash',
 ];
