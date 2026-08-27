@@ -69,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $q = trim(get_query('q'));
 $page = max(1, (int) get_query('page', '1'));
-$result = media_list($q, $page, 48);
+$result = media_list($q, $page, 96);
 $items = $result['items'];
 $total = $result['total'];
 $pages = max(1, (int) ceil($total / $result['per_page']));

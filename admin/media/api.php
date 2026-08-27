@@ -19,7 +19,7 @@ $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 if ($method === 'GET') {
     $q = trim((string) ($_GET['q'] ?? ''));
     $page = max(1, (int) ($_GET['page'] ?? 1));
-    $result = media_list($q, $page, 48);
+    $result = media_list($q, $page, 200);
     media_api_json(['ok' => true] + $result);
 }
 

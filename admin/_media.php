@@ -21,8 +21,11 @@ function media_row_public(array $row): array
     $path = (string) ($row['path'] ?? '');
     $id = (int) ($row['id'] ?? 0);
     $source = (string) ($row['source'] ?? (strpos($path, 'assets/') === 0 ? 'asset' : 'upload'));
+    // Stable key for JS selection — assets all share id 0, so path must be used.
+    $key = $id > 0 ? ('id:' . $id) : ('path:' . $path);
     return [
         'id' => $id,
+        'key' => $key,
         'path' => $path,
         'url' => image_url($path, ''),
         'name' => (string) ($row['original_name'] ?: basename(str_replace('\\', '/', $path))),
@@ -94,12 +97,67 @@ function media_scan_asset_images(): array
 }
 
 /**
+ * Scan uploads/ (recursive) into virtual media rows so files on disk
+ * appear in the library even before they are registered in the media table.
+ * @return array<int, array>
+ */
+function media_scan_upload_images(): array
+{
+    static $cache = null;
+    if ($cache !== null) {
+        return $cache;
+    }
+
+    $root = realpath((string) config('upload_dir', dirname(__DIR__) . '/uploads'));
+    if (!$root || !is_dir($root)) {
+        $cache = [];
+        return $cache;
+    }
+
+    $allowed = ['jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg', 'png' => 'image/png', 'webp' => 'image/webp', 'gif' => 'image/gif'];
+    $items = [];
+    $iterator = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($root, FilesystemIterator::SKIP_DOTS)
+    );
+    foreach ($iterator as $file) {
+        if (!$file->isFile()) {
+            continue;
+        }
+        $ext = strtolower($file->getExtension());
+        if (!isset($allowed[$ext])) {
+            continue;
+        }
+        $full = $file->getPathname();
+        $relative = str_replace('\\', '/', substr($full, strlen($root) + 1));
+        $path = 'uploads/' . ltrim($relative, '/');
+        $items[] = [
+            'id' => 0,
+            'path' => $path,
+            'original_name' => basename($relative),
+            'mime' => $allowed[$ext],
+            'bytes' => (int) $file->getSize(),
+            'width' => null,
+            'height' => null,
+            'created_at' => date('Y-m-d H:i:s', (int) $file->getMTime()),
+            'source' => 'upload',
+        ];
+    }
+
+    usort($items, static function ($a, $b) {
+        return strcmp((string) ($b['created_at'] ?? ''), (string) ($a['created_at'] ?? ''));
+    });
+
+    $cache = $items;
+    return $cache;
+}
+
+/**
  * @return array{items: array, total: int, page: int, per_page: int}
  */
 function media_list(string $q = '', int $page = 1, int $perPage = 48): array
 {
     $page = max(1, $page);
-    $perPage = max(1, min(100, $perPage));
+    $perPage = max(1, min(500, $perPage));
     $offset = ($page - 1) * $perPage;
     $q = trim($q);
     $qLower = strtolower($q);
@@ -111,7 +169,12 @@ function media_list(string $q = '', int $page = 1, int $perPage = 48): array
         $byPath[$row['path']] = media_row_public($row);
     }
 
-    // Uploaded / registered library rows override assets when same path exists.
+    // Files present under uploads/ even if not yet in the media table.
+    foreach (media_scan_upload_images() as $row) {
+        $byPath[$row['path']] = media_row_public($row);
+    }
+
+    // Uploaded / registered library rows override scanned rows when present.
     try {
         $stmt = db()->query('SELECT * FROM media ORDER BY created_at DESC, id DESC');
         foreach ($stmt->fetchAll() as $row) {
@@ -119,7 +182,7 @@ function media_list(string $q = '', int $page = 1, int $perPage = 48): array
             $byPath[$public['path']] = $public;
         }
     } catch (Throwable $e) {
-        // media table missing — still show assets
+        // media table missing — still show assets / disk uploads
     }
 
     $all = array_values($byPath);
@@ -131,9 +194,9 @@ function media_list(string $q = '', int $page = 1, int $perPage = 48): array
     }
 
     usort($all, static function ($a, $b) {
-        // Uploads (deletable / id>0) first by date, then assets A–Z
-        $aUpload = !empty($a['deletable']) || (int) $a['id'] > 0;
-        $bUpload = !empty($b['deletable']) || (int) $b['id'] > 0;
+        // Uploads (deletable / id>0 / uploads path) first by date, then assets A–Z
+        $aUpload = !empty($a['deletable']) || (int) $a['id'] > 0 || strpos((string) $a['path'], 'uploads/') === 0;
+        $bUpload = !empty($b['deletable']) || (int) $b['id'] > 0 || strpos((string) $b['path'], 'uploads/') === 0;
         if ($aUpload !== $bUpload) {
             return $aUpload ? -1 : 1;
         }
@@ -394,13 +457,19 @@ function media_delete_if_unused(int $id): bool
 }
 
 /**
- * Import referenced upload paths into the media table.
+ * Import referenced upload paths (and any other files under uploads/) into the media table.
  * @return int number of newly registered rows
  */
 function media_import_referenced_uploads(): int
 {
     $added = 0;
-    foreach (media_referenced_paths() as $path) {
+    $paths = media_referenced_paths();
+    foreach (media_scan_upload_images() as $row) {
+        $paths[] = (string) $row['path'];
+    }
+    $paths = array_values(array_unique(array_filter($paths)));
+
+    foreach ($paths as $path) {
         if (!admin_is_upload_path($path)) {
             continue;
         }
