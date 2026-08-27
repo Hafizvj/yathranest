@@ -216,10 +216,11 @@ require dirname(__DIR__) . '/includes/layout-header.php';
               <h2>Gallery</h2>
               <div class="gallery-grid" data-gallery>
                 <?php foreach ($pkg['gallery'] as $file):
-                  if (!media_exists((string) $file)) {
+                  $file = trim((string) $file);
+                  if ($file === '') {
                       continue;
                   }
-                  $src = pkg_img_src((string) $file);
+                  $src = pkg_img_src($file);
                   ?>
                   <button type="button" data-gallery-item data-full="<?= e($src) ?>">
                     <img src="<?= e($src) ?>" alt="<?= e($pkg['title']) ?>" loading="lazy" />

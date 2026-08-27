@@ -46,29 +46,4 @@ jobs:
             scripts/**
             node_modules/**
             .cursor/**
-
-      - name: Retry deploy if connection dropped
-        if: steps.deploy.outcome == 'failure'
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftps
-          security: loose
-          timeout: 120000
-          server-dir: ./
-          log-level: standard
-          exclude: |
-            .git/**
-            .github/**
-            README.md
-            tools/**
-            .env
-            .env.example
-            config/config.php
-            db-check.php
-            sql/seed-data.json
-            scripts/**
-            node_modules/**
-            .cursor/**
+            uploads/**
