@@ -27,72 +27,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $oldGallery = json_decode_array($row['gallery_json'] ?? null);
 
         $data = package_form_data_from_post($row);
-        $errors = array_merge($errors, package_form_validate($data));
+        $saveMode = package_save_mode_from_post();
+        $errors = array_merge($errors, package_form_validate($data, $saveMode));
 
-        $takeUploadError = static function () use (&$errors): void {
-            $message = admin_upload_last_error();
-            if ($message) {
-                $errors[] = $message;
-                admin_upload_last_error('');
-            }
-        };
-
+        $requireCover = $saveMode === 'publish';
         $newHero = !empty($_FILES['image_file']['name']);
         $libraryCover = trim(post('library_image'));
         $removeHero = post('remove_image') === '1';
         $hasCover = $newHero || ($libraryCover !== '' && !$removeHero) || (!$removeHero && $oldImage !== '');
-        if (!$hasCover) {
+        if ($requireCover && !$hasCover) {
             $errors[] = 'A cover image is required.';
         }
 
-        // Uploads only run once the rest of the form is valid, so a rejected
-        // save does not leave orphaned files behind.
         $gallery = $oldGallery;
         if (!$errors) {
-            $gallery = admin_collect_media_paths('gallery_keep', '', $_FILES['gallery_files'] ?? null, 'packages');
-            $takeUploadError();
-            if (count($gallery) > 10) {
-                $gallery = array_slice($gallery, 0, 10);
-            }
-            $data['gallery_json'] = json_encode($gallery, JSON_UNESCAPED_UNICODE);
-
-            if ($newHero) {
-                $uploaded = admin_apply_image_upload($_FILES['image_file'], 'packages', $oldImage);
-                $takeUploadError();
-                if ($uploaded) {
-                    $data['image'] = $uploaded;
-                }
-            } elseif ($libraryCover !== '' && !$removeHero) {
-                $data['image'] = ltrim($libraryCover, '/');
-                media_ensure_row($data['image']);
-            } elseif ($removeHero) {
-                $data['image'] = '';
-            }
-
-            $data['itinerary_pdf'] = admin_apply_pdf_field(
-                'itinerary_pdf_file',
-                'remove_itinerary_pdf',
-                (string) ($row['itinerary_pdf'] ?? ''),
-                'packages'
-            );
-            $takeUploadError();
-            $data['price_chart_pdf'] = admin_apply_pdf_field(
-                'price_chart_pdf_file',
-                'remove_price_chart_pdf',
-                (string) ($row['price_chart_pdf'] ?? ''),
-                'packages'
-            );
-            $takeUploadError();
+            $mediaErrors = admin_package_apply_media_uploads($data, $row, $requireCover);
+            $errors = array_merge($errors, $mediaErrors);
+            $gallery = json_decode_array($data['gallery_json'] ?? null);
         }
 
         if (!$errors) {
             if ($id) {
                 admin_package_update($id, $data);
                 admin_remove_missing_uploads($oldGallery, $gallery);
-                flash_set('success', 'Package updated.');
+                flash_set('success', $saveMode === 'publish' ? 'Package published.' : 'Draft saved.');
             } else {
                 admin_package_insert($data);
-                flash_set('success', 'Package created.');
+                flash_set('success', $saveMode === 'publish' ? 'Package published.' : 'Draft saved.');
             }
             redirect('admin/packages/index.php');
         }
@@ -504,7 +465,11 @@ ob_start();
 
   <div class="form-footer">
     <a class="btn btn--secondary" href="<?= e(url('admin/packages/index.php')) ?>">Cancel</a>
-    <button class="btn btn--primary" type="submit"><?= yn_icon('check') ?>Save Package</button>
+    <?php if ($id && !empty($row['slug'])): ?>
+      <a class="btn btn--secondary" href="<?= e(package_public_url((string) $row['slug'], empty($row['is_published']))) ?>" target="_blank" rel="noopener">Preview</a>
+    <?php endif; ?>
+    <button class="btn btn--secondary" type="submit" name="save_mode" value="draft">Save draft</button>
+    <button class="btn btn--primary" type="submit" name="save_mode" value="publish"><?= yn_icon('check') ?>Publish</button>
   </div>
 </form>
 <template id="icon-copy"><?= yn_icon('copy') ?></template>

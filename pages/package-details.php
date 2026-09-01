@@ -4,10 +4,11 @@ require_once dirname(__DIR__) . '/includes/bootstrap.php';
 
 $assetDepth = '../';
 $slug = get_query('package');
+$isPreview = get_query('preview') === '1' && admin_user();
 $pkg = null;
 try {
     if ($slug !== '') {
-        $pkg = package_by_slug($slug);
+        $pkg = package_by_slug($slug, !$isPreview);
     }
 } catch (Throwable $e) {
     $pkg = null;
@@ -54,6 +55,9 @@ function pkg_img_src(string $file): string
 
 require dirname(__DIR__) . '/includes/layout-header.php';
 ?>
+<?php if ($isPreview && $pkg): ?>
+<div class="admin-preview-banner" role="status">Draft preview — not visible to visitors. <a href="<?= e(url('admin/packages/edit.php?id=' . (int) ($pkg['id'] ?? 0))) ?>">Edit package</a></div>
+<?php endif; ?>
 <main id="main">
   <div class="crumbs-bar">
     <div class="container">

@@ -732,10 +732,25 @@
   /* ---------- package media panel (cover + gallery) ---------- */
 
   (function () {
-    var root = form.querySelector('[data-package-media]');
-    if (!root) {
+    var mediaRoots = form.querySelectorAll('[data-package-media]');
+    if (!mediaRoots.length) {
       return;
     }
+
+    mediaRoots.forEach(function (root) {
+      initPackageMediaPanel(root);
+    });
+
+    window.ynInitPackageMediaPanels = function (scope) {
+      var host = scope || form;
+      host.querySelectorAll('[data-package-media]:not([data-media-ready])').forEach(initPackageMediaPanel);
+    };
+
+    function initPackageMediaPanel(root) {
+    if (!root || root.getAttribute('data-media-ready') === '1') {
+      return;
+    }
+    root.setAttribute('data-media-ready', '1');
 
     var maxGallery = parseInt(root.getAttribute('data-gallery-max') || '10', 10) || 10;
     var coverInput = root.querySelector('[data-cover-input]');
@@ -1197,6 +1212,7 @@
     }
 
     updateGalleryMeta();
+    }
   })();
 
   /* ---------- featured toggle label ---------- */

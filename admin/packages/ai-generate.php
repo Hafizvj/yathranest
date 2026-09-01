@@ -1,6 +1,7 @@
 <?php
 
 require_once dirname(__DIR__, 2) . '/includes/bootstrap.php';
+require_once dirname(__DIR__, 2) . '/includes/gemini.php';
 require_once __DIR__ . '/_form_helpers.php';
 require_admin();
 
@@ -87,10 +88,7 @@ foreach ($types as $type) {
     $typeLabels[] = (string) ($typeOptions[$type] ?? ucwords(str_replace('-', ' ', $type)));
 }
 
-$model = trim((string) config('gemini_model', 'gemini-3.6-flash'));
-if ($model === '') {
-    $model = 'gemini-3.6-flash';
-}
+$model = gemini_default_model();
 
 $prompt = package_ai_seo_prompt([
     'days' => $days,
@@ -187,217 +185,13 @@ function package_ai_call_gemini(string $apiKey, string $model, string $prompt, i
         'required' => ['title', 'card_text', 'overview', 'itinerary'],
     ];
 
-    // Prefer generateContent (more reliable under PHP request limits).
-    // Fall back to Interactions API on transport failure.
-    $result = package_ai_call_generate_content($apiKey, $model, $prompt, $schema);
-    if (!$result['ok'] && package_ai_is_retryable_transport_error($result['error'] ?? '')) {
-        $result = package_ai_call_interactions($apiKey, $model, $prompt, $schema);
-    }
+    $parts = gemini_build_parts($prompt);
+    $result = gemini_call_json_schema($apiKey, $model, $parts, $schema, 100);
     if (!$result['ok']) {
         return $result;
     }
 
     return package_ai_normalize_content($result['data'], $days);
-}
-
-/**
- * @param array<string,mixed> $schema
- * @return array{ok:bool,error?:string,code?:int,data?:array<string,mixed>}
- */
-function package_ai_call_interactions(string $apiKey, string $model, string $prompt, array $schema): array
-{
-    $url = 'https://generativelanguage.googleapis.com/v1beta/interactions';
-    $body = [
-        'model' => $model,
-        'input' => $prompt,
-        'generation_config' => [
-            'thinking_level' => 'minimal',
-        ],
-        'response_format' => [
-            [
-                'type' => 'text',
-                'mime_type' => 'application/json',
-                'schema' => $schema,
-            ],
-        ],
-    ];
-
-    $payload = json_encode($body, JSON_UNESCAPED_UNICODE);
-    if ($payload === false) {
-        return ['ok' => false, 'error' => 'Could not build AI request.', 'code' => 500];
-    }
-
-    $response = package_ai_http_post($url, $payload, [
-        'Content-Type: application/json',
-        'x-goog-api-key: ' . $apiKey,
-    ], 100);
-
-    return package_ai_parse_http_json_response($response, static function (array $decoded): string {
-        return package_ai_extract_interaction_text($decoded);
-    });
-}
-
-/**
- * @param array<string,mixed> $schema
- * @return array{ok:bool,error?:string,code?:int,data?:array<string,mixed>}
- */
-function package_ai_call_generate_content(string $apiKey, string $model, string $prompt, array $schema): array
-{
-    $url = 'https://generativelanguage.googleapis.com/v1beta/models/'
-        . rawurlencode($model)
-        . ':generateContent';
-
-    $body = [
-        'contents' => [
-            [
-                'role' => 'user',
-                'parts' => [['text' => $prompt]],
-            ],
-        ],
-        'generationConfig' => [
-            'responseMimeType' => 'application/json',
-            'responseSchema' => $schema,
-            'thinkingConfig' => [
-                'thinkingLevel' => 'MINIMAL',
-            ],
-        ],
-    ];
-
-    $payload = json_encode($body, JSON_UNESCAPED_UNICODE);
-    if ($payload === false) {
-        return ['ok' => false, 'error' => 'Could not build AI request.', 'code' => 500];
-    }
-
-    $response = package_ai_http_post($url, $payload, [
-        'Content-Type: application/json',
-        'x-goog-api-key: ' . $apiKey,
-    ], 100);
-
-    return package_ai_parse_http_json_response($response, static function (array $decoded): string {
-        $text = '';
-        $parts = $decoded['candidates'][0]['content']['parts'] ?? [];
-        if (is_array($parts)) {
-            foreach ($parts as $part) {
-                if (isset($part['text']) && is_string($part['text'])) {
-                    $text .= $part['text'];
-                }
-            }
-        }
-        return $text;
-    });
-}
-
-/**
- * @param array{body:string,code:int,error:string} $response
- * @param callable(array<string,mixed>):string $extractText
- * @return array{ok:bool,error?:string,code?:int,data?:array<string,mixed>}
- */
-function package_ai_parse_http_json_response(array $response, callable $extractText): array
-{
-    if ($response['error'] !== '') {
-        $err = $response['error'];
-        if (stripos($err, 'timed out') !== false || stripos($err, 'timeout') !== false) {
-            $err = 'Gemini timed out. Please try Generate again.';
-        }
-        return ['ok' => false, 'error' => $err, 'code' => 502];
-    }
-
-    $httpCode = $response['code'];
-    $decoded = json_decode($response['body'], true);
-    if (!is_array($decoded)) {
-        $hint = $httpCode > 0 ? ' (HTTP ' . $httpCode . ')' : '';
-        $snippet = trim(preg_replace('/\s+/', ' ', substr($response['body'], 0, 160)));
-        if ($snippet !== '') {
-            $hint .= ': ' . $snippet;
-        } elseif ($httpCode === 404) {
-            $hint .= ': endpoint not found';
-        } elseif ($response['body'] === '') {
-            $hint .= ': empty body';
-        }
-        return ['ok' => false, 'error' => 'Invalid response from Gemini' . $hint . '.', 'code' => 502];
-    }
-
-    if ($httpCode >= 400) {
-        $message = (string) ($decoded['error']['message'] ?? $decoded['message'] ?? 'Gemini request failed.');
-        if ($httpCode === 429) {
-            $message = 'Gemini rate limit reached. Try again in a moment.';
-        }
-        return ['ok' => false, 'error' => $message, 'code' => $httpCode >= 500 ? 502 : $httpCode];
-    }
-
-    $text = trim($extractText($decoded));
-    if ($text === '') {
-        $status = (string) ($decoded['status'] ?? '');
-        $hint = $status !== '' ? ' (status: ' . $status . ')' : '';
-        return ['ok' => false, 'error' => 'Gemini returned empty content' . $hint . '.', 'code' => 502];
-    }
-
-    if (preg_match('/```(?:json)?\s*([\s\S]*?)```/', $text, $m)) {
-        $text = trim($m[1]);
-    }
-
-    $data = json_decode($text, true);
-    if (!is_array($data)) {
-        return ['ok' => false, 'error' => 'Could not parse AI JSON. Try generating again.', 'code' => 502];
-    }
-
-    return ['ok' => true, 'data' => $data];
-}
-
-function package_ai_is_retryable_transport_error(string $error): bool
-{
-    $error = strtolower($error);
-    return str_contains($error, 'timed out')
-        || str_contains($error, 'timeout')
-        || str_contains($error, 'could not reach')
-        || str_contains($error, 'failed to connect')
-        || str_contains($error, '0 bytes received');
-}
-
-/**
- * Pull final model text from an Interactions API response.
- *
- * @param array<string,mixed> $decoded
- */
-function package_ai_extract_interaction_text(array $decoded): string
-{
-    if (isset($decoded['outputs']) && is_array($decoded['outputs'])) {
-        $chunks = [];
-        foreach ($decoded['outputs'] as $output) {
-            if (!is_array($output)) {
-                continue;
-            }
-            if (($output['type'] ?? '') === 'text' && isset($output['text']) && is_string($output['text'])) {
-                $chunks[] = $output['text'];
-            }
-        }
-        if ($chunks !== []) {
-            return implode('', $chunks);
-        }
-    }
-
-    $steps = $decoded['steps'] ?? [];
-    if (!is_array($steps)) {
-        return '';
-    }
-
-    $text = '';
-    foreach ($steps as $step) {
-        if (!is_array($step) || ($step['type'] ?? '') !== 'model_output') {
-            continue;
-        }
-        $content = $step['content'] ?? [];
-        if (!is_array($content)) {
-            continue;
-        }
-        foreach ($content as $part) {
-            if (is_array($part) && ($part['type'] ?? '') === 'text' && isset($part['text']) && is_string($part['text'])) {
-                $text .= $part['text'];
-            }
-        }
-    }
-
-    return $text;
 }
 
 /**
@@ -414,7 +208,6 @@ function package_ai_normalize_content(array $data, int $days): array
         return ['ok' => false, 'error' => 'AI response missing title or overview.', 'code' => 502];
     }
 
-    // Strip accidental pickup-intent phrases from titles.
     $title = preg_replace('/\s*[\-\|–—]?\s*(from|ex[-\s]?|starting from)\s+[A-Za-z .]+$/iu', '', $title) ?? $title;
     $title = trim($title);
 
@@ -431,7 +224,7 @@ function package_ai_normalize_content(array $data, int $days): array
     }
 
     $itinerary = [];
-    foreach (array_values($rawItinerary) as $i => $day) {
+    foreach (array_values($rawItinerary) as $day) {
         if (!is_array($day)) {
             continue;
         }
@@ -465,59 +258,4 @@ function package_ai_normalize_content(array $data, int $days): array
         'overview' => $overview,
         'itinerary' => $itinerary,
     ];
-}
-
-/**
- * @param list<string> $headers
- * @return array{body:string,code:int,error:string}
- */
-function package_ai_http_post(string $url, string $payload, array $headers = [], int $timeoutSeconds = 100): array
-{
-    if ($headers === []) {
-        $headers = ['Content-Type: application/json'];
-    }
-    $timeoutSeconds = max(30, $timeoutSeconds);
-
-    if (function_exists('curl_init')) {
-        $ch = curl_init($url);
-        $opts = [
-            CURLOPT_POST => true,
-            CURLOPT_HTTPHEADER => $headers,
-            CURLOPT_POSTFIELDS => $payload,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_CONNECTTIMEOUT => 20,
-            CURLOPT_TIMEOUT => $timeoutSeconds,
-            // Windows/XAMPP often hangs on IPv6 routes to Google APIs.
-            CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        ];
-        curl_setopt_array($ch, $opts);
-        $body = curl_exec($ch);
-        $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $err = curl_error($ch);
-        curl_close($ch);
-        if ($body === false) {
-            return ['body' => '', 'code' => 0, 'error' => $err !== '' ? $err : 'Could not reach Gemini.'];
-        }
-        return ['body' => (string) $body, 'code' => $code, 'error' => ''];
-    }
-
-    $ctx = stream_context_create([
-        'http' => [
-            'method' => 'POST',
-            'header' => implode("\r\n", $headers) . "\r\n",
-            'content' => $payload,
-            'timeout' => $timeoutSeconds,
-            'ignore_errors' => true,
-        ],
-    ]);
-    $body = @file_get_contents($url, false, $ctx);
-    $code = 0;
-    if (isset($http_response_header[0]) && preg_match('/\s(\d{3})\s/', $http_response_header[0], $m)) {
-        $code = (int) $m[1];
-    }
-    if ($body === false) {
-        return ['body' => '', 'code' => 0, 'error' => 'Could not reach Gemini.'];
-    }
-    return ['body' => (string) $body, 'code' => $code, 'error' => ''];
 }

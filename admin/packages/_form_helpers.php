@@ -391,9 +391,50 @@ function stays_to_runs(array $slugs): array
  * Builds a full package row from the minimal form. Everything the form no
  * longer asks for is derived here, or carried over from $existing.
  */
+function package_save_mode_from_post(): string
+{
+    $mode = trim(post('save_mode', 'publish'));
+
+    return $mode === 'draft' ? 'draft' : 'publish';
+}
+
+function package_draft_title(string $title): string
+{
+    $title = trim($title);
+
+    return $title !== '' ? $title : 'Untitled package';
+}
+
+function package_is_published_from_mode(string $mode): int
+{
+    return $mode === 'publish' ? 1 : 0;
+}
+
+function package_public_url(string $slug, bool $preview = false): string
+{
+    $path = 'pages/package-details.php?package=' . rawurlencode($slug);
+    if ($preview) {
+        $path .= '&preview=1';
+    }
+
+    return url($path);
+}
+
+function admin_package_by_id(int $id): ?array
+{
+    if ($id < 1) {
+        return null;
+    }
+    $stmt = db()->prepare('SELECT * FROM packages WHERE id = ?');
+    $stmt->execute([$id]);
+
+    return $stmt->fetch() ?: null;
+}
+
 function package_form_data_from_post(?array $existing = null): array
 {
-    $title = post('title');
+    $saveMode = package_save_mode_from_post();
+    $title = package_draft_title(post('title'));
     $existingSlug = trim((string) ($existing['slug'] ?? ''));
     $slug = $existingSlug !== '' ? $existingSlug : unique_package_slug(slugify($title), (int) ($existing['id'] ?? 0));
 
@@ -455,19 +496,21 @@ function package_form_data_from_post(?array $existing = null): array
         'has_houseboat' => (int) ($existing['has_houseboat'] ?? 0),
         'accommodation' => $staySummary !== '' ? $staySummary : (string) ($existing['accommodation'] ?? ''),
         'is_featured' => isset($_POST['is_featured']) ? 1 : 0,
-        'is_published' => $existing ? (int) ($existing['is_published'] ?? 1) : 1,
+        'is_published' => package_is_published_from_mode($saveMode),
         'sort_order' => (int) post('sort_order', (string) ($existing['sort_order'] ?? '0')),
     ];
 }
 
-function package_form_validate(array $data): array
+function package_form_validate(array $data, string $mode = 'publish'): array
 {
     $errors = [];
-    if (($data['title'] ?? '') === '') {
-        $errors[] = 'Title is required.';
-    }
-    if (trim((string) ($data['overview'] ?? '')) === '') {
-        $errors[] = 'Overview is required.';
+    if ($mode === 'publish') {
+        if (trim((string) ($data['title'] ?? '')) === '' || ($data['title'] ?? '') === 'Untitled package') {
+            $errors[] = 'Title is required.';
+        }
+        if (trim((string) ($data['overview'] ?? '')) === '') {
+            $errors[] = 'Overview is required.';
+        }
     }
     if ((int) ($data['days'] ?? 0) < 1) {
         $errors[] = 'Duration needs at least one day.';
@@ -895,6 +938,850 @@ function admin_hero_preview(?string $path, string $prefix = 'assets/images/'): s
         . '<div class="media-preview__item media-preview__item--hero">'
         . '<img src="' . e(image_url($path, $prefix)) . '" alt="Current image" />'
         . '</div></div>';
+}
+
+function admin_pdf_temp_dir(): string
+{
+    return rtrim((string) config('upload_dir'), '/\\') . DIRECTORY_SEPARATOR . 'temp' . DIRECTORY_SEPARATOR . 'pdf-import';
+}
+
+function admin_cleanup_old_temp_pdfs(): void
+{
+    $dir = admin_pdf_temp_dir();
+    if (!is_dir($dir)) {
+        return;
+    }
+    $cutoff = time() - 86400;
+    foreach (glob($dir . DIRECTORY_SEPARATOR . '*.pdf') ?: [] as $file) {
+        if (@filemtime($file) !== false && filemtime($file) < $cutoff) {
+            @unlink($file);
+        }
+    }
+}
+
+/**
+ * Store an uploaded PDF in a temp folder for later finalize.
+ *
+ * @return array{token:string,filename:string}|null
+ */
+function admin_store_temp_pdf(array $file): ?array
+{
+    admin_upload_last_error('');
+    admin_cleanup_old_temp_pdfs();
+
+    $error = (int) ($file['error'] ?? UPLOAD_ERR_NO_FILE);
+    if ($error === UPLOAD_ERR_NO_FILE || ($file['name'] ?? '') === '') {
+        admin_upload_last_error('No PDF was selected.');
+        return null;
+    }
+    if ($error !== UPLOAD_ERR_OK) {
+        admin_upload_last_error('PDF upload failed.');
+        return null;
+    }
+
+    $tmp = (string) ($file['tmp_name'] ?? '');
+    if ($tmp === '' || !is_uploaded_file($tmp)) {
+        admin_upload_last_error('Invalid upload.');
+        return null;
+    }
+
+    $size = (int) ($file['size'] ?? 0);
+    if ($size <= 0 || $size > admin_pdf_max_bytes()) {
+        admin_upload_last_error('PDF must be between 1 byte and 10 MB.');
+        return null;
+    }
+
+    if (strtolower(pathinfo((string) ($file['name'] ?? ''), PATHINFO_EXTENSION)) !== 'pdf') {
+        admin_upload_last_error('Only PDF files are allowed.');
+        return null;
+    }
+
+    $finfo = new finfo(FILEINFO_MIME_TYPE);
+    if ((string) $finfo->file($tmp) !== 'application/pdf') {
+        admin_upload_last_error('File is not a valid PDF.');
+        return null;
+    }
+
+    $dir = admin_pdf_temp_dir();
+    if (!is_dir($dir) && !mkdir($dir, 0755, true) && !is_dir($dir)) {
+        admin_upload_last_error('Could not create temp folder.');
+        return null;
+    }
+
+    $token = bin2hex(random_bytes(16));
+    $dest = $dir . DIRECTORY_SEPARATOR . $token . '.pdf';
+    if (!move_uploaded_file($tmp, $dest)) {
+        admin_upload_last_error('Could not save uploaded PDF.');
+        return null;
+    }
+    @chmod($dest, 0644);
+
+    return [
+        'token' => $token,
+        'filename' => (string) ($file['name'] ?? 'package.pdf'),
+    ];
+}
+
+function admin_temp_pdf_full_path(string $token): ?string
+{
+    if (!preg_match('/^[a-f0-9]{32}$/', $token)) {
+        return null;
+    }
+    $path = admin_pdf_temp_dir() . DIRECTORY_SEPARATOR . $token . '.pdf';
+    return is_file($path) ? $path : null;
+}
+
+/**
+ * Move a temp PDF into uploads/packages/ and return the relative path.
+ */
+function admin_finalize_temp_pdf(string $token, string $subdir = 'packages'): ?string
+{
+    $full = admin_temp_pdf_full_path($token);
+    if ($full === null) {
+        admin_upload_last_error('Uploaded PDF session expired. Parse the PDF again.');
+        return null;
+    }
+
+    $subdir = trim(str_replace(['..', '\\'], '', $subdir), '/');
+    $dir = rtrim((string) config('upload_dir'), '/\\') . DIRECTORY_SEPARATOR . $subdir;
+    if (!is_dir($dir) && !mkdir($dir, 0755, true) && !is_dir($dir)) {
+        admin_upload_last_error('Could not create upload folder.');
+        return null;
+    }
+
+    $name = bin2hex(random_bytes(8)) . '.pdf';
+    $dest = $dir . DIRECTORY_SEPARATOR . $name;
+    if (!rename($full, $dest)) {
+        admin_upload_last_error('Could not store itinerary PDF.');
+        return null;
+    }
+    @chmod($dest, 0644);
+
+    return 'uploads/' . $subdir . '/' . $name;
+}
+
+function package_resolve_place_slug(string $input, array $places): ?string
+{
+    $input = trim($input);
+    if ($input === '') {
+        return null;
+    }
+    if (isset($places[$input])) {
+        return $input;
+    }
+
+    $needle = mb_strtolower($input);
+    foreach ($places as $slug => $place) {
+        if (mb_strtolower((string) $slug) === $needle) {
+            return (string) $slug;
+        }
+        $label = mb_strtolower((string) ($place['label'] ?? ''));
+        if ($label === $needle) {
+            return (string) $slug;
+        }
+    }
+
+    foreach ($places as $slug => $place) {
+        $label = mb_strtolower((string) ($place['label'] ?? ''));
+        if ($label !== '' && (str_contains($label, $needle) || str_contains($needle, $label))) {
+            return (string) $slug;
+        }
+    }
+
+    return null;
+}
+
+/**
+ * @param list<string> $inputs
+ * @return array{resolved:list<string>,unmatched:list<string>}
+ */
+function package_resolve_place_slugs(array $inputs, array $places): array
+{
+    $resolved = [];
+    $unmatched = [];
+    foreach ($inputs as $input) {
+        $input = trim((string) $input);
+        if ($input === '') {
+            continue;
+        }
+        $slug = package_resolve_place_slug($input, $places);
+        if ($slug !== null) {
+            if (!in_array($slug, $resolved, true)) {
+                $resolved[] = $slug;
+            }
+        } elseif (!in_array($input, $unmatched, true)) {
+            $unmatched[] = $input;
+        }
+    }
+    return ['resolved' => $resolved, 'unmatched' => $unmatched];
+}
+
+/**
+ * @param list<string> $reserved
+ */
+function unique_package_slug_in_batch(string $base, array &$reserved, int $excludeId = 0): string
+{
+    $slug = unique_package_slug($base, $excludeId);
+    $candidate = $slug;
+    $i = 2;
+    while (in_array($candidate, $reserved, true)) {
+        $candidate = $slug . '-' . $i;
+        $i++;
+    }
+    $reserved[] = $candidate;
+    return $candidate;
+}
+
+/** @return list<string> */
+function package_types_from_array(array $types): array
+{
+    $valid = array_keys(package_type_options());
+    $out = [];
+    foreach ($types as $type) {
+        $type = strtolower(trim((string) $type));
+        if ($type !== '' && in_array($type, $valid, true) && !in_array($type, $out, true)) {
+            $out[] = $type;
+        }
+    }
+    return $out;
+}
+
+/** @return list<array{day:int,title:string,text:string}> */
+function package_itinerary_from_plan_array(array $plan): array
+{
+    $titles = isset($plan['itinerary_title']) && is_array($plan['itinerary_title'])
+        ? array_values($plan['itinerary_title'])
+        : [];
+    $texts = isset($plan['itinerary_text']) && is_array($plan['itinerary_text'])
+        ? array_values($plan['itinerary_text'])
+        : [];
+
+    if ($titles === [] && isset($plan['itinerary']) && is_array($plan['itinerary'])) {
+        $out = [];
+        foreach ($plan['itinerary'] as $day) {
+            if (!is_array($day)) {
+                continue;
+            }
+            $title = trim((string) ($day['title'] ?? ''));
+            $text = trim((string) ($day['text'] ?? ''));
+            if ($title === '' && $text === '') {
+                continue;
+            }
+            $out[] = ['day' => count($out) + 1, 'title' => $title, 'text' => $text];
+        }
+        return $out;
+    }
+
+    $out = [];
+    foreach ($titles as $i => $title) {
+        $title = trim((string) $title);
+        $text = trim((string) ($texts[$i] ?? ''));
+        if ($title === '' && $text === '') {
+            continue;
+        }
+        $out[] = ['day' => count($out) + 1, 'title' => $title, 'text' => $text];
+    }
+    return $out;
+}
+
+/**
+ * Build package row data from a nested plan POST array.
+ *
+ * @param array<string,mixed> $plan
+ * @param array{
+ *   image?:string,
+ *   gallery_json?:string,
+ *   itinerary_pdf?:string,
+ *   price_chart_pdf?:string,
+ *   sort_order?:int,
+ *   is_featured?:int
+ * } $shared
+ * @param list<string> $reservedSlugs
+ */
+function package_form_data_from_plan_post(array $plan, array $shared = [], array &$reservedSlugs = []): array
+{
+    $saveMode = (string) ($shared['save_mode'] ?? 'publish');
+    $packageId = (int) ($plan['package_id'] ?? 0);
+    $existing = $packageId > 0 ? admin_package_by_id($packageId) : null;
+
+    $title = package_draft_title(trim((string) ($plan['title'] ?? '')));
+    $planKey = trim((string) ($plan['plan_key'] ?? ''));
+    if ($existing) {
+        $slug = (string) $existing['slug'];
+    } else {
+        $slugBase = slugify($title);
+        if ($slugBase === '' || $slugBase === 'untitled-package') {
+            $slugBase = slugify((string) ($plan['plan_label'] ?? 'package'));
+        }
+        if ($planKey !== '' && !str_ends_with($slugBase, $planKey)) {
+            $slugBase .= '-' . $planKey;
+        }
+        $slug = unique_package_slug_in_batch($slugBase, $reservedSlugs);
+    }
+
+    $days = max(1, (int) ($plan['days'] ?? 1));
+    $nights = max(0, min($days, (int) ($plan['nights'] ?? 0)));
+    $pickup = trim((string) ($plan['pickup'] ?? ''));
+
+    $places = places_all();
+    $destSlugs = isset($plan['destinations']) && is_array($plan['destinations'])
+        ? array_values(array_filter(array_map('strval', $plan['destinations'])))
+        : [];
+    $types = package_types_from_array(isset($plan['types']) && is_array($plan['types']) ? $plan['types'] : []);
+
+    $destLabels = [];
+    $pages = [];
+    foreach ($destSlugs as $destSlug) {
+        $place = $places[$destSlug] ?? null;
+        $destLabels[] = $place['label'] ?? $destSlug;
+        $scopes = $place['catalog_scopes'] ?? [place_default_catalog_scope((string) $destSlug)];
+        foreach ($scopes as $scope) {
+            if ($scope !== '' && !in_array($scope, $pages, true)) {
+                $pages[] = $scope;
+            }
+        }
+    }
+    if (!$pages) {
+        $pages = ['kerala'];
+    }
+
+    $stays = [];
+    if (isset($plan['stays']) && is_array($plan['stays'])) {
+        $stays = array_values(array_map('strval', $plan['stays']));
+    }
+    if (count($stays) < $nights) {
+        $stays = array_merge($stays, array_fill(0, $nights - count($stays), $destSlugs[count($destSlugs) - 1] ?? ''));
+    }
+    $stays = array_slice($stays, 0, $nights);
+    $staySummary = stays_to_summary($stays, $places);
+
+    $highlights = [];
+    if (isset($plan['highlights']) && is_array($plan['highlights'])) {
+        foreach ($plan['highlights'] as $h) {
+            $h = trim((string) $h);
+            if ($h !== '' && !in_array($h, $highlights, true)) {
+                $highlights[] = $h;
+            }
+        }
+    }
+
+    return [
+        'slug' => $slug,
+        'sheet' => '',
+        'group_name' => $destLabels[0] ?? '',
+        'pickup' => $pickup,
+        'drop_point' => $pickup,
+        'pickup_slug' => $pickup !== '' ? slugify($pickup) : '',
+        'days' => $days,
+        'nights' => $nights,
+        'stay_split' => stays_to_split($stays),
+        'stay_summary' => $staySummary,
+        'stays_json' => json_encode($stays, JSON_UNESCAPED_UNICODE),
+        'destinations_json' => json_encode($destSlugs, JSON_UNESCAPED_UNICODE),
+        'dest_line' => implode(' · ', $destLabels),
+        'pages_json' => json_encode($pages, JSON_UNESCAPED_UNICODE),
+        'type' => $types[0] ?? 'family',
+        'types_json' => json_encode($types, JSON_UNESCAPED_UNICODE),
+        'state' => '',
+        'duration_bucket' => package_duration_bucket($days),
+        'title' => $title,
+        'overview' => trim((string) ($plan['overview'] ?? '')),
+        'card_text' => trim((string) ($plan['card_text'] ?? '')),
+        'highlights_json' => json_encode($highlights, JSON_UNESCAPED_UNICODE),
+        'itinerary_json' => json_encode(package_itinerary_from_plan_array($plan), JSON_UNESCAPED_UNICODE),
+        'image' => (string) ($plan['image'] ?? $shared['image'] ?? ($existing['image'] ?? '')),
+        'gallery_json' => (string) ($plan['gallery_json'] ?? $shared['gallery_json'] ?? ($existing['gallery_json'] ?? '[]')),
+        'itinerary_pdf' => (string) ($shared['itinerary_pdf'] ?? ($existing['itinerary_pdf'] ?? '')),
+        'price_chart_pdf' => (string) ($plan['price_chart_pdf'] ?? $shared['price_chart_pdf'] ?? ($existing['price_chart_pdf'] ?? '')),
+        'has_houseboat' => 0,
+        'accommodation' => $staySummary,
+        'is_featured' => (int) ($plan['is_featured'] ?? $shared['is_featured'] ?? ($existing['is_featured'] ?? 0)),
+        'is_published' => package_is_published_from_mode($saveMode),
+        'sort_order' => (int) ($plan['sort_order'] ?? $shared['sort_order'] ?? ($existing['sort_order'] ?? 0)),
+    ];
+}
+
+/**
+ * Apply standard single-package media uploads from POST to a data row.
+ *
+ * @return list<string> validation/upload errors
+ */
+function admin_package_apply_media_uploads(array &$data, ?array $existing = null, bool $requireCover = true): array
+{
+    $errors = [];
+    $existing = $existing ?? [];
+    $oldImage = (string) ($existing['image'] ?? $data['image'] ?? '');
+    $oldGallery = json_decode_array($existing['gallery_json'] ?? $data['gallery_json'] ?? null);
+
+    $takeUploadError = static function () use (&$errors): void {
+        $message = admin_upload_last_error();
+        if ($message) {
+            $errors[] = $message;
+            admin_upload_last_error('');
+        }
+    };
+
+    $newHero = !empty($_FILES['image_file']['name']);
+    $libraryCover = trim(post('library_image'));
+    $removeHero = post('remove_image') === '1';
+    $hasCover = $newHero || ($libraryCover !== '' && !$removeHero) || (!$removeHero && $oldImage !== '');
+
+    if ($requireCover && !$hasCover) {
+        $errors[] = 'A cover image is required.';
+    }
+
+    if ($errors) {
+        return $errors;
+    }
+
+    $gallery = admin_collect_media_paths('gallery_keep', '', $_FILES['gallery_files'] ?? null, 'packages');
+    $takeUploadError();
+    if (count($gallery) > 10) {
+        $gallery = array_slice($gallery, 0, 10);
+    }
+    $data['gallery_json'] = json_encode($gallery, JSON_UNESCAPED_UNICODE);
+
+    if ($newHero) {
+        $uploaded = admin_apply_image_upload($_FILES['image_file'], 'packages', $removeHero ? '' : $oldImage);
+        $takeUploadError();
+        if ($uploaded) {
+            $data['image'] = $uploaded;
+        }
+    } elseif ($libraryCover !== '' && !$removeHero) {
+        $data['image'] = ltrim($libraryCover, '/');
+        media_ensure_row($data['image']);
+    } elseif ($removeHero) {
+        $data['image'] = '';
+    } else {
+        $data['image'] = $oldImage;
+    }
+
+    $data['itinerary_pdf'] = admin_apply_pdf_field(
+        'itinerary_pdf_file',
+        'remove_itinerary_pdf',
+        (string) ($existing['itinerary_pdf'] ?? $data['itinerary_pdf'] ?? ''),
+        'packages'
+    );
+    $takeUploadError();
+    $data['price_chart_pdf'] = admin_apply_pdf_field(
+        'price_chart_pdf_file',
+        'remove_price_chart_pdf',
+        (string) ($existing['price_chart_pdf'] ?? $data['price_chart_pdf'] ?? ''),
+        'packages'
+    );
+    $takeUploadError();
+
+    return $errors;
+}
+
+/**
+ * @return array<string,mixed>|null
+ */
+function admin_plan_file_from_post(int $index, string $field): ?array
+{
+    if (!isset($_FILES['plans']['name'][$index][$field]) || $_FILES['plans']['name'][$index][$field] === '') {
+        return null;
+    }
+
+    return [
+        'name' => $_FILES['plans']['name'][$index][$field],
+        'type' => $_FILES['plans']['type'][$index][$field],
+        'tmp_name' => $_FILES['plans']['tmp_name'][$index][$field],
+        'error' => $_FILES['plans']['error'][$index][$field],
+        'size' => $_FILES['plans']['size'][$index][$field],
+    ];
+}
+
+/**
+ * Apply per-plan media uploads for PDF wizard step 3.
+ *
+ * @return list<string>
+ */
+function admin_package_apply_plan_media_uploads(array &$data, int $planIndex, ?array $existing = null, bool $requireCover = true): array
+{
+    $errors = [];
+    $existing = $existing ?? [];
+    $oldImage = (string) ($existing['image'] ?? $data['image'] ?? '');
+    $oldGallery = json_decode_array($existing['gallery_json'] ?? $data['gallery_json'] ?? null);
+
+    $takeUploadError = static function () use (&$errors): void {
+        $message = admin_upload_last_error();
+        if ($message) {
+            $errors[] = $message;
+            admin_upload_last_error('');
+        }
+    };
+
+    $prefix = 'plans';
+    $newHeroFile = admin_plan_file_from_post($planIndex, 'image_file');
+    $libraryCover = trim((string) (($_POST['plans'][$planIndex]['library_image'] ?? '') ?: ''));
+    $removeHero = (($_POST['plans'][$planIndex]['remove_image'] ?? '0') === '1');
+    $newHero = $newHeroFile !== null;
+    $hasCover = $newHero || ($libraryCover !== '' && !$removeHero) || (!$removeHero && $oldImage !== '');
+
+    if ($requireCover && !$hasCover) {
+        $errors[] = 'A cover image is required.';
+    }
+
+    if ($errors) {
+        return $errors;
+    }
+
+    $galleryFiles = null;
+    if (isset($_FILES['plans']['name'][$planIndex]['gallery_files'])) {
+        $names = $_FILES['plans']['name'][$planIndex]['gallery_files'];
+        if (is_array($names) ? in_array(true, array_map(static fn($n) => $n !== '', $names), true) : $names !== '') {
+            $galleryFiles = [
+                'name' => $_FILES['plans']['name'][$planIndex]['gallery_files'],
+                'type' => $_FILES['plans']['type'][$planIndex]['gallery_files'],
+                'tmp_name' => $_FILES['plans']['tmp_name'][$planIndex]['gallery_files'],
+                'error' => $_FILES['plans']['error'][$planIndex]['gallery_files'],
+                'size' => $_FILES['plans']['size'][$planIndex]['gallery_files'],
+            ];
+        }
+    }
+
+    $keep = [];
+    if (isset($_POST['plans'][$planIndex]['gallery_keep']) && is_array($_POST['plans'][$planIndex]['gallery_keep'])) {
+        foreach ($_POST['plans'][$planIndex]['gallery_keep'] as $path) {
+            $path = trim((string) $path);
+            if ($path !== '' && strpos($path, '..') === false) {
+                $keep[] = $path;
+            }
+        }
+    }
+    if ($galleryFiles) {
+        $keep = array_merge($keep, admin_store_uploads_many($galleryFiles, 'packages'));
+    }
+    $takeUploadError();
+    if (count($keep) > 10) {
+        $keep = array_slice($keep, 0, 10);
+    }
+    $data['gallery_json'] = json_encode(array_values(array_unique($keep)), JSON_UNESCAPED_UNICODE);
+
+    if ($newHero && $newHeroFile) {
+        $uploaded = admin_apply_image_upload($newHeroFile, 'packages', $removeHero ? '' : $oldImage);
+        $takeUploadError();
+        if ($uploaded) {
+            $data['image'] = $uploaded;
+        }
+    } elseif ($libraryCover !== '' && !$removeHero) {
+        $data['image'] = ltrim($libraryCover, '/');
+        media_ensure_row($data['image']);
+    } elseif ($removeHero) {
+        $data['image'] = '';
+    } else {
+        $data['image'] = $oldImage;
+    }
+
+    $priceFile = admin_plan_file_from_post($planIndex, 'price_chart_pdf_file');
+    if ($priceFile) {
+        $uploadedPdf = admin_store_pdf($priceFile, 'packages');
+        $takeUploadError();
+        if ($uploadedPdf) {
+            $oldPdf = (string) ($existing['price_chart_pdf'] ?? '');
+            if ($oldPdf !== '' && $oldPdf !== $uploadedPdf) {
+                admin_delete_upload($oldPdf);
+            }
+            $data['price_chart_pdf'] = $uploadedPdf;
+        }
+    } elseif (($_POST['plans'][$planIndex]['remove_price_chart_pdf'] ?? '0') === '1') {
+        $oldPdf = (string) ($existing['price_chart_pdf'] ?? '');
+        if ($oldPdf !== '') {
+            admin_delete_upload($oldPdf);
+        }
+        $data['price_chart_pdf'] = '';
+    }
+
+    return $errors;
+}
+
+/**
+ * Upsert a single package row from form data.
+ *
+ * @return array{id:int,slug:string,preview_url:string}
+ */
+function admin_package_upsert(array $data, int $packageId = 0): array
+{
+    if ($packageId > 0) {
+        admin_package_update($packageId, $data);
+        $id = $packageId;
+    } else {
+        $id = admin_package_insert($data);
+    }
+
+    return [
+        'id' => $id,
+        'slug' => (string) $data['slug'],
+        'preview_url' => package_public_url((string) $data['slug'], true),
+    ];
+}
+
+/**
+ * Normalize a parsed PDF plan from Gemini.
+ *
+ * @param array<string,mixed> $plan
+ * @return array{plan:array<string,mixed>,warnings:list<string>}
+ */
+function package_normalize_pdf_plan(array $plan, array $places): array
+{
+    $warnings = [];
+    $planLabel = trim((string) ($plan['plan_label'] ?? ''));
+    if ($planLabel === '') {
+        $planLabel = 'Standard Plan';
+    }
+    $planKey = trim((string) ($plan['plan_key'] ?? ''));
+    if ($planKey === '') {
+        $planKey = slugify($planLabel);
+    }
+
+    $days = max(1, min(60, (int) ($plan['days'] ?? 1)));
+    $nights = max(0, min($days, (int) ($plan['nights'] ?? 0)));
+
+    $destResult = package_resolve_place_slugs(
+        isset($plan['destinations']) && is_array($plan['destinations']) ? $plan['destinations'] : [],
+        $places
+    );
+    foreach ($destResult['unmatched'] as $u) {
+        $warnings[] = ($planLabel !== '' ? $planLabel . ': ' : '') . 'Unknown destination "' . $u . '".';
+    }
+
+    $stayResult = package_resolve_place_slugs(
+        isset($plan['stays']) && is_array($plan['stays']) ? $plan['stays'] : [],
+        $places
+    );
+    $stays = $stayResult['resolved'];
+    if ($nights > 0 && count($stays) < $nights && $destResult['resolved'] !== []) {
+        $fill = $destResult['resolved'][count($destResult['resolved']) - 1];
+        $stays = array_merge($stays, array_fill(0, $nights - count($stays), $fill));
+    }
+    foreach ($stayResult['unmatched'] as $u) {
+        $warnings[] = ($planLabel !== '' ? $planLabel . ': ' : '') . 'Unknown stay place "' . $u . '".';
+    }
+
+    $types = package_types_from_array(isset($plan['types']) && is_array($plan['types']) ? $plan['types'] : []);
+    if ($types === []) {
+        $types = ['family'];
+    }
+
+    $highlights = [];
+    if (isset($plan['highlights']) && is_array($plan['highlights'])) {
+        foreach ($plan['highlights'] as $h) {
+            $h = trim((string) $h);
+            if ($h !== '' && !in_array($h, $highlights, true)) {
+                $highlights[] = $h;
+            }
+        }
+    }
+
+    $itinerary = [];
+    $rawItinerary = $plan['itinerary'] ?? [];
+    if (is_array($rawItinerary)) {
+        foreach (array_values($rawItinerary) as $day) {
+            if (!is_array($day)) {
+                continue;
+            }
+            $dayTitle = trim((string) ($day['title'] ?? ''));
+            $dayText = trim((string) ($day['text'] ?? ''));
+            if ($dayTitle === '' && $dayText === '') {
+                continue;
+            }
+            if (mb_strlen($dayText) > 1000) {
+                $dayText = rtrim(mb_substr($dayText, 0, 997)) . '…';
+            }
+            $itinerary[] = [
+                'day' => count($itinerary) + 1,
+                'title' => $dayTitle !== '' ? $dayTitle : ('Day ' . (count($itinerary) + 1)),
+                'text' => $dayText,
+            ];
+            if (count($itinerary) >= $days) {
+                break;
+            }
+        }
+    }
+    while (count($itinerary) < $days) {
+        $n = count($itinerary) + 1;
+        $itinerary[] = ['day' => $n, 'title' => 'Day ' . $n, 'text' => ''];
+    }
+
+    $title = trim((string) ($plan['title'] ?? ''));
+    $cardText = trim((string) ($plan['card_text'] ?? ''));
+    $overview = trim((string) ($plan['overview'] ?? ''));
+    if (mb_strlen($cardText) > 90) {
+        $cardText = rtrim(mb_substr($cardText, 0, 87)) . '…';
+    }
+    if (mb_strlen($overview) > 500) {
+        $overview = rtrim(mb_substr($overview, 0, 497)) . '…';
+    }
+
+    return [
+        'plan' => [
+            'plan_key' => $planKey,
+            'plan_label' => $planLabel,
+            'days' => $days,
+            'nights' => $nights,
+            'destinations' => $destResult['resolved'],
+            'unmatched_destinations' => $destResult['unmatched'],
+            'types' => $types,
+            'pickup' => trim((string) ($plan['pickup'] ?? '')),
+            'stays' => array_slice($stays, 0, $nights),
+            'unmatched_stays' => $stayResult['unmatched'],
+            'highlights' => $highlights,
+            'title' => $title,
+            'card_text' => $cardText,
+            'overview' => $overview,
+            'itinerary' => $itinerary,
+        ],
+        'warnings' => $warnings,
+    ];
+}
+
+/**
+ * Create a minimal place row for quick-add from PDF wizard.
+ *
+ * @param list<string> $scopes
+ * @return array{slug:string,label:string}
+ */
+function admin_quick_insert_place(string $label, array $scopes = ['kerala']): array
+{
+    $label = trim($label);
+    if ($label === '') {
+        throw new InvalidArgumentException('Place label is required.');
+    }
+
+    $validScopes = [];
+    foreach ($scopes as $scope) {
+        $scope = strtolower(trim((string) $scope));
+        if (isset(catalog_scope_options()[$scope]) && !in_array($scope, $validScopes, true)) {
+            $validScopes[] = $scope;
+        }
+    }
+    if ($validScopes === []) {
+        $validScopes = ['kerala'];
+    }
+
+    $slug = unique_place_slug(slugify($label));
+    db()->prepare(
+        'INSERT INTO places (slug, label, catalog_scope, catalog_scopes_json, tags_json, arrive_text, sightseeing_text, images_json, sort_order) VALUES (?,?,?,?,?,?,?,?,?)'
+    )->execute([
+        $slug,
+        $label,
+        $validScopes[0],
+        json_encode($validScopes, JSON_UNESCAPED_UNICODE),
+        '[]',
+        '',
+        '',
+        '[]',
+        0,
+    ]);
+
+    return ['slug' => $slug, 'label' => $label];
+}
+
+/**
+ * @param array<string,array<string,mixed>> $places
+ * @param array<string,string> $typeOptions
+ */
+function package_pdf_parse_prompt(array $places, array $typeOptions): string
+{
+    $placeLines = [];
+    foreach ($places as $slug => $place) {
+        $placeLines[] = '- ' . $slug . ': ' . (string) ($place['label'] ?? $slug);
+    }
+    $placeCatalog = $placeLines !== [] ? implode("\n", $placeLines) : '(none)';
+
+    $typeLines = [];
+    foreach ($typeOptions as $slug => $label) {
+        $typeLines[] = '- ' . $slug . ': ' . $label;
+    }
+    $typeCatalog = $typeLines !== [] ? implode("\n", $typeLines) : '- family: Family';
+
+    return <<<PROMPT
+You extract structured travel package data from YathraNest itinerary PDF brochures.
+
+Return ONLY valid JSON matching the schema. Each distinct itinerary variant in the PDF must be a separate object in the "plans" array.
+
+Plan naming rules:
+- PDF labels like "PLAN A : Sightseeing Plan" → plan_label = "Sightseeing Plan" (drop PLAN A/B letter prefix)
+- PDF labels like "PLAN B : Trekking Plan" → plan_label = "Trekking Plan"
+- Use descriptive names such as "Sightseeing Plan", "Trekking Plan", "Pykara lake & Pykara waterfalls", etc.
+- plan_key = slugified plan_label (e.g. sightseeing-plan, trekking-plan)
+- Single-plan PDFs without A/B variants → plan_label = section heading or "Standard Plan"
+
+For each plan extract:
+- days, nights from duration text (e.g. "3 DAY 2 NIGHT" → days=3, nights=2)
+- destinations: ONLY slugs from the catalog below
+- stays: one slug per night from the catalog (infer from "Overnight stay in X" lines)
+- types: ONLY slugs from the type catalog (infer from copy mentioning families, couples, etc.)
+- pickup: the pickup/drop line text
+- highlights: key activities or places (short strings)
+- title: destination + duration + "Package" + plan name when multiple plans exist (e.g. "Wayanad 3 Days Package — Sightseeing Plan")
+- card_text: one benefit line, max 90 chars
+- overview: intro copy for this plan, max 500 chars (from page 1 or plan-specific intro)
+- itinerary: one object per day; merge FORENOON and AFTERNOON bullets into text (max 1000 chars per day)
+
+Ignore these PDF sections entirely:
+- Budget/Classic/Signature/Elite/Platinum/Luxury package tier descriptions
+- Private trip details / terms / contact pages
+- How to Reach / train-bus info pages
+- Honeymoon special promos without a full itinerary
+
+Important:
+- Template header art may show wrong destination names — trust itinerary content over decorative headers
+- Use ONLY destination/stay slugs from the catalog
+- If a place is not in the catalog, put the human name in destinations array anyway (we will flag it)
+
+Destination catalog (slug: label):
+{$placeCatalog}
+
+Type catalog (slug: label):
+{$typeCatalog}
+PROMPT;
+}
+
+/** @return array<string,mixed> */
+function package_pdf_parse_schema(): array
+{
+    $daySchema = [
+        'type' => 'OBJECT',
+        'properties' => [
+            'day' => ['type' => 'INTEGER'],
+            'title' => ['type' => 'STRING'],
+            'text' => ['type' => 'STRING'],
+        ],
+        'required' => ['day', 'title', 'text'],
+    ];
+
+    $planSchema = [
+        'type' => 'OBJECT',
+        'properties' => [
+            'plan_key' => ['type' => 'STRING'],
+            'plan_label' => ['type' => 'STRING'],
+            'days' => ['type' => 'INTEGER'],
+            'nights' => ['type' => 'INTEGER'],
+            'destinations' => ['type' => 'ARRAY', 'items' => ['type' => 'STRING']],
+            'types' => ['type' => 'ARRAY', 'items' => ['type' => 'STRING']],
+            'pickup' => ['type' => 'STRING'],
+            'stays' => ['type' => 'ARRAY', 'items' => ['type' => 'STRING']],
+            'highlights' => ['type' => 'ARRAY', 'items' => ['type' => 'STRING']],
+            'title' => ['type' => 'STRING'],
+            'card_text' => ['type' => 'STRING'],
+            'overview' => ['type' => 'STRING'],
+            'itinerary' => ['type' => 'ARRAY', 'items' => $daySchema],
+        ],
+        'required' => ['plan_label', 'days', 'nights', 'destinations', 'types', 'pickup', 'title', 'overview', 'itinerary'],
+    ];
+
+    return [
+        'type' => 'OBJECT',
+        'properties' => [
+            'plans' => [
+                'type' => 'ARRAY',
+                'items' => $planSchema,
+            ],
+        ],
+        'required' => ['plans'],
+    ];
 }
 
 // Media library helpers (media_register_*, media_list, …)

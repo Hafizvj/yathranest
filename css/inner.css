@@ -1522,3 +1522,19 @@ html.has-motion .section-head.is-in {
     max-width: 22rem;
   }
 }
+
+.admin-preview-banner {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  padding: 0.65rem 1rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #5c3b00;
+  background: #fff4d6;
+  border-bottom: 1px solid #f0d58a;
+}
+.admin-preview-banner a {
+  color: #346356;
+  font-weight: 600;
+}

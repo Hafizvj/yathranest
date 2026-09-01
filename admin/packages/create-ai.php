@@ -5,6 +5,14 @@ require_admin();
 require_once __DIR__ . '/_form_helpers.php';
 
 $row = null;
+$packageId = (int) get_query('id', '0');
+if ($packageId > 0) {
+    $row = admin_package_by_id($packageId);
+    if (!$row) {
+        flash_set('error', 'Package not found.');
+        redirect('admin/packages/index.php');
+    }
+}
 $places = places_all();
 $errors = [];
 
@@ -12,66 +20,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verify_csrf(post('_csrf'))) {
         $errors[] = 'Invalid CSRF token.';
     } else {
-        $data = package_form_data_from_post(null);
-        $errors = array_merge($errors, package_form_validate($data));
+        $postPackageId = (int) post('package_id', '0');
+        $existing = $postPackageId > 0 ? admin_package_by_id($postPackageId) : null;
+        $data = package_form_data_from_post($existing);
+        $saveMode = package_save_mode_from_post();
+        $errors = array_merge($errors, package_form_validate($data, $saveMode));
 
-        $takeUploadError = static function () use (&$errors): void {
-            $message = admin_upload_last_error();
-            if ($message) {
-                $errors[] = $message;
-                admin_upload_last_error('');
-            }
-        };
-
-        $newHero = !empty($_FILES['image_file']['name']);
-        $libraryCover = trim(post('library_image'));
-        $hasCover = $newHero || $libraryCover !== '';
-        if (!$hasCover) {
-            $errors[] = 'A cover image is required.';
-        }
-
-        $gallery = [];
+        $requireCover = $saveMode === 'publish';
         if (!$errors) {
-            $gallery = admin_collect_media_paths('gallery_keep', '', $_FILES['gallery_files'] ?? null, 'packages');
-            $takeUploadError();
-            if (count($gallery) > 10) {
-                $gallery = array_slice($gallery, 0, 10);
-            }
-            $data['gallery_json'] = json_encode($gallery, JSON_UNESCAPED_UNICODE);
-
-            if ($newHero) {
-                $uploaded = admin_apply_image_upload($_FILES['image_file'], 'packages', '');
-                $takeUploadError();
-                if ($uploaded) {
-                    $data['image'] = $uploaded;
-                }
-            } elseif ($libraryCover !== '') {
-                $data['image'] = ltrim($libraryCover, '/');
-                media_ensure_row($data['image']);
-            }
-
-            $data['itinerary_pdf'] = admin_apply_pdf_field(
-                'itinerary_pdf_file',
-                'remove_itinerary_pdf',
-                '',
-                'packages'
-            );
-            $takeUploadError();
-            $data['price_chart_pdf'] = admin_apply_pdf_field(
-                'price_chart_pdf_file',
-                'remove_price_chart_pdf',
-                '',
-                'packages'
-            );
-            $takeUploadError();
+            $mediaErrors = admin_package_apply_media_uploads($data, $existing, $requireCover);
+            $errors = array_merge($errors, $mediaErrors);
         }
 
         if (!$errors) {
-            admin_package_insert($data);
-            flash_set('success', 'Package created.');
+            admin_package_upsert($data, $postPackageId);
+            flash_set('success', $saveMode === 'publish' ? 'Package published.' : 'Draft saved.');
             redirect('admin/packages/index.php');
         }
-        $row = $data;
+        $row = array_merge($existing ?: [], $data);
+        $packageId = $postPackageId;
     }
 }
 
@@ -148,9 +115,13 @@ ob_start();
   data-rich-form
   data-ai-package-form
   data-ai-generate-url="<?= e(url('admin/packages/ai-generate.php')) ?>"
+  data-save-draft-url="<?= e(url('admin/packages/save-draft.php')) ?>"
   data-ai-start-step="<?= (int) $startStep ?>"
 >
   <?= csrf_field() ?>
+  <input type="hidden" name="package_id" value="<?= (int) $packageId ?>" data-package-id />
+  <input type="hidden" name="save_mode" value="publish" data-save-mode />
+  <input type="hidden" name="wizard_step" value="1" data-wizard-step />
   <?php if ($errors): ?>
     <div class="admin-alert admin-alert--err" role="alert"><span><?= e(implode(' ', $errors)) ?></span></div>
   <?php endif; ?>
@@ -274,9 +245,6 @@ ob_start();
         <div class="form-card__titles">
           <h2 class="form-card__title">Content</h2>
         </div>
-        <button class="btn btn--secondary btn--sm" type="button" data-ai-generate>
-          <?= yn_icon('sparkle') ?>Generate
-        </button>
       </div>
       <div class="form-card__body">
         <div class="ai-status" data-ai-status hidden></div>
@@ -506,8 +474,10 @@ ob_start();
     </div>
     <div class="ai-wizard__footer-right">
       <button class="btn btn--secondary" type="button" data-ai-generate-footer hidden><?= yn_icon('sparkle') ?>Regenerate</button>
+      <button class="btn btn--secondary" type="button" data-ai-save-draft>Save</button>
       <button class="btn btn--primary" type="button" data-ai-next>Continue</button>
-      <button class="btn btn--primary" type="submit" data-ai-save hidden>Save</button>
+      <button class="btn btn--secondary" type="button" data-ai-preview hidden>Preview</button>
+      <button class="btn btn--primary" type="submit" data-ai-publish hidden>Publish</button>
     </div>
   </div>
 </form>

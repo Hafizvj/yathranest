@@ -5,9 +5,11 @@
   }
 
   var generateUrl = form.getAttribute('data-ai-generate-url') || '';
+  var saveDraftUrl = form.getAttribute('data-save-draft-url') || '';
   var startStep = parseInt(form.getAttribute('data-ai-start-step') || '1', 10) || 1;
   var step = startStep;
   var generatedOnce = false;
+  var previewUrl = '';
 
   var panels = {
     1: form.querySelector('[data-ai-panel="1"]'),
@@ -22,10 +24,14 @@
   var statusEl = form.querySelector('[data-ai-status]');
   var btnBack = form.querySelector('[data-ai-back]');
   var btnNext = form.querySelector('[data-ai-next]');
-  var btnSave = form.querySelector('[data-ai-save]');
   var btnCancel = form.querySelector('[data-ai-cancel]');
-  var btnGenerate = form.querySelector('[data-ai-generate]');
   var btnGenerateFooter = form.querySelector('[data-ai-generate-footer]');
+  var btnSaveDraft = form.querySelector('[data-ai-save-draft]');
+  var btnPreview = form.querySelector('[data-ai-preview]');
+  var btnPublish = form.querySelector('[data-ai-publish]');
+  var packageIdInput = form.querySelector('[data-package-id]');
+  var saveModeInput = form.querySelector('[data-save-mode]');
+  var wizardStepInput = form.querySelector('[data-wizard-step]');
   var csrfInput = form.querySelector('input[name="_csrf"]');
 
   function showError(message) {
@@ -39,6 +45,18 @@
     }
     errorText.textContent = message;
     errorBox.hidden = false;
+  }
+
+  function showToast(message) {
+    if (!message) {
+      return;
+    }
+    setStatus(message, false);
+    window.setTimeout(function () {
+      if (statusEl && statusEl.textContent === message) {
+        setStatus('');
+      }
+    }, 3000);
   }
 
   function setStatus(message, isBusy) {
@@ -146,7 +164,6 @@
     daysInput.value = String(target);
     daysInput.dispatchEvent(new Event('input', { bubbles: true }));
 
-    // Ensure enough rows even if trailing empties were not added.
     var addBtn = form.querySelector('[data-day-add]');
     while (list.children.length < target && addBtn) {
       addBtn.click();
@@ -221,7 +238,7 @@
   }
 
   function setGenerating(busy) {
-    [btnGenerate, btnGenerateFooter, btnNext, btnBack].forEach(function (btn) {
+    [btnGenerateFooter, btnNext, btnBack, btnSaveDraft].forEach(function (btn) {
       if (btn) {
         btn.disabled = !!busy;
       }
@@ -277,6 +294,84 @@
       });
   }
 
+  function saveDraft() {
+    if (!saveDraftUrl) {
+      showError('Save endpoint is not configured.');
+      return Promise.resolve(false);
+    }
+
+    var err = validateStep1();
+    if (err) {
+      showError(err);
+      return Promise.resolve(false);
+    }
+
+    if (wizardStepInput) {
+      wizardStepInput.value = String(step);
+    }
+
+    var fd = new FormData(form);
+    fd.set('save_mode', 'draft');
+    fd.set('wizard_type', 'ai');
+    fd.set('wizard_step', String(step));
+
+    if (btnSaveDraft) {
+      btnSaveDraft.disabled = true;
+    }
+    setStatus('Saving draft…', true);
+
+    return fetch(saveDraftUrl, {
+      method: 'POST',
+      body: fd,
+      credentials: 'same-origin',
+      headers: {
+        Accept: 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRF-Token': csrfInput ? csrfInput.value : '',
+      },
+    })
+      .then(function (res) {
+        return res.json();
+      })
+      .then(function (data) {
+        if (!data || !data.ok) {
+          showError((data && data.error) || 'Could not save draft.');
+          setStatus('');
+          return false;
+        }
+        if (packageIdInput && data.id) {
+          packageIdInput.value = String(data.id);
+        }
+        if (data.preview_url) {
+          previewUrl = data.preview_url;
+        }
+        showToast(data.message || 'Draft saved.');
+        return true;
+      })
+      .catch(function () {
+        showError('Could not reach the save endpoint. Try again.');
+        setStatus('');
+        return false;
+      })
+      .finally(function () {
+        if (btnSaveDraft) {
+          btnSaveDraft.disabled = false;
+        }
+      });
+  }
+
+  function openPreview() {
+    if (previewUrl) {
+      window.open(previewUrl, '_blank', 'noopener');
+      return;
+    }
+    saveDraft().then(function (ok) {
+      if (ok && previewUrl) {
+        window.open(previewUrl, '_blank', 'noopener');
+      }
+    });
+  }
+
   function updateChrome() {
     Object.keys(panels).forEach(function (key) {
       var panel = panels[key];
@@ -307,13 +402,21 @@
     }
     if (btnNext) {
       btnNext.hidden = step === 3;
-      btnNext.textContent = 'Continue';
     }
-    if (btnSave) {
-      btnSave.hidden = step !== 3;
+    if (btnSaveDraft) {
+      btnSaveDraft.hidden = false;
     }
     if (btnGenerateFooter) {
       btnGenerateFooter.hidden = step !== 2;
+    }
+    if (btnPreview) {
+      btnPreview.hidden = step !== 3;
+    }
+    if (btnPublish) {
+      btnPublish.hidden = step !== 3;
+    }
+    if (wizardStepInput) {
+      wizardStepInput.value = String(step);
     }
   }
 
@@ -358,22 +461,34 @@
     });
   }
 
-  function onGenerateClick(e) {
-    e.preventDefault();
-    generate();
+  if (btnGenerateFooter) {
+    btnGenerateFooter.addEventListener('click', function (e) {
+      e.preventDefault();
+      generate();
+    });
   }
 
-  if (btnGenerate) {
-    btnGenerate.addEventListener('click', onGenerateClick);
+  if (btnSaveDraft) {
+    btnSaveDraft.addEventListener('click', function (e) {
+      e.preventDefault();
+      saveDraft();
+    });
   }
-  if (btnGenerateFooter) {
-    btnGenerateFooter.addEventListener('click', onGenerateClick);
+
+  if (btnPreview) {
+    btnPreview.addEventListener('click', function (e) {
+      e.preventDefault();
+      openPreview();
+    });
   }
 
   form.addEventListener('submit', function (e) {
     if (step !== 3) {
       e.preventDefault();
       return;
+    }
+    if (saveModeInput) {
+      saveModeInput.value = 'publish';
     }
     var err1 = validateStep1();
     if (err1) {
