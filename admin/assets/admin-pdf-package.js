@@ -417,8 +417,14 @@
     renderMediaSidebar();
   }
 
+  function iconHtml(id) {
+    var tpl = document.getElementById(id);
+    return tpl ? tpl.innerHTML : '';
+  }
+
   function buildMediaPanel(plan, index) {
     var prefix = 'plans[' + index + ']';
+    var keepName = prefix + '[gallery_keep][]';
     var label = plan.plan_label || 'Plan ' + (index + 1);
     var section = document.createElement('section');
     section.className = 'form-card ai-panel-card pdf-plan-media-panel';
@@ -431,24 +437,60 @@
       '<input type="hidden" name="' + escHtml(prefix) + '[package_id]" value="' + escHtml(plan.package_id || '') + '" data-plan-package-id />' +
       '<input type="hidden" name="' + escHtml(prefix) + '[plan_key]" value="' + escHtml(plan.plan_key || '') + '" />' +
       '<input type="hidden" name="' + escHtml(prefix) + '[plan_label]" value="' + escHtml(label) + '" />' +
-      '<div class="media-split" data-package-media data-gallery-max="10">' +
+      '<div class="media-split" data-package-media data-gallery-max="10" data-gallery-keep-name="' + escHtml(keepName) + '">' +
       '<div class="media-col media-col--cover">' +
       '<span class="field__label">Cover <span class="field__req">*</span></span>' +
+      '<p class="field__hint">Main card image for this package.</p>' +
       '<input type="hidden" name="' + escHtml(prefix) + '[remove_image]" value="0" data-cover-remove />' +
       '<input type="hidden" name="' + escHtml(prefix) + '[library_image]" value="" data-cover-library />' +
-      '<input class="media-file-input" type="file" name="' + escHtml(prefix) + '[image_file]" accept="image/jpeg,image/png,image/webp,image/gif" data-cover-input />' +
+      '<input class="media-file-input" type="file" name="' + escHtml(prefix) + '[image_file]" accept="image/jpeg,image/png,image/webp,image/gif" data-cover-input data-cover-required />' +
       '<div class="media-drop media-drop--cover" data-dropzone data-cover-empty>' +
-      '<span class="media-drop__title">Upload cover image</span></div>' +
-      '<div class="media-cover-card" data-cover-filled hidden><div class="media-cover-card__preview">' +
-      '<img alt="Cover preview" data-cover-img hidden /></div></div></div>' +
+      '<span class="media-drop__icon" aria-hidden="true">' + iconHtml('icon-upload') + '</span>' +
+      '<span class="media-drop__title">Upload cover image</span>' +
+      '<span class="media-drop__hint">JPG, PNG, WEBP up to 5MB</span>' +
+      '<span class="media-drop__divider"><span>or</span></span>' +
+      '<button class="media-drop__browse" type="button" data-cover-library>' +
+      iconHtml('icon-image') + ' Choose from library</button></div>' +
+      '<div class="media-cover-card" data-cover-filled hidden>' +
+      '<div class="media-cover-card__preview">' +
+      '<img alt="Cover preview" data-cover-img hidden />' +
+      '<button class="media-thumb__remove" type="button" data-cover-clear aria-label="Remove cover image">' +
+      iconHtml('icon-trash') + '</button></div>' +
+      '<div class="media-cover-card__meta"><span class="media-file-meta">' +
+      '<span class="media-file-meta__check" aria-hidden="true">' + iconHtml('icon-check') + '</span>' +
+      '<span data-cover-name>cover-image.jpg</span></span>' +
+      '<span class="media-file-meta__size" data-cover-size></span></div>' +
+      '<button class="btn btn--secondary media-cover-card__replace" type="button" data-cover-replace>' +
+      iconHtml('icon-upload') + ' Replace image</button></div>' +
+      '<p class="field__error" data-cover-error hidden>Choose a cover image before saving.</p>' +
+      '</div>' +
       '<div class="media-col media-col--gallery">' +
       '<span class="field__label">Gallery</span>' +
+      '<p class="field__hint">Up to 10 images (optional).</p>' +
       '<input class="media-file-input" type="file" name="' + escHtml(prefix) + '[gallery_files][]" accept="image/jpeg,image/png,image/webp,image/gif" multiple data-gallery-input />' +
-      '<div class="media-drop media-drop--gallery" data-dropzone data-gallery-empty><span class="media-drop__title">Upload gallery images</span></div>' +
-      '<div class="media-gallery-panel" data-gallery-panel hidden><div class="media-gallery-grid" data-gallery-grid></div></div>' +
-      '</div></div>' +
+      '<div class="media-drop media-drop--gallery" data-dropzone data-gallery-empty>' +
+      '<span class="media-drop__icon" aria-hidden="true">' + iconHtml('icon-upload') + '</span>' +
+      '<span class="media-drop__title">Upload gallery images</span>' +
+      '<span class="media-drop__hint">Up to 10 images (5MB each)</span>' +
+      '<span class="media-drop__divider"><span>or</span></span>' +
+      '<button class="media-drop__browse" type="button" data-gallery-library>' +
+      iconHtml('icon-image') + ' Choose from library</button>' +
+      '<p class="media-drop__note">' + iconHtml('icon-info') + ' You can upload up to 10 images</p></div>' +
+      '<div class="media-gallery-panel" data-gallery-panel hidden>' +
+      '<div class="media-gallery-grid" data-gallery-grid>' +
+      '<button class="media-thumb media-thumb--add" type="button" data-gallery-add>' +
+      '<span class="media-thumb__add-icon" aria-hidden="true">' + iconHtml('icon-plus') + '</span>' +
+      '<span class="media-thumb__add-title">Add more images</span>' +
+      '<span class="media-thumb__add-hint">Up to 10 images</span></button></div>' +
+      '<div class="media-gallery-foot">' +
+      '<span data-gallery-count>Selected Images (0/10)</span>' +
+      '<span data-gallery-status>No images selected</span></div>' +
+      '<p class="media-gallery-note">' + iconHtml('icon-info') + ' You can upload up to 10 images. Each image up to 5MB.</p>' +
+      '</div></div></div>' +
       '<div class="field" style="margin-top:1rem"><span class="field__label">Price chart PDF</span>' +
-      '<input class="form-control" type="file" name="' + escHtml(prefix) + '[price_chart_pdf_file]" accept="application/pdf,.pdf" /></div>' +
+      '<div class="file-pick"><label class="file-pick__btn">' + iconHtml('icon-upload') + 'Upload' +
+      '<input type="file" name="' + escHtml(prefix) + '[price_chart_pdf_file]" accept="application/pdf,.pdf" /></label>' +
+      '<span class="file-pick__name">No file chosen</span></div></div>' +
       '</div>';
     return section;
   }

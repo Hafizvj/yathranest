@@ -732,19 +732,12 @@
   /* ---------- package media panel (cover + gallery) ---------- */
 
   (function () {
-    var mediaRoots = form.querySelectorAll('[data-package-media]');
-    if (!mediaRoots.length) {
-      return;
-    }
-
-    mediaRoots.forEach(function (root) {
-      initPackageMediaPanel(root);
-    });
-
     window.ynInitPackageMediaPanels = function (scope) {
       var host = scope || form;
       host.querySelectorAll('[data-package-media]:not([data-media-ready])').forEach(initPackageMediaPanel);
     };
+
+    form.querySelectorAll('[data-package-media]').forEach(initPackageMediaPanel);
 
     function initPackageMediaPanel(root) {
     if (!root || root.getAttribute('data-media-ready') === '1') {
@@ -753,6 +746,7 @@
     root.setAttribute('data-media-ready', '1');
 
     var maxGallery = parseInt(root.getAttribute('data-gallery-max') || '10', 10) || 10;
+    var galleryKeepName = root.getAttribute('data-gallery-keep-name') || 'gallery_keep[]';
     var coverInput = root.querySelector('[data-cover-input]');
     var coverRemove = root.querySelector('[data-cover-remove]');
     var coverLibrary = root.querySelector('input[data-cover-library]');
@@ -868,7 +862,7 @@
           return;
         }
         var exists = false;
-        galleryGrid.querySelectorAll('input[name="gallery_keep[]"]').forEach(function (input) {
+        galleryGrid.querySelectorAll('input[name="' + galleryKeepName + '"]').forEach(function (input) {
           if (input.value === item.path) {
             exists = true;
           }
@@ -886,12 +880,12 @@
           '<button class="media-thumb__remove" type="button" data-gallery-remove aria-label="Remove image"></button>' +
           '</div>' +
           '<p class="media-thumb__name"><span class="media-file-meta__check" aria-hidden="true"></span><span></span></p>' +
-          '<input type="hidden" name="gallery_keep[]" value="" />';
+          '<input type="hidden" name="' + galleryKeepName + '" value="" />';
         var img = node.querySelector('img');
         var nameEl = node.querySelector('.media-thumb__name span:last-child');
         var removeBtn = node.querySelector('[data-gallery-remove]');
         var checkHost = node.querySelector('.media-file-meta__check');
-        var keep = node.querySelector('input[name="gallery_keep[]"]');
+        var keep = node.querySelector('input[name="' + galleryKeepName + '"]');
         var iconTrash = document.querySelector('#icon-trash');
         var sampleCheck = root.querySelector('.media-file-meta__check');
         if (iconTrash && removeBtn) {
@@ -1064,7 +1058,7 @@
 
     if (coverEmpty) {
       coverEmpty.addEventListener('click', function (event) {
-        if (event.target.closest('[data-cover-browse]')) {
+        if (event.target.closest('[data-cover-browse], [data-cover-library]')) {
           return;
         }
         openCoverPicker();
@@ -1140,7 +1134,7 @@
 
     if (galleryEmpty) {
       galleryEmpty.addEventListener('click', function (event) {
-        if (event.target.closest('[data-gallery-browse]')) {
+        if (event.target.closest('[data-gallery-browse], [data-gallery-library]')) {
           return;
         }
         openGalleryPicker();

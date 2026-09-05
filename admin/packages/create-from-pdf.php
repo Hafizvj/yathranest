@@ -298,6 +298,8 @@ ob_start();
 <template id="icon-upload"><?= yn_icon('upload') ?></template>
 <template id="icon-image"><?= yn_icon('image') ?></template>
 <template id="icon-check"><?= yn_icon('check') ?></template>
+<template id="icon-plus"><?= yn_icon('plus') ?></template>
+<template id="icon-info"><?= yn_icon('info') ?></template>
 <?php
 $adminContent = ob_get_clean();
 $pageTitle = 'Add Package from PDF';
