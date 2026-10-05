@@ -281,7 +281,8 @@
           return false;
         }
         applyGenerated(result.data);
-        setStatus('Draft ready — edit anything before continuing.');
+        var note = result.data.fallback ? ' (generated with ' + result.data.model + ' — primary model was busy)' : '';
+        setStatus('Draft ready' + note + ' — edit anything before continuing.');
         return true;
       })
       .catch(function () {

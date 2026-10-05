@@ -90,10 +90,16 @@ function gemini_parse_http_json_response(array $response, callable $extractText)
 
     if ($httpCode >= 400) {
         $message = (string) ($decoded['error']['message'] ?? $decoded['message'] ?? 'Gemini request failed.');
+        $overloaded = gemini_is_overload_error($httpCode, $message);
         if ($httpCode === 429) {
             $message = 'Gemini rate limit reached. Try again in a moment.';
         }
-        return ['ok' => false, 'error' => $message, 'code' => $httpCode >= 500 ? 502 : $httpCode];
+        return [
+            'ok' => false,
+            'error' => $message,
+            'code' => $httpCode >= 500 ? 502 : $httpCode,
+            'overloaded' => $overloaded,
+        ];
     }
 
     $text = trim($extractText($decoded));
@@ -297,11 +303,60 @@ function gemini_call_generate_content(string $apiKey, string $model, array $part
  */
 function gemini_call_json_schema(string $apiKey, string $model, array $parts, array $schema, int $timeoutSeconds = 120): array
 {
+    $result = ['ok' => false, 'error' => 'Gemini request failed.', 'code' => 502];
+    foreach (gemini_model_chain($model) as $candidate) {
+        $result = gemini_call_json_schema_once($apiKey, $candidate, $parts, $schema, $timeoutSeconds);
+        $result['model'] = $candidate;
+        if ($result['ok'] || empty($result['overloaded'])) {
+            return $result;
+        }
+    }
+    return $result;
+}
+
+/**
+ * @param list<array<string,mixed>> $parts
+ * @param array<string,mixed> $schema
+ * @return array{ok:bool,error?:string,code?:int,overloaded?:bool,data?:array<string,mixed>}
+ */
+function gemini_call_json_schema_once(string $apiKey, string $model, array $parts, array $schema, int $timeoutSeconds): array
+{
     $result = gemini_call_generate_content($apiKey, $model, $parts, $schema, $timeoutSeconds);
     if (!$result['ok'] && gemini_is_retryable_transport_error($result['error'] ?? '')) {
         $result = gemini_call_interactions($apiKey, $model, $parts, $schema, $timeoutSeconds);
     }
     return $result;
+}
+
+/**
+ * Busy / quota responses that another model is likely to serve. Timeouts are
+ * excluded: retrying a slow request on more models would outrun the PHP time limit.
+ */
+function gemini_is_overload_error(int $httpCode, string $message): bool
+{
+    if (in_array($httpCode, [429, 500, 503, 504], true)) {
+        return true;
+    }
+    $message = strtolower($message);
+    return str_contains($message, 'high demand')
+        || str_contains($message, 'overloaded')
+        || str_contains($message, 'unavailable')
+        || str_contains($message, 'resource exhausted')
+        || str_contains($message, 'resource_exhausted');
+}
+
+/** @return list<string> */
+function gemini_model_chain(string $primary): array
+{
+    $fallbacks = config('gemini_fallback_models', ['gemini-3.5-flash', 'gemini-3.5-flash-lite', 'gemini-3.1-flash-lite']);
+    $chain = [];
+    foreach (array_merge([$primary], is_array($fallbacks) ? $fallbacks : []) as $model) {
+        $model = trim((string) $model);
+        if ($model !== '' && !in_array($model, $chain, true)) {
+            $chain[] = $model;
+        }
+    }
+    return $chain;
 }
 
 function gemini_default_model(): string

@@ -111,6 +111,8 @@ ai_json([
     'card_text' => $result['card_text'],
     'overview' => $result['overview'],
     'itinerary' => $result['itinerary'],
+    'model' => $result['model'] ?? $model,
+    'fallback' => ($result['model'] ?? $model) !== $model,
 ]);
 
 /**
@@ -191,7 +193,9 @@ function package_ai_call_gemini(string $apiKey, string $model, string $prompt, i
         return $result;
     }
 
-    return package_ai_normalize_content($result['data'], $days);
+    $content = package_ai_normalize_content($result['data'], $days);
+    $content['model'] = $result['model'] ?? $model;
+    return $content;
 }
 
 /**

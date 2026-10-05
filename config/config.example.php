@@ -27,4 +27,7 @@ return [
     // Google AI Studio free key — https://aistudio.google.com/apikey
     'gemini_api_key' => '',
     'gemini_model' => 'gemini-3.6-flash',
+    // Tried in order when the primary model is busy (high demand / rate limit).
+    // Must accept thinkingLevel MINIMAL (gemini-3.7/3.8-flash and 2.5 models do not).
+    'gemini_fallback_models' => ['gemini-3.5-flash', 'gemini-3.5-flash-lite', 'gemini-3.1-flash-lite'],
 ];
