@@ -50,6 +50,8 @@ function yn_icon(string $name): string
         'globe' => 'global-linear',
         'map' => 'map-linear',
         'chart' => 'chart-2-linear',
+        'pencil' => 'pen-2-linear',
+        'eye' => 'eye-linear',
     ];
 
     $id = $icons[$name] ?? $icons['sparkle'];

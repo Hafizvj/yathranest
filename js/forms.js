@@ -35,7 +35,10 @@
         el.textContent = title;
       });
     }
-    openModal(btn.getAttribute("data-open-modal"));
+    const targetId = btn.getAttribute("data-open-modal");
+    const parent = btn.closest(".modal.is-open");
+    if (parent && parent.id !== targetId) closeModal(parent);
+    openModal(targetId);
   });
 
   document.querySelectorAll(".modal").forEach(function (modal) {

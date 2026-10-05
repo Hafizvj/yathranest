@@ -74,7 +74,7 @@ if ($headerHero) {
   <link rel="stylesheet" href="<?= e($assetDepth) ?>css/components.css?v=12" />
   <link rel="stylesheet" href="<?= e($assetDepth) ?>css/responsive.css?v=14" />
   <?php if (!$headerHero): ?>
-  <link rel="stylesheet" href="<?= e($assetDepth) ?>css/inner.css?v=14" />
+  <link rel="stylesheet" href="<?= e($assetDepth) ?>css/inner.css?v=15" />
   <?php endif; ?>
   <link rel="stylesheet" href="<?= e($assetDepth) ?>css/motion.css?v=14" />
   <script src="https://code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js" defer></script>

@@ -108,6 +108,7 @@ CREATE TABLE IF NOT EXISTS gift_cards (
   title VARCHAR(255) NOT NULL,
   blurb TEXT NULL,
   features_json JSON NULL,
+  resorts_json JSON NULL,
   image VARCHAR(255) NOT NULL DEFAULT '',
   is_published TINYINT(1) NOT NULL DEFAULT 1,
   sort_order INT NOT NULL DEFAULT 0,

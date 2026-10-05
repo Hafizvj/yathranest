@@ -1538,3 +1538,189 @@ html.has-motion .section-head.is-in {
   color: #346356;
   font-weight: 600;
 }
+
+/* ------------------------------------------------------------------
+   Gift cards: available resorts popup
+------------------------------------------------------------------ */
+.tile__foot--split {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.gift-resorts-btn {
+  gap: 0.45rem;
+}
+
+.gift-resorts-btn iconify-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--teal);
+}
+
+.gift-resorts-btn__count {
+  min-width: 1.5rem;
+  padding: 0.05rem 0.45rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--teal-dark);
+  background: var(--teal-wash);
+}
+
+.modal__dialog--xl {
+  width: min(1040px, 100%);
+}
+
+.gift-resorts__dialog {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+}
+
+.gift-resorts__head {
+  padding: 1.6rem 4rem 1.1rem 1.75rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.gift-resorts__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0 0 0.4rem !important;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--teal) !important;
+}
+
+.gift-resorts__eyebrow iconify-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.modal .gift-resorts__head h2 {
+  font-size: 1.5rem;
+  margin-bottom: 0.35rem;
+}
+
+.modal .gift-resorts__lead {
+  margin: 0;
+  font-size: 0.9375rem;
+}
+
+.gift-resorts__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 1.4rem 1.75rem;
+  background: var(--wash);
+}
+
+.gift-resorts__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 1rem;
+}
+
+.gift-resort-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.gift-resort-card .card__media {
+  display: block;
+}
+
+.gift-resort-card .card__body {
+  gap: 0.3rem;
+  padding: 1rem 1.1rem 1.15rem;
+}
+
+.modal .gift-resort-card .card__meta,
+.modal .gift-resort-card .card__title {
+  margin: 0;
+}
+
+.modal .gift-resort-card .card__text {
+  margin: 0 0 0.5rem;
+  font-size: 0.875rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.gift-resort-card__link {
+  margin-top: auto;
+  font-size: 0.875rem;
+  color: var(--teal-dark);
+}
+
+.gift-resort-card__link::after {
+  content: "\2192";
+  transition: transform 0.2s ease;
+}
+
+.gift-resort-card__link:hover::after {
+  transform: translateX(3px);
+}
+
+.gift-resorts__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 1rem 1.75rem;
+  border-top: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.gift-resorts__count {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.gift-resorts__count iconify-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--teal);
+}
+
+@media (max-width: 640px) {
+  .gift-resorts {
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .gift-resorts__dialog {
+    max-height: 92vh;
+    border-radius: 22px 22px 0 0;
+  }
+
+  .gift-resorts__head {
+    padding: 1.3rem 3.5rem 0.9rem 1.15rem;
+  }
+
+  .gift-resorts__body {
+    padding: 1rem 1.15rem;
+  }
+
+  .gift-resorts__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .gift-resorts__foot {
+    padding: 0.85rem 1.15rem;
+  }
+
+  .gift-resorts__foot .btn {
+    flex: 1;
+  }
+}

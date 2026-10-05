@@ -751,7 +751,6 @@
     var coverRemove = root.querySelector('[data-cover-remove]');
     var coverLibrary = root.querySelector('input[data-cover-library]');
     var coverLibraryBtn = root.querySelector('button[data-cover-library]');
-    var galleryLibraryBtn = root.querySelector('[data-gallery-library]');
     var coverEmpty = root.querySelector('[data-cover-empty]');
     var coverFilled = root.querySelector('[data-cover-filled]');
     var coverImg = root.querySelector('[data-cover-img]');
@@ -1087,7 +1086,7 @@
         }
       });
     }
-    if (galleryLibraryBtn) {
+    root.querySelectorAll('[data-gallery-library]').forEach(function (galleryLibraryBtn) {
       galleryLibraryBtn.addEventListener('click', function (event) {
         event.preventDefault();
         event.stopPropagation();
@@ -1103,7 +1102,7 @@
           }
         });
       });
-    }
+    });
     var clearBtn = root.querySelector('[data-cover-clear]');
     if (clearBtn) {
       clearBtn.addEventListener('click', function (event) {

@@ -263,11 +263,38 @@ function catalog_list(string $table, bool $publishedOnly = true): array
     }
     $sql .= ' ORDER BY sort_order ASC, title ASC';
     $rows = db()->query($sql)->fetchAll();
-    $json = $table === 'resorts' ? ['gallery', 'amenities'] : ['features'];
-    if ($table === 'getaways') {
-        $json = [];
-    }
+    $json = catalog_json_fields($table);
     return array_map(static fn($r) => map_catalog_row($r, $json), $rows);
+}
+
+function catalog_json_fields(string $table): array
+{
+    switch ($table) {
+        case 'resorts':
+            return ['gallery', 'amenities'];
+        case 'getaways':
+            return [];
+        case 'gift_cards':
+            return ['features', 'resorts'];
+        default:
+            return ['features'];
+    }
+}
+
+/**
+ * Published resorts linked to a gift card, in the order the admin saved them.
+ * @param array<int, array> $resortsById published resorts keyed by id
+ */
+function gift_card_resorts(array $card, array $resortsById): array
+{
+    $out = [];
+    foreach ($card['resorts'] ?? [] as $id) {
+        $id = (int) $id;
+        if (isset($resortsById[$id]) && !isset($out[$id])) {
+            $out[$id] = $resortsById[$id];
+        }
+    }
+    return array_values($out);
 }
 
 function catalog_by_slug(string $table, string $slug, bool $publishedOnly = true): ?array
@@ -287,11 +314,7 @@ function catalog_by_slug(string $table, string $slug, bool $publishedOnly = true
     if (!$row) {
         return null;
     }
-    $json = $table === 'resorts' ? ['gallery', 'amenities'] : ['features'];
-    if ($table === 'getaways') {
-        $json = [];
-    }
-    return map_catalog_row($row, $json);
+    return map_catalog_row($row, catalog_json_fields($table));
 }
 
 function package_card_html(array $pkg, string $assetPrefix = '../assets/images/'): string
