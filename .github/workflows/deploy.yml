@@ -4,46 +4,32 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 concurrency:
   group: deploy-production
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      # Shared hosts often drop plain FTP data sockets (ECONNRESET).
-      # FTPS + longer timeout + one automatic retry handles most cases.
-      - name: Deploy site via FTPS
-        id: deploy
-        continue-on-error: true
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
         with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftps
-          security: loose
-          timeout: 120000
-          # FTP account must open in public_html/yathranest_v3 (yathranest.com)
-          server-dir: ./
-          log-level: standard
-          exclude: |
-            .git/**
-            .github/**
-            README.md
-            tools/**
-            .env
-            .env.example
-            config/config.php
-            db-check.php
-            sql/seed-data.json
-            scripts/**
-            node_modules/**
-            .cursor/**
-            uploads/**
+          fetch-depth: 0
+
+      - name: Install lftp
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+
+      # HostMaria resets FTP-Deploy-Action's FTPS data connections (ECONNRESET);
+      # lftp retries each transfer instead of aborting the whole deploy.
+      # The FTP account must open in the site root (public_html/yathranest_v3).
+      - name: Deploy changed files via FTPS
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        run: bash .github/scripts/ftp-deploy.sh
