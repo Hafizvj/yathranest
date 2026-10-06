@@ -63,7 +63,7 @@
 
   rows.forEach(function (row) {
     row.addEventListener('click', function (event) {
-      if (event.target.closest('a, button, form, input')) {
+      if (event.target.closest('a, button, form, input, label')) {
         return;
       }
       window.location.href = row.getAttribute('data-href');

@@ -2805,7 +2805,100 @@ body.pdf-place-modal-open {
 
 .catalog-list--packages .catalog-list__head,
 .catalog-list--packages .catalog-row {
-  grid-template-columns: minmax(0, 1fr) 90px minmax(0, 200px) 120px 120px;
+  grid-template-columns: 22px minmax(0, 1fr) 90px minmax(0, 200px) 120px 120px;
+}
+.catalog-row__check {
+  display: grid;
+  place-items: center;
+  margin: -0.5rem -0.35rem;
+  padding: 0.5rem 0.35rem;
+  cursor: pointer;
+}
+.catalog-row__check input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+.catalog-row.is-selected,
+.catalog-row.is-selected:hover { background: #eef5f2; }
+
+.bulk-bar {
+  position: sticky;
+  bottom: 1rem;
+  z-index: 20;
+  max-width: 1240px;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem 1rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+  padding: 0.65rem 0.85rem;
+  background: var(--ink);
+  color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(28, 26, 23, 0.25);
+}
+.bulk-bar[hidden] { display: none; }
+.bulk-bar__count { font-size: 0.9rem; white-space: nowrap; }
+.bulk-bar__actions { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.bulk-bar .btn--ghost { margin-left: auto; color: rgba(255, 255, 255, 0.75); }
+.bulk-bar .btn--ghost:hover { color: #fff; background: rgba(255, 255, 255, 0.1); }
+
+body.bulk-modal-open { overflow: hidden; }
+.bulk-modal[hidden] { display: none !important; }
+.bulk-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+.bulk-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(20, 24, 22, 0.45);
+}
+.bulk-modal__dialog {
+  position: relative;
+  width: min(560px, 100%);
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.22);
+}
+.bulk-modal__head {
+  padding: 1.1rem 1.2rem 0.75rem;
+  border-bottom: 1px solid var(--line);
+}
+.bulk-modal__title { margin: 0; font-size: 1.1rem; }
+.bulk-modal__hint {
+  margin: 0.45rem 0 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+.bulk-modal__body {
+  display: grid;
+  gap: 0.9rem;
+  padding: 1rem 1.2rem;
+}
+.bulk-modal__row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+.bulk-modal__types { margin-top: 0.6rem; }
+.bulk-modal__types[hidden] { display: none; }
+.bulk-modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 0.85rem 1.2rem 1.1rem;
+  border-top: 1px solid var(--line);
 }
 .catalog-row__thumb { position: relative; }
 .catalog-row__star {
@@ -2877,9 +2970,9 @@ body.pdf-place-modal-open {
 @media (max-width: 960px) {
   .catalog-list--packages .catalog-list__head,
   .catalog-list--packages .catalog-row {
-    grid-template-columns: minmax(0, 1fr) 80px 110px 120px;
+    grid-template-columns: 22px minmax(0, 1fr) 80px 110px 120px;
   }
-  .catalog-list--packages .catalog-list__head span:nth-child(3),
+  .catalog-list--packages .catalog-list__head span:nth-child(4),
   .catalog-list--packages .catalog-row__chips { display: none; }
 }
 
@@ -2887,10 +2980,18 @@ body.pdf-place-modal-open {
   .package-filters__field,
   .package-filters__field .form-control { flex: 1 1 100%; width: 100%; }
   .package-filters__clear { margin-left: 0; }
-  .catalog-list--packages .catalog-row {
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-areas: "main actions" "status status";
+  .catalog-list--packages .catalog-list__head {
+    display: grid;
+    grid-template-columns: 22px minmax(0, 1fr);
   }
+  .catalog-list--packages .catalog-list__head span:nth-child(n+3) { display: none; }
+  .catalog-list--packages .catalog-row {
+    grid-template-columns: 22px minmax(0, 1fr) auto;
+    grid-template-areas: "check main actions" ". status status";
+  }
+  .catalog-list--packages .catalog-row__check { grid-area: check; }
+  .bulk-modal__row { grid-template-columns: 1fr; }
+  .bulk-bar .btn--ghost { margin-left: 0; }
   .catalog-list--packages .catalog-row__duration { display: none; }
   .catalog-list--packages .catalog-row__status {
     grid-area: status;

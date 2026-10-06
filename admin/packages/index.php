@@ -123,8 +123,11 @@ ob_start();
     <?php endif; ?>
   </div>
 <?php else: ?>
-  <div class="catalog-list catalog-list--packages" data-catalog-list>
-    <div class="catalog-list__head" aria-hidden="true">
+  <div class="catalog-list catalog-list--packages" data-catalog-list data-bulk-list>
+    <div class="catalog-list__head">
+      <label class="catalog-row__check" title="Select all shown">
+        <input type="checkbox" aria-label="Select all shown packages" data-bulk-all />
+      </label>
       <span>Package</span>
       <span>Duration</span>
       <span>Listing pages</span>
@@ -144,6 +147,9 @@ ob_start();
       $searchText = strtolower(implode(' ', [$row['title'], $row['slug'], $typeLabel, implode(' ', $destNames)]));
       ?>
       <div class="catalog-row" data-catalog-row data-href="<?= e($editUrl) ?>" data-status="<?= $isPub ? 'published' : 'draft' ?>" data-featured="<?= $isFeatured ? '1' : '0' ?>" data-search="<?= e($searchText) ?>">
+        <label class="catalog-row__check">
+          <input type="checkbox" name="ids[]" value="<?= $pid ?>" form="packages-bulk" aria-label="Select <?= e($row['title']) ?>" data-bulk-item />
+        </label>
         <div class="catalog-row__main">
           <span class="catalog-row__thumb">
             <?php if (!empty($row['image'])): ?>
@@ -190,6 +196,84 @@ ob_start();
     <?php endforeach; ?>
     <p class="catalog-list__none" data-catalog-none hidden>No packages match your search.</p>
   </div>
+
+  <form id="packages-bulk" method="post" action="<?= e(url('admin/packages/bulk.php')) ?>" data-bulk-form>
+    <?= csrf_field() ?>
+    <input type="hidden" name="return_query" value="<?= e(http_build_query(array_filter(['destination' => $destination, 'duration' => $duration, 'scope' => $scope], 'strlen'))) ?>" />
+
+    <?php /* The dialog comes first so Enter inside its fields submits "Apply changes", not a bar action. */ ?>
+    <div class="bulk-modal" data-bulk-modal hidden>
+      <div class="bulk-modal__backdrop" data-bulk-edit-close></div>
+      <div class="bulk-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="bulk-edit-title">
+        <header class="bulk-modal__head">
+          <h2 class="bulk-modal__title" id="bulk-edit-title">Edit <span data-bulk-label>0 packages</span></h2>
+          <p class="bulk-modal__hint">Only fields you change are applied. Everything left on &ldquo;No change&rdquo; stays as it is on each package.</p>
+        </header>
+        <div class="bulk-modal__body">
+          <div class="bulk-modal__row">
+            <div class="field">
+              <label for="edit_status">Status</label>
+              <select class="form-control" id="edit_status" name="edit_status">
+                <option value="">No change</option>
+                <option value="published">Published</option>
+                <option value="draft">Draft</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="edit_featured">Featured</label>
+              <select class="form-control" id="edit_featured" name="edit_featured">
+                <option value="">No change</option>
+                <option value="yes">Featured</option>
+                <option value="no">Not featured</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="edit_types_mode">Type</label>
+            <select class="form-control" id="edit_types_mode" name="edit_types_mode" data-bulk-types-mode>
+              <option value="">No change</option>
+              <option value="add">Add these types</option>
+              <option value="remove">Remove these types</option>
+              <option value="replace">Replace with these types</option>
+            </select>
+            <div class="checks bulk-modal__types" data-bulk-types hidden>
+              <?php foreach (package_type_options() as $value => $label): ?>
+                <label><input type="checkbox" name="edit_types[]" value="<?= e($value) ?>" /> <?= e($label) ?></label>
+              <?php endforeach; ?>
+            </div>
+          </div>
+          <div class="bulk-modal__row">
+            <div class="field">
+              <label for="edit_pickup">Pickup / Drop</label>
+              <input class="form-control" id="edit_pickup" name="edit_pickup" placeholder="No change" autocomplete="off" />
+            </div>
+            <div class="field">
+              <label for="edit_sort_order">Display order</label>
+              <input class="form-control" id="edit_sort_order" type="number" name="edit_sort_order" placeholder="No change" />
+            </div>
+          </div>
+          <p class="field__hint">Drafts are only published when they have a title, overview, cover image, pickup, type, destinations and stays.</p>
+        </div>
+        <footer class="bulk-modal__footer">
+          <button class="btn btn--ghost" type="button" data-bulk-edit-close>Cancel</button>
+          <button class="btn btn--primary" type="submit" name="bulk_action" value="edit">Apply changes</button>
+        </footer>
+      </div>
+    </div>
+
+    <div class="bulk-bar" data-bulk-bar hidden>
+      <span class="bulk-bar__count"><strong data-bulk-count>0</strong> selected</span>
+      <div class="bulk-bar__actions">
+        <button class="btn btn--secondary btn--sm" type="submit" name="bulk_action" value="publish">Publish</button>
+        <button class="btn btn--secondary btn--sm" type="submit" name="bulk_action" value="draft">Move to draft</button>
+        <button class="btn btn--secondary btn--sm" type="submit" name="bulk_action" value="feature"><?= yn_icon('star') ?>Feature</button>
+        <button class="btn btn--secondary btn--sm" type="submit" name="bulk_action" value="unfeature">Unfeature</button>
+        <button class="btn btn--primary btn--sm" type="button" data-bulk-edit-open><?= yn_icon('pencil') ?>Bulk edit</button>
+        <button class="btn btn--danger btn--sm" type="submit" name="bulk_action" value="delete"><?= yn_icon('trash') ?>Delete</button>
+      </div>
+      <button class="btn btn--ghost btn--sm" type="button" data-bulk-clear>Clear</button>
+    </div>
+  </form>
 <?php endif; ?>
 <?php
 $adminContent = ob_get_clean();
@@ -198,5 +282,5 @@ $pageSubtitle = $hasFilters
     ? count($rows) . ' matching package' . (count($rows) === 1 ? '' : 's')
     : ($rows ? count($rows) . ' total · ' . $publishedCount . ' published · ' . $draftCount . ' draft' : 'Nothing here yet.');
 $activeNav = 'packages';
-$adminScripts = ['admin/assets/admin-catalog-index.js'];
+$adminScripts = ['admin/assets/admin-catalog-index.js', 'admin/assets/admin-packages-bulk.js'];
 require dirname(__DIR__) . '/_layout.php';
